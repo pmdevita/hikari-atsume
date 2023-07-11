@@ -13,5 +13,3 @@ class AbstractComponentPermissions(abc.ABC):
     @abc.abstractmethod
     def allow_in_dm(self) -> bool:
         ...
-
-

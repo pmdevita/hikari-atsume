@@ -1,3 +1,5 @@
+import typing
+
 from hikari import Intents
 
 TOKEN: str
@@ -14,8 +16,8 @@ HIKARI_LOGGING: bool
 
 INTENTS: Intents
 
-MESSAGE_PREFIX: str
+MESSAGE_PREFIX: typing.Optional[str]
 
 DATABASE_URL: str
 
-MIDDLEWARE: str
+MIDDLEWARE: list[str]

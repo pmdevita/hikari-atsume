@@ -13,14 +13,18 @@ import tanjun
 from atsume.settings import settings
 from atsume.component.component_config import ComponentConfig
 from atsume.component.decorators import AtsumeEventListener
-from atsume.permissions import import_permission_class, AbstractComponentPermissions, permission_check
+from atsume.permissions import (
+    import_permission_class,
+    AbstractComponentPermissions,
+    permission_check,
+)
 from atsume.db.manager import hook_database, database
 from atsume.component.manager import manager as component_manager
 from atsume.middleware.loader import attach_middleware
 from atsume.utils import module_to_path
 
 
-def initialize_atsume(bot_module: str):
+def initialize_atsume(bot_module: str) -> None:
     settings._initialize(bot_module)
     sys.path.insert(0, module_to_path(bot_module))
     if settings.HIKARI_LOGGING:
@@ -29,9 +33,14 @@ def initialize_atsume(bot_module: str):
     database._create_database()
 
 
-def initialize_discord() -> [hikari.GatewayBot, tanjun.Client]:
-    bot = hikari.impl.GatewayBot(settings.TOKEN, intents=hikari.Intents(settings.INTENTS))
-    client = tanjun.Client.from_gateway_bot(bot, declare_global_commands=True, mention_prefix=False)
+def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
+    bot = hikari.impl.GatewayBot(
+        settings.TOKEN, intents=hikari.Intents(settings.INTENTS)
+    )
+
+    client = tanjun.Client.from_gateway_bot(
+        bot, declare_global_commands=True, mention_prefix=False
+    )
     if settings.MESSAGE_PREFIX:
         client.add_prefix(settings.MESSAGE_PREFIX)
     return bot, client
@@ -47,7 +56,7 @@ def create_bot(bot_module: str) -> hikari.GatewayBot:
 
 @click.command()
 @click.argument("bot_module")
-def start_bot(bot_module: str):
+def start_bot(bot_module: str) -> None:
     bot = create_bot(bot_module)
     bot.run()
 
@@ -59,8 +68,11 @@ def load_components(client: tanjun.abc.Client):
         load_component(client, component_config, permission_class)
 
 
-def load_component(client: tanjun.abc.Client, component_config: ComponentConfig,
-                   permission_class: typing.Type[AbstractComponentPermissions]):
+def load_component(
+    client: tanjun.abc.Client,
+    component_config: ComponentConfig,
+    permission_class: typing.Type[AbstractComponentPermissions],
+):
     try:
         models_module = importlib.import_module(component_config.models_path)
     except ModuleNotFoundError:
@@ -86,5 +98,5 @@ def load_component(client: tanjun.abc.Client, component_config: ComponentConfig,
     client.add_component(component)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     start_bot()

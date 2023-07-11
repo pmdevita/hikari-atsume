@@ -1,30 +1,17 @@
 import hikari
-from .type_hints import *
+from atsume.settings.type_hints import *
 
-TOKEN = None
-
-COMPONENTS = [
-
-]
+COMPONENTS = []
 
 COMPONENT_PERMISSIONS_CLASS = "atsume.permissions.SettingsPermissions"
 
-COMPONENT_ALL_GUILDS_PERMISSIONS = [
+COMPONENT_ALL_GUILDS_PERMISSIONS = []
 
-]
+COMPONENT_DM_PERMISSIONS = []
 
-COMPONENT_DM_PERMISSIONS = [
+COMPONENT_GUILD_PERMISSIONS = {}
 
-]
-
-COMPONENT_GUILD_PERMISSIONS = {
-
-}
-
-MIDDLEWARE = [
-
-]
-
+MIDDLEWARE = []
 
 HIKARI_LOGGING = False
 

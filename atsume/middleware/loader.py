@@ -6,12 +6,10 @@ import tanjun
 from atsume.settings import settings
 
 # Middleware that Atsume always needs to load
-ATSUME_MIDDLEWARE = [
-    "atsume.db.manager.hook_database"
-]
+ATSUME_MIDDLEWARE = ["atsume.db.manager.hook_database"]
 
 
-def attach_middleware(client: tanjun.Client):
+def attach_middleware(client: tanjun.Client) -> None:
     middleware = set()
     middleware.update(settings.MIDDLEWARE)
     middleware.update(ATSUME_MIDDLEWARE)
@@ -24,6 +22,3 @@ def attach_middleware(client: tanjun.Client):
             logging.error(f"Unable to load middleware {module_path}")
             continue
         func(client)
-
-
-

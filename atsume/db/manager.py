@@ -3,7 +3,6 @@ import typing
 
 import alluka
 import tanjun
-import ormar
 import databases
 import sqlalchemy
 from atsume.settings import settings
@@ -12,31 +11,27 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self.database: typing.Optional[databases.Database] = None
         self.engine: typing.Optional[sqlalchemy.engine.Engine] = None
-        self.metadata = sqlalchemy.MetaData()
 
-    def _create_database(self):
+    def _create_database(self) -> None:
         self.database = databases.Database(settings.DATABASE_URL)
 
 
 database = DatabaseManager()
 
 
-def hook_database(client: alluka.Injected[tanjun.abc.Client]):
+def hook_database(client: alluka.Injected[tanjun.abc.Client]) -> None:
     @client.with_client_callback(tanjun.ClientCallbackNames.STARTING)
-    async def on_starting(client: alluka.Injected[tanjun.abc.Client]):
+    async def on_starting(client: alluka.Injected[tanjun.abc.Client]) -> None:
         logger.info("Connecting to database...")
-        if not database.engine:
+        if not database.engine and database.database:
             await database.database.connect()
             database.engine = sqlalchemy.create_engine(settings.DATABASE_URL)
 
-        # Todo: Implement Alembic integration
-        database.metadata.create_all(database.engine)
-
     @client.with_client_callback(tanjun.ClientCallbackNames.CLOSED)
-    async def on_closed(client: alluka.Injected[tanjun.abc.Client]):
+    async def on_closed(client: alluka.Injected[tanjun.abc.Client]) -> None:
         if database.database:
             logger.info("Disconnecting from the database...")
             await database.database.disconnect()

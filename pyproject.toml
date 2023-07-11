@@ -1,18 +1,22 @@
 [tool.poetry]
-name = "beatricehikari"
+name = "atsume"
 version = "0.1.0"
 description = ""
 authors = ["Peter DeVita <mewtwo2643@yahoo.com>"]
-readme = "README.md"
+readme = "Readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.11,<3.12"
 hikari = "^2.0.0.dev120"
-click = "^8.1.4"
+click = "^8.1, <8.1.4"
 hikari-tanjun = "^2.15.0"
 aiohttp = "^3.8.4"
 ormar = {version = "^0.12.2", extras = ["sqlite", "mysql"]}
+alembic = "^1.11.1"
 
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.4.1"
+black = "^23.7.0"
 
 [build-system]
 requires = ["poetry-core"]
