@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "beatricehikari"
+version = "0.1.0"
+description = ""
+authors = ["Peter DeVita <mewtwo2643@yahoo.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11,<3.12"
+hikari = "^2.0.0.dev120"
+click = "^8.1.4"
+hikari-tanjun = "^2.15.0"
+aiohttp = "^3.8.4"
+ormar = {version = "^0.12.2", extras = ["sqlite", "mysql"]}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
