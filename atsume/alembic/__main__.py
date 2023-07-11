@@ -6,7 +6,7 @@ import alembic.util.exc
 import click
 import sqlalchemy
 
-from alembic.config import command
+from alembic.command import revision
 from alembic.config import Config as AlembicConfig
 
 from atsume.bot import create_bot
@@ -72,7 +72,7 @@ def makemigrations(bot_module: str) -> None:
         if len(app._models) == 0:
             continue
         try:
-            command.revision(cfg, "New migration", autogenerate=True)
+            revision(cfg, "New migration", autogenerate=True)
         except alembic.util.exc.CommandError as e:
             if e.args[0] == "Target database is not up to date.":
                 print(f"Cannot migrate {app}, a migration hasn't been applied.")

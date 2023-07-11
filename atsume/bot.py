@@ -61,7 +61,7 @@ def start_bot(bot_module: str) -> None:
     bot.run()
 
 
-def load_components(client: tanjun.abc.Client):
+def load_components(client: tanjun.abc.Client) -> None:
     permission_class = import_permission_class(settings.COMPONENT_PERMISSIONS_CLASS)
     component_manager._load_components()
     for component_config in component_manager.component_configs:
@@ -72,7 +72,7 @@ def load_component(
     client: tanjun.abc.Client,
     component_config: ComponentConfig,
     permission_class: typing.Type[AbstractComponentPermissions],
-):
+) -> None:
     try:
         models_module = importlib.import_module(component_config.models_path)
     except ModuleNotFoundError:
