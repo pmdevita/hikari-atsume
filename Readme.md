@@ -24,8 +24,8 @@ it can bootstrap the bot, database, and components, so it's functionally
 nearly complete. You can also look in the Beatrice package to get an
 idea of how usage might work.
 
-Once Atsume is in good shape, it'll be moved over to its own repo and 
-put up on PyPI.
+Once Atsume is in good shape, Beatrice will be moved out to it's own repo 
+and Atsume will be put on PyPI.
 
 Todo:
  - [x] Implement Django-like components and loading through configuration
@@ -33,8 +33,11 @@ Todo:
  - [x] Implement support for Ormar models
  - [ ] Implement Alembic migrations/port from nextcord-ormar
  - [ ] Code clean up
+ - [ ] Beatrice move out
  - [ ] MyPy hints
  - [ ] Documentation
+ - [ ] Test
+ - [ ] Actions/Automation
 
 
 
