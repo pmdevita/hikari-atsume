@@ -17,3 +17,5 @@ INTENTS: Intents
 MESSAGE_PREFIX: str
 
 DATABASE_URL: str
+
+MIDDLEWARE: str

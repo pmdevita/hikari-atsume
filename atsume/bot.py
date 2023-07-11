@@ -3,7 +3,6 @@ import importlib.util
 import logging
 import sys
 import typing
-import os
 
 import aiohttp
 import alluka
@@ -17,59 +16,57 @@ from atsume.component.decorators import AtsumeEventListener
 from atsume.permissions import import_permission_class, AbstractComponentPermissions, permission_check
 from atsume.db.manager import hook_database, database
 from atsume.component.manager import manager as component_manager
+from atsume.middleware.loader import attach_middleware
+from atsume.utils import module_to_path
 
-@click.command()
-@click.argument("bot_module")
-def start_bot(bot_module: str):
+
+def initialize_atsume(bot_module: str):
     settings._initialize(bot_module)
     sys.path.insert(0, module_to_path(bot_module))
-
     if settings.HIKARI_LOGGING:
         logging.basicConfig(level=logging.DEBUG)
-
     # This needs to get done before we load any database models
     database._create_database()
 
+
+def initialize_discord() -> [hikari.GatewayBot, tanjun.Client]:
     bot = hikari.impl.GatewayBot(settings.TOKEN, intents=hikari.Intents(settings.INTENTS))
     client = tanjun.Client.from_gateway_bot(bot, declare_global_commands=True, mention_prefix=False)
     if settings.MESSAGE_PREFIX:
         client.add_prefix(settings.MESSAGE_PREFIX)
+    return bot, client
 
-    hook_aiohttp(client)
-    hook_database(client)
 
+def create_bot(bot_module: str) -> hikari.GatewayBot:
+    initialize_atsume(bot_module)
+    bot, client = initialize_discord()
+    attach_middleware(client)
+    load_components(client)
+    return bot
+
+
+@click.command()
+@click.argument("bot_module")
+def start_bot(bot_module: str):
+    bot = create_bot(bot_module)
+    bot.run()
+
+
+def load_components(client: tanjun.abc.Client):
     permission_class = import_permission_class(settings.COMPONENT_PERMISSIONS_CLASS)
     component_manager._load_components()
     for component_config in component_manager.component_configs:
         load_component(client, component_config, permission_class)
 
-    bot.run()
 
-
-def hook_aiohttp(client: alluka.Injected[tanjun.abc.Client]):
-    @client.with_client_callback(tanjun.ClientCallbackNames.STARTING)
-    async def on_starting(client: alluka.Injected[tanjun.abc.Client]) -> None:
-        client.set_type_dependency(aiohttp.ClientSession, aiohttp.ClientSession())
-
-    @client.with_client_callback(tanjun.ClientCallbackNames.CLOSED)
-    async def on_closed(session: alluka.Injected[aiohttp.ClientSession]) -> None:
-        await session.close()
-
-
-def module_to_path(module_path):
-    module = importlib.util.find_spec(module_path)
-    path = module.submodule_search_locations[0]
-    return path
-
-
-def load_component(client: alluka.Injected[tanjun.abc.Client], component_config: ComponentConfig,
+def load_component(client: tanjun.abc.Client, component_config: ComponentConfig,
                    permission_class: typing.Type[AbstractComponentPermissions]):
     try:
         models_module = importlib.import_module(component_config.models_path)
     except ModuleNotFoundError:
-        pass
+        logging.warning(f"Was not able to load database models for {component_config}")
 
-    # Create the component and load the commmands into it
+    # Create the component and load the commands into it
     component = tanjun.Component(name=component_config.name)
     module = importlib.import_module(component_config.commands_path)
     module_attrs = vars(module)

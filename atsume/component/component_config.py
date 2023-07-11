@@ -25,5 +25,7 @@ class ComponentConfig:
     def models_path(self):
         return f"{self.module_path}.{self.models_module_name}"
 
+    def __str__(self):
+        return f"ComponentConfig(name\"{self.name}\")"
 
 
