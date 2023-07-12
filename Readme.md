@@ -1,5 +1,9 @@
 # hikari-atsume
 
+[![ci](https://github.com/pmdevita/hikari-atsume/actions/workflows/ci.yml/badge.svg)](https://github.com/pmdevita/hikari-atsume/actions/workflows/ci.yml)
+![mypy](https://badgen.net/badge/mypy/checked/2A6DB2)
+![code-style-black](https://img.shields.io/badge/code%20style-black-black)
+
 An opinionated Discord bot framework inspired by Django and built on 
 top of Hikari, Tanjun, Ormar, and Alembic.
 
@@ -52,5 +56,10 @@ Todo:
  - [ ] Test
  - [ ] Actions/Automation
 
+
+## Special thanks to
+- The Hikari Discord for help and feedback
+- FasterSpeeding for Tanjun
+- Lunarmagpie for help with the CI and linting
 
 
