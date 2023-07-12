@@ -155,7 +155,7 @@ def table_name_to_model(table_name: str) -> typing.Optional["ModelMetaclass"]:
 OPERATION_NAME_TEMPLATES: dict[typing.Type[ops.MigrateOperation], str] = {
     ops.CreateTableOp: "create_{model_name}",
     ops.DropTableOp: "drop_{model_name}",
-    ops.AddColumnOp: "add_{column_name}",
+    ops.AddColumnOp: "add_{model_name}{column_name}",
 }
 
 # For migrations that don't have a name, attempt to autogenerate it
@@ -170,4 +170,6 @@ for revision in revision_context.generated_revisions:
         model_name = model.Meta._qual_name if model else ""
         column_name = upgrade.column_name if hasattr(upgrade, "column_name") else ""
         name = name + template.format(model_name=model_name, column_name=column_name)
+    if name == "":
+        name = "migration"
     revision.message = name
