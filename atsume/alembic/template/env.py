@@ -1,9 +1,13 @@
+import typing
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy.sql.schema import SchemaItem
 
 from alembic import context
+
+from atsume.alembic.config import Config
 
 
 class MigrationIsEmpty(Exception):
@@ -12,7 +16,10 @@ class MigrationIsEmpty(Exception):
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-config = context.config
+alembic_config = context.config
+if not isinstance(alembic_config, Config):
+    raise ValueError("Provided config is not an Atsume Alembic Config")
+config: Config = alembic_config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -34,11 +41,11 @@ version_table = config.get_main_option("version_table")
 # ... etc.
 
 
-def metadata_has_table(all_tables, table_name):
+def metadata_has_table(all_tables: list[str], table_name: typing.Optional[str]) -> bool:
     return table_name in all_tables
 
 
-def include_object(object, name, type_, reflected, compare_to):
+def include_object(object: SchemaItem, name: typing.Optional[str], type_: str, reflected: bool, compare_to: typing.Optional[SchemaItem]) -> bool:
     if type_ == "table":
         if name in target_metadata.tables:
             return True
@@ -110,8 +117,8 @@ if context.is_offline_mode():
 else:
     run_migrations_online()
 
-
-revision_context = context._proxy.context_opts.get("revision_context")
+# Not sure what's going on here but this property totally does exist at runtime
+revision_context = context._proxy.context_opts.get("revision_context")  # type: ignore
 # If we are making migrations
 if revision_context:
     # If the migration is empty, don't output anything

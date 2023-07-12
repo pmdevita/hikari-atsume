@@ -12,8 +12,8 @@ ListenerCallbackType = typing.TypeVar(
 
 class AtsumeEventListener:
     def __init__(
-        self,
-        callback: ListenerCallbackType,
+            self,
+            callback: ListenerCallbackType,
     ):
         callable_types = typing.get_type_hints(callback)
         if len(callable_types) > 1:
@@ -26,21 +26,25 @@ class AtsumeEventListener:
         self.permissions: typing.Optional[AbstractComponentPermissions] = None
 
     def __call__(
-        self, event: hikari.Event
-    ) -> typing.Coroutine[None, None, None] | None:
+            self, event: hikari.Event
+    ) -> typing.Coroutine[None, None, None]:
         if self.permissions:
             if hasattr(event, "guild_id"):
                 if not self.permissions.allow_in_guild(event.guild_id):
-                    return None
+                    return noop()
             # IDK if this is correct but if it has these it's still probably a DM event right?
             elif hasattr(event, "channel_id"):
                 if not self.permissions.allow_in_dm():
-                    return None
+                    return noop()
 
         return self.callback(event)
 
 
+async def noop() -> None:
+    pass
+
+
 def with_listener(
-    callback: typing.Callable[[hikari.Event], typing.Coroutine[None, None, None]]
+        callback: typing.Callable[[hikari.Event], typing.Coroutine[None, None, None]]
 ) -> AtsumeEventListener:
     return AtsumeEventListener(callback)
