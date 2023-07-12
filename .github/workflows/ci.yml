@@ -1,0 +1,40 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: |
+          pip install poetry
+      - name: Install Poetry Project
+        run: |
+          poetry install
+      - name: Run mypy
+        run: |
+          poetry run nox -s mypy
+
+  mypy:
+    name: "mypy"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: |
+          pip install poetry
+      - name: Install Poetry Project
+        run: |
+          poetry install
+      - name: Run mypy
+        run: |
+          poetry run nox -s mypy
