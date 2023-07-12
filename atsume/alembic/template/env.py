@@ -162,7 +162,9 @@ OPERATION_NAME_TEMPLATES: dict[typing.Type[ops.MigrateOperation], str] = {
 }
 
 # For migrations that don't have a name, attempt to autogenerate it
+# Todo: move this to a function and clean it up
 if revision_context:
+    print(f"Migrating {config.component_config}...")
     for revision in revision_context.generated_revisions:
         # Todo: Make this a sentinel
         if revision.message != "New migration":
@@ -174,10 +176,22 @@ if revision_context:
             if not model_name:
                 model_name = ""
             columns = []
-            if isinstance(upgrade, ops.ModifyTableOps):
+            if isinstance(upgrade, ops.CreateTableOp):
+                print(f"  Create model {model_name}...")
+            elif isinstance(upgrade, ops.DropTableOp):
+                print(f"  Drop model {model_name}...")
+            elif isinstance(upgrade, ops.ModifyTableOps):
+                print(f"  Modify model {model_name}...")
                 for op in upgrade.ops:
-                    if hasattr(op, "column"):
+                    if isinstance(op, ops.AddColumnOp):
+                        print(f"    Add Column {op.column.name}...")
                         columns.append(op.column.name)
+                    elif isinstance(op, ops.DropColumnOp):
+                        print(f"    Drop Column {op.column_name}...")
+                        columns.append(op.column_name)
+                    elif isinstance(op, ops.AlterColumnOp):
+                        print(f"    Alter Column {op.column_name}...")
+                        columns.append(op.column_name)
             actions.append(
                 template.format(model_name=model_name, column_name="_".join(columns))
             )
