@@ -11,8 +11,14 @@ hikari = "^2.0.0.dev120"
 click = "^8.1, <8.1.4"
 hikari-tanjun = "^2.15.0"
 aiohttp = "^3.8.4"
-ormar = {version = "^0.12.2", extras = ["sqlite", "mysql"]}
+ormar = "^0.12.2"
 alembic = "^1.11.1"
+asyncpg = { version = "^0.28.0", optional = true }
+psycopg2-binary = { version = "^2.9.6", optional = true }
+aiopg = { version = "^1.4.0", optional = true }
+aiomysql = { version = "^0.2.0", optional = true }
+pymysql = { version = "^1.1.0", optional = true }
+aiosqlite = { version = "^0.19.0", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
@@ -21,6 +27,13 @@ pre-commit = "^3.3.3"
 nox = "^2023.4.22"
 nox-poetry = "^1.0.3"
 sqlalchemy-stubs = "^0.4"
+
+[tool.poetry.extras]
+postgresql = ["asyncpg", "psycopg2-binary"]
+postgres = ["asyncpg", "psycopg2-binary"]
+aiopg = ["aiopg", "psycopg2-binary"]
+mysql = ["aiomysql", "PyMySQL"]
+sqlite = ["aiosqlite"]
 
 [build-system]
 requires = ["poetry-core"]
