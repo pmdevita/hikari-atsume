@@ -17,6 +17,10 @@ alembic = "^1.11.1"
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
 black = "^23.7.0"
+pre-commit = "^3.3.3"
+nox = "^2023.4.22"
+nox-poetry = "^1.0.3"
+sqlalchemy-stubs = "^0.4"
 
 [build-system]
 requires = ["poetry-core"]

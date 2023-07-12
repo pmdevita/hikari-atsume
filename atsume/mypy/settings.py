@@ -5,6 +5,9 @@ import mypy.checker
 import mypy.nodes
 from mypy.plugin import Plugin, AttributeContext
 
+# With a lot of help from the Django mypy plugin
+# https://github.com/typeddjango/django-stubs/blob/master/mypy_django_plugin/transformers/settings.py
+
 
 class SettingsPlugin(Plugin):
     def get_attribute_hook(

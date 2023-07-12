@@ -45,7 +45,13 @@ def metadata_has_table(all_tables: list[str], table_name: typing.Optional[str]) 
     return table_name in all_tables
 
 
-def include_object(object: SchemaItem, name: typing.Optional[str], type_: str, reflected: bool, compare_to: typing.Optional[SchemaItem]) -> bool:
+def include_object(
+    object: SchemaItem,
+    name: typing.Optional[str],
+    type_: str,
+    reflected: bool,
+    compare_to: typing.Optional[SchemaItem],
+) -> bool:
     if type_ == "table":
         if name in target_metadata.tables:
             return True

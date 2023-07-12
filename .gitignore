@@ -1,4 +1,7 @@
 __pycache__
 .idea
 *.db
+*.sqlite
 local.py
+.mypy_cache
+dist
