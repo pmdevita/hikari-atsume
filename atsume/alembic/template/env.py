@@ -129,7 +129,7 @@ else:
     run_migrations_online()
 
 # Not sure what's going on here but this property totally does exist at runtime
-revision_context: RevisionContext = context._proxy.context_opts.get("revision_context")  # type: ignore
+revision_context: typing.Optional[RevisionContext] = context._proxy.context_opts.get("revision_context")  # type: ignore
 
 # If we are making migrations
 if revision_context:
@@ -159,17 +159,20 @@ OPERATION_NAME_TEMPLATES: dict[typing.Type[ops.MigrateOperation], str] = {
 }
 
 # For migrations that don't have a name, attempt to autogenerate it
-for revision in revision_context.generated_revisions:
-    # Todo: Make this a sentinel
-    if revision.message != "New migration":
-        continue
-    name = ""
-    for upgrade in revision.upgrade_ops.ops:
-        template = OPERATION_NAME_TEMPLATES.get(upgrade.__class__, "")
-        model = table_name_to_model(upgrade.table_name)
-        model_name = model.Meta._qual_name if model else ""
-        column_name = upgrade.column_name if hasattr(upgrade, "column_name") else ""
-        name = name + template.format(model_name=model_name, column_name=column_name)
-    if name == "":
-        name = "migration"
-    revision.message = name
+if revision_context:
+    for revision in revision_context.generated_revisions:
+        # Todo: Make this a sentinel
+        if revision.message != "New migration":
+            continue
+        name = ""
+        for upgrade in revision.upgrade_ops.ops:
+            template = OPERATION_NAME_TEMPLATES.get(upgrade.__class__, "")
+            model = table_name_to_model(upgrade.table_name)
+            model_name = model.Meta._qual_name if model else ""
+            column_name = upgrade.column_name if hasattr(upgrade, "column_name") else ""
+            name = name + template.format(
+                model_name=model_name, column_name=column_name
+            )
+        if name == "":
+            name = "migration"
+        revision.message = name

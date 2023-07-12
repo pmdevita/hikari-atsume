@@ -1,7 +1,7 @@
 import alembic.util.exc
 import click
 
-from alembic.command import revision
+from alembic.command import revision, upgrade, downgrade
 
 from atsume.bot import create_bot
 from atsume.alembic.config import get_alembic_config
@@ -17,9 +17,8 @@ def alembic_group() -> None:
 @alembic_group.command()
 @click.argument("bot_module")
 def makemigrations(bot_module: str) -> None:
-    bot = create_bot(bot_module)
+    create_bot(bot_module)
     apps = manager.component_configs
-    print(apps)
     for app in apps:
         cfg = get_alembic_config(app)
         # If the app has no models, skip it
@@ -37,6 +36,33 @@ def makemigrations(bot_module: str) -> None:
                 print(f"Cannot migrate {app}, a migration hasn't been applied.")
             else:
                 raise e
+
+
+@alembic_group.command(name="upgrade")
+@click.argument("bot_module")
+def upgrade_command(bot_module: str) -> None:
+    create_bot(bot_module)
+    apps = manager.component_configs
+    for app in apps:
+        cfg = get_alembic_config(app)
+        # If the app has no models, skip it
+        if len(app._models) == 0:
+            continue
+        upgrade(cfg, "head")
+
+
+@alembic_group.command(name="downgrade")
+@click.argument("bot_module")
+@click.argument("app_name")
+def downgrade_command(bot_module: str, app_name: str) -> None:
+    create_bot(bot_module)
+    apps = [app for app in manager.component_configs if app.name == app_name]
+    for app in apps:
+        cfg = get_alembic_config(app)
+        # If the app has no models, skip it
+        if len(app._models) == 0:
+            continue
+        downgrade(cfg, "-1")
 
 
 if __name__ == "__main__":
