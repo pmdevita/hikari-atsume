@@ -34,7 +34,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 
-# This is set in nxalembic when it grabs the app metadata out of the bot
+# This is set when it grabs the app metadata out of the component config
 target_metadata = config.app_metadata
 all_tables = config.all_tables
 version_table = config.get_main_option("version_table")
