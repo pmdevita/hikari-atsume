@@ -16,9 +16,9 @@ jobs:
       - name: Install Poetry Project
         run: |
           poetry install
-      - name: Run mypy
+      - name: Run Nox
         run: |
-          poetry run nox -s mypy
+          poetry run nox -s lint
 
   mypy:
     name: "mypy"
@@ -35,6 +35,6 @@ jobs:
       - name: Install Poetry Project
         run: |
           poetry install
-      - name: Run mypy
+      - name: Run Nox
         run: |
           poetry run nox -s mypy
