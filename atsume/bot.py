@@ -18,6 +18,7 @@ from atsume.permissions import (
     AbstractComponentPermissions,
     permission_check,
 )
+from atsume.cli.base import cli
 from atsume.db.manager import hook_database, database
 from atsume.component.manager import manager as component_manager
 from atsume.middleware.loader import attach_middleware
@@ -54,10 +55,9 @@ def create_bot(bot_module: str) -> hikari.GatewayBot:
     return bot
 
 
-@click.command()
-@click.argument("bot_module")
-def start_bot(bot_module: str) -> None:
-    bot = create_bot(bot_module)
+@cli.command("run")
+@click.pass_obj
+def start_bot(bot: hikari.GatewayBot) -> None:
     bot.run()
 
 
@@ -96,7 +96,3 @@ def load_component(
         # if isinstance(value, tanjun.schedules.TimeSchedule):
         #     component.add_schedule(value)
     client.add_component(component)
-
-
-if __name__ == "__main__":
-    start_bot()

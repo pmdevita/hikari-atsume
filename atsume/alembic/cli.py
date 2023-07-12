@@ -1,3 +1,5 @@
+import typing
+
 import alembic.util.exc
 import click
 
@@ -7,18 +9,12 @@ from atsume.bot import create_bot
 from atsume.alembic.config import get_alembic_config
 from atsume.alembic.exceptions import MigrationIsEmpty
 from atsume.component.manager import manager
+from atsume.cli.base import cli
 from atsume.utils import pad_number
 
 
-@click.group(name="alembic")
-def alembic_group() -> None:
-    pass
-
-
-@alembic_group.command()
-@click.argument("bot_module")
-def makemigrations(bot_module: str) -> None:
-    create_bot(bot_module)
+@cli.command("makemigrations")
+def make_migrations() -> None:
     apps = manager.component_configs
     for app in apps:
         # If the app has no models, skip it
@@ -45,32 +41,31 @@ def makemigrations(bot_module: str) -> None:
                 raise e
 
 
-@alembic_group.command(name="upgrade")
-@click.argument("bot_module")
-def upgrade_command(bot_module: str) -> None:
-    create_bot(bot_module)
+@cli.command(name="upgrade")
+@click.option("--component_name", "-c")
+def upgrade_command(component_name: typing.Optional[str] = None) -> None:
     apps = manager.component_configs
+    if component_name:
+        apps = [app for app in apps if app.name == component_name]
     for app in apps:
         cfg = get_alembic_config(app)
         # If the app has no models, skip it
-        if len(app._models) == 0:
+        if len(app.models) == 0:
             continue
         upgrade(cfg, "head")
 
 
-@alembic_group.command(name="downgrade")
-@click.argument("bot_module")
-@click.argument("app_name")
-def downgrade_command(bot_module: str, app_name: str) -> None:
-    create_bot(bot_module)
-    apps = [app for app in manager.component_configs if app.name == app_name]
+@cli.command(name="downgrade")
+@click.argument("component_name")
+def downgrade_command(component_name: str) -> None:
+    apps = [app for app in manager.component_configs if app.name == component_name]
     for app in apps:
         cfg = get_alembic_config(app)
         # If the app has no models, skip it
-        if len(app._models) == 0:
+        if len(app.models) == 0:
             continue
-        downgrade(cfg, "-1")
-
-
-if __name__ == "__main__":
-    alembic_group()
+        try:
+            downgrade(cfg, "-1")
+        except alembic.util.exc.CommandError as e:
+            if e.args[0] == "Relative revision -1 didn't produce 1 migrations":
+                print(f"{app} cannot be downgraded any further.")

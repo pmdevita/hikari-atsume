@@ -13,8 +13,8 @@ class Settings:
     _LOCAL: typing.Optional[types.ModuleType] = None
 
     def _initialize(self, bot_module: str) -> None:
-        self._SETTINGS = importlib.import_module(f"{bot_module}.bot.settings")
-        self._LOCAL = importlib.import_module(f"{bot_module}.bot.local")
+        self._SETTINGS = importlib.import_module(f"{bot_module}.settings")
+        self._LOCAL = importlib.import_module(f"{bot_module}.local")
 
     def __getattribute__(self, item: str) -> typing.Any:
         try:
