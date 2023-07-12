@@ -14,3 +14,8 @@ def module_to_path(module_path: str) -> str:
     if not path:
         raise Exception(f"Couldn't load module {module_path}")
     return path
+
+
+def pad_number(num: int, pad: int) -> str:
+    n = str(num)
+    return "".join(["0" for i in range(pad - len(n))]) + n

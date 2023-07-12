@@ -6,6 +6,7 @@ from alembic.command import revision
 from atsume.bot import create_bot
 from atsume.alembic.config import get_alembic_config
 from atsume.component.manager import manager
+from atsume.utils import pad_number
 
 
 @click.group(name="alembic")
@@ -21,11 +22,16 @@ def makemigrations(bot_module: str) -> None:
     print(apps)
     for app in apps:
         cfg = get_alembic_config(app)
-        # If the app has zero models, skip it
+        # If the app has no models, skip it
         if len(app._models) == 0:
             continue
         try:
-            revision(cfg, "New migration", autogenerate=True)
+            revision(
+                cfg,
+                "New migration",
+                autogenerate=True,
+                rev_id=pad_number(cfg.previous_revision_number + 1, 4),
+            )
         except alembic.util.exc.CommandError as e:
             if e.args[0] == "Target database is not up to date.":
                 print(f"Cannot migrate {app}, a migration hasn't been applied.")

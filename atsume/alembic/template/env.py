@@ -1,6 +1,8 @@
 import typing
 from logging.config import fileConfig
 
+from alembic.autogenerate.api import RevisionContext
+from alembic.operations import ops
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy.sql.schema import SchemaItem
@@ -8,6 +10,9 @@ from sqlalchemy.sql.schema import SchemaItem
 from alembic import context
 
 from atsume.alembic.config import Config
+
+if typing.TYPE_CHECKING:
+    from ormar.models.metaclass import ModelMetaclass
 
 
 class MigrationIsEmpty(Exception):
@@ -124,7 +129,8 @@ else:
     run_migrations_online()
 
 # Not sure what's going on here but this property totally does exist at runtime
-revision_context = context._proxy.context_opts.get("revision_context")  # type: ignore
+revision_context: RevisionContext = context._proxy.context_opts.get("revision_context")  # type: ignore
+
 # If we are making migrations
 if revision_context:
     # If the migration is empty, don't output anything
@@ -137,3 +143,31 @@ if revision_context:
 
     if is_empty:
         raise MigrationIsEmpty
+
+
+def table_name_to_model(table_name: str) -> typing.Optional["ModelMetaclass"]:
+    for model in config.component_config._models:
+        if model.Meta.tablename == table_name:
+            return model
+    return None
+
+
+OPERATION_NAME_TEMPLATES: dict[typing.Type[ops.MigrateOperation], str] = {
+    ops.CreateTableOp: "create_{model_name}",
+    ops.DropTableOp: "drop_{model_name}",
+    ops.AddColumnOp: "add_{column_name}",
+}
+
+# For migrations that don't have a name, attempt to autogenerate it
+for revision in revision_context.generated_revisions:
+    # Todo: Make this a sentinel
+    if revision.message != "New migration":
+        continue
+    name = ""
+    for upgrade in revision.upgrade_ops.ops:
+        template = OPERATION_NAME_TEMPLATES.get(upgrade.__class__, "")
+        model = table_name_to_model(upgrade.table_name)
+        model_name = model.Meta._qual_name if model else ""
+        column_name = upgrade.column_name if hasattr(upgrade, "column_name") else ""
+        name = name + template.format(model_name=model_name, column_name=column_name)
+    revision.message = name
