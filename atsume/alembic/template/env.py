@@ -1,7 +1,6 @@
 import typing
 from logging.config import fileConfig
 
-import sqlalchemy
 from alembic.autogenerate.api import RevisionContext
 from alembic.operations import ops
 from sqlalchemy import engine_from_config
@@ -12,9 +11,6 @@ from alembic import context
 
 from atsume.alembic.config import Config
 from atsume.alembic.exceptions import MigrationIsEmpty
-
-if typing.TYPE_CHECKING:
-    from ormar.models.metaclass import ModelMetaclass
 
 
 # this is the Alembic Config object, which provides
@@ -56,12 +52,10 @@ def include_object(
     compare_to: typing.Optional[SchemaItem],
 ) -> bool:
     if type_ == "table":
+        # If this app currently owns this table, allow it
         if name in target_metadata.tables:
             return True
-        # print(all_tables, name)
-        if metadata_has_table(all_tables, name):
-            return False
-        # If this app previously owned this table, keep it
+        # If this app previously owned this table, allow it
         if name in config.previous_model_mapping.values():
             return True
         # If we don't know what this table is, don't touch it

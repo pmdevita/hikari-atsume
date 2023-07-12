@@ -14,9 +14,9 @@ revision = ${repr(up_revision)}
 down_revision = ${repr(down_revision)}
 branch_labels = ${repr(branch_labels)}
 depends_on = ${repr(depends_on)}
-add_models = ${repr(config.add_models if config.add_models else {})}
-remove_models = ${repr(config.remove_models if config.remove_models else {})}
-rename_models = ${repr(config.rename_models if config.rename_models else {})}
+add_models: dict[str, str] = ${repr(config.add_models if config.add_models else {})}
+remove_models: dict[str, str] = ${repr(config.remove_models if config.remove_models else {})}
+rename_models: dict[str, str] = ${repr(config.rename_models if config.rename_models else {})}
 
 
 def upgrade() -> None:
