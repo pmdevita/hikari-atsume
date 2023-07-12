@@ -1,6 +1,7 @@
 import typing
 from logging.config import fileConfig
 
+import sqlalchemy
 from alembic.autogenerate.api import RevisionContext
 from alembic.operations import ops
 from sqlalchemy import engine_from_config
@@ -10,13 +11,10 @@ from sqlalchemy.sql.schema import SchemaItem
 from alembic import context
 
 from atsume.alembic.config import Config
+from atsume.alembic.exceptions import MigrationIsEmpty
 
 if typing.TYPE_CHECKING:
     from ormar.models.metaclass import ModelMetaclass
-
-
-class MigrationIsEmpty(Exception):
-    pass
 
 
 # this is the Alembic Config object, which provides
@@ -63,6 +61,9 @@ def include_object(
         # print(all_tables, name)
         if metadata_has_table(all_tables, name):
             return False
+        # If this app previously owned this table, keep it
+        if name in config.previous_model_mapping.values():
+            return True
         # If we don't know what this table is, don't touch it
         return False
     else:
@@ -104,11 +105,14 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    if isinstance(config.engine, str):
+        connectable = engine_from_config(
+            config.get_section(config.config_ini_section, {}),
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
+    else:
+        connectable = config.engine
 
     with connectable.connect() as connection:
         context.configure(
@@ -142,20 +146,25 @@ if revision_context:
             is_empty = False
 
     if is_empty:
-        raise MigrationIsEmpty
+        raise MigrationIsEmpty()
 
 
-def table_name_to_model(table_name: str) -> typing.Optional["ModelMetaclass"]:
+def table_name_to_model_name(table_name: str) -> typing.Optional[str]:
     for model in config.component_config._models:
         if model.Meta.tablename == table_name:
-            return model
+            # Something funny happened with the types but this should be a string
+            assert isinstance(model.Meta._qual_name, str)
+            return model.Meta._qual_name
+    for old_model, old_table_name in config.previous_model_mapping.items():
+        if old_table_name == table_name:
+            return old_model
     return None
 
 
 OPERATION_NAME_TEMPLATES: dict[typing.Type[ops.MigrateOperation], str] = {
     ops.CreateTableOp: "create_{model_name}",
     ops.DropTableOp: "drop_{model_name}",
-    ops.AddColumnOp: "add_{model_name}{column_name}",
+    ops.ModifyTableOps: "modify_{model_name}{column_name}",
 }
 
 # For migrations that don't have a name, attempt to autogenerate it
@@ -164,15 +173,22 @@ if revision_context:
         # Todo: Make this a sentinel
         if revision.message != "New migration":
             continue
-        name = ""
+        actions = []
         for upgrade in revision.upgrade_ops.ops:
             template = OPERATION_NAME_TEMPLATES.get(upgrade.__class__, "")
-            model = table_name_to_model(upgrade.table_name)
-            model_name = model.Meta._qual_name if model else ""
-            column_name = upgrade.column_name if hasattr(upgrade, "column_name") else ""
-            name = name + template.format(
-                model_name=model_name, column_name=column_name
+            model_name = table_name_to_model_name(upgrade.table_name)
+            if not model_name:
+                model_name = ""
+            columns = []
+            if isinstance(upgrade, ops.ModifyTableOps):
+                for op in upgrade.ops:
+                    if hasattr(op, "column"):
+                        columns.append(op.column.name)
+            actions.append(
+                template.format(model_name=model_name, column_name="_".join(columns))
             )
-        if name == "":
+        if actions:
+            name = "_".join(actions)
+        else:
             name = "migration"
         revision.message = name

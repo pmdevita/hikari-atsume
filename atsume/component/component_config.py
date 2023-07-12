@@ -32,6 +32,10 @@ class ComponentConfig:
         return f"{self.module_path}.{self.models_module_name}"
 
     @property
+    def models(self) -> list["ModelMetaclass"]:
+        return self._models
+
+    @property
     def db_migration_path(self) -> Path:
         return Path(module_to_path(self.__class__.__module__)).parent / "migrations"
 

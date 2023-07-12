@@ -5,6 +5,7 @@ from alembic.command import revision, upgrade, downgrade
 
 from atsume.bot import create_bot
 from atsume.alembic.config import get_alembic_config
+from atsume.alembic.exceptions import MigrationIsEmpty
 from atsume.component.manager import manager
 from atsume.utils import pad_number
 
@@ -20,10 +21,14 @@ def makemigrations(bot_module: str) -> None:
     create_bot(bot_module)
     apps = manager.component_configs
     for app in apps:
-        cfg = get_alembic_config(app)
         # If the app has no models, skip it
-        if len(app._models) == 0:
+        if len(app.models) == 0:
             continue
+
+        cfg = get_alembic_config(app, in_memory=True)
+        # Simulate the migration state up to this point
+        upgrade(cfg, "head")
+
         try:
             revision(
                 cfg,
@@ -31,6 +36,8 @@ def makemigrations(bot_module: str) -> None:
                 autogenerate=True,
                 rev_id=pad_number(cfg.previous_revision_number + 1, 4),
             )
+        except MigrationIsEmpty:
+            print(f"Component {app} does not have to be migrated.")
         except alembic.util.exc.CommandError as e:
             if e.args[0] == "Target database is not up to date.":
                 print(f"Cannot migrate {app}, a migration hasn't been applied.")

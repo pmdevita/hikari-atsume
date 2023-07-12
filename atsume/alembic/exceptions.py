@@ -1,0 +1,2 @@
+class MigrationIsEmpty(Exception):
+    pass
