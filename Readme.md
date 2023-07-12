@@ -1,8 +1,21 @@
-# Beatrice/hikari-atsume
+# hikari-atsume
+
+An opinionated Discord bot framework inspired by Django and built on 
+top of Hikari, Tanjun, Ormar, and Alembic.
+
+## Features
+
+- Django-inspired design and philosophy
+  - Automatic project scaffolding/file-based organization
+  - Configuration instead of boilerplate
+- Configure which components run in which servers
+- Database ORM with Ormar
+- Automatic database migrations with Alembic
+
+## Alpha notes
 
 This repo currently holds two projects, a rewrite of my Discord bot 
-Beatrice, and hikari-atsume, an opinionated Discord bot framework 
-inspired by Django and built on top of Hikari, Tanjun, Ormar, and Alembic.
+Beatrice, and hikari-atsume, 
 
 Atsume is the next stage of my work on my bot. For a while, I've 
 been thinking about how Django's solution of opinionated, helpful 
@@ -32,9 +45,9 @@ Todo:
  - [x] Implement per-guild and DM permissions
  - [x] Implement support for Ormar models
  - [ ] Implement Alembic migrations/port from nextcord-ormar
- - [ ] Code clean up
+ - [x] Code clean up
  - [ ] Beatrice move out
- - [ ] MyPy hints
+ - [x] MyPy hints
  - [ ] Documentation
  - [ ] Test
  - [ ] Actions/Automation

@@ -5,3 +5,4 @@ __pycache__
 local.py
 .mypy_cache
 dist
+.nox
