@@ -2,6 +2,8 @@ from pathlib import Path
 
 TEMPLATE_DIR = Path(__file__).parent / "templates"
 
+IGNORE_SUFFIX = set([".pyc"])
+
 
 def create_template(
     template_name: Path | str, dest: Path | str, **template_args: str
@@ -24,6 +26,8 @@ def create_template(
             # Start copying from inside the template folder into our new folder
             create_template(full_path, dest / new_folder_relative_path, **template_args)
         else:
+            if full_path.suffix in IGNORE_SUFFIX:
+                continue
             # Open the template file, perform any replacements, and save as the new template file
             with open(full_path, "r") as template_file:
                 template = template_file.read()
