@@ -32,6 +32,15 @@ your Python dependency should be `python = "^3.10,<3.12"`)
 # PyPI coming soon!
 
 pip install git+https://github.com/pmdevita/hikari-atsume.git
+
+# You currently can't install database libraries as extras so you'll also need 
+# to pick the libraries yourself.
+
+pip install aiosqlite
+
+pip install aiomysql PyMySQL
+
+pip install aiopg psycopg2-binary
 ```
 
 ### Start a new project
@@ -43,8 +52,65 @@ atsume startproject my_bot
 ```
 
 which should generate some files for your project. In `my_bot/local.py`, add your
-Discord bot token in.
+Discord bot token in. If you want to use message commands, make sure to set your 
+`MESSAGE_PREFIX` and add `hikari.Intents.MESSAGE_CONTENT` to your `INTENTS`.
 
+```python
+# my_bot/settings.py
+
+INTENTS = hikari.Intents.ALL_UNPRIVILEGED | hikari.Intents.MESSAGE_CONTENT
+```
+
+### Start a component
+
+In your project directory run
+
+```shell
+python manage.py startapp basic
+```
+which should generate a new directory called `basic`.
+
+In `basic/commands.py`, write your commands using [Tanjun](https://tanjun.cursed.solutions/usage/#declaring-commands).
+Commands are declared without explicitly attaching to a Component object 
+(Atsume takes care of that using `load_from_scope`).
+
+At the moment, Atsume generates apps with an example default hi command. This is an example 
+of a hybrid slash/message command that takes one optional positional argument, the user to say 
+hi to.
+
+```python
+# basic/commands.py
+
+@tanjun.annotations.with_annotated_args(follow_wrapped=True)
+@tanjun.as_message_command("hi", "hello", "hey", "howdy")
+@tanjun.as_slash_command("hi", "The bot says hi.")
+async def hello(
+    ctx: tanjun.abc.Context,
+    member: Annotated[Optional[Member], "The user to say hi to.", Positional()] = None,
+) -> None:
+    member = member if member else ctx.member
+    if member:
+        await ctx.respond(f"Hi {member.display_name}!")
+```
+
+Now with our new component ready, register it in the bot's settings.
+
+```python
+# my_bot/settings.py
+
+COMPONENTS = [
+  "basic"
+]
+
+```
+
+### Run the bot
+
+With our component ready and the bot configured, it's time to run it!
+
+```shell
+python manage.py run
+```
 
 ## Special thanks to
 - The Hikari Discord for help and feedback
