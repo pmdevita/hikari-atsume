@@ -104,9 +104,86 @@ COMPONENTS = [
 
 ```
 
+### Working with the database
+
+Let's say we want to track how many times each member of a guild has said 
+hi to the bot. In our `models.py` file, let's create a new database model 
+to keep track of this. Atsume uses [Ormar](https://collerek.github.io/ormar/)
+for its database models and queries.
+
+```python
+# basic/models.py
+from atsume.db import Model
+import ormar
+
+class HiCounter(Model):
+  user: int = ormar.BigInteger(primary_key=True)  # Discord User IDs need to be stored as big integers
+  count: int = ormar.Integer(default=0)
+
+```
+
+Now in our `commands.py`, let's increment a user's count every time they say hi.
+
+```python
+# basic.models.py
+
+# Skipping the decorators
+async def hello(
+    ctx: tanjun.abc.Context,
+    member: Annotated[Optional[Member], "The user to say hi to.", Positional()] = None,
+) -> None:
+    member = member if member else ctx.member
+    if member:
+        count_model, _ = await HiCounter.objects.get_or_create(user=member.user.id, _defaults={"count": 0})
+        count_model.count = count_model.count + 1
+        await count_model.upsert()
+        await ctx.respond(f"Hi {member.display_name}! (You've said hi {count_model.count} time[s]!)")
+```
+
+### Migrating the database
+
+Before we run this though, we need to add our HiCounter model to the database! To do this, 
+we can generate a database migration that will migrate the database from it's current 
+state (nothing) to the state we want (a database with a table for HiCounter). Atsume 
+can generate migrations automatically in most cases so we'll use it's tool for that here.
+
+Run this command to generate migrations.
+
+```shell
+python manage.py makemigrations
+```
+
+You should see something like
+
+```
+Migrating ComponentConfig(name"basic")...
+  Create model hicounter...
+```
+
+Once that's done, your migration is ready to go! Run it on the database with 
+
+```shell
+python manage.py upgrade
+```
+
+#### Note about Atsume Migrations
+
+Atsume's migrations are still very much a work in progress. 
+As a general rule of thumb, Atsume is good at migrations that create and delete 
+models and fields, but currently struggles with renames. You can always review 
+a migration and make any needed changes by looking in the component's 
+generated migration folder. Atsume uses 
+[Alembic](https://alembic.sqlalchemy.org/en/latest/) 
+for migrations so you can look at the 
+[Alembic operations docs](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations)
+to figure out how to write migrations manually.
+
+
 ### Run the bot
 
-With our component ready and the bot configured, it's time to run it!
+Finally, with the bot configured and our component's commands and models ready , 
+it's time to run it!
+
 
 ```shell
 python manage.py run

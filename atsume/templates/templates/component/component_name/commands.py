@@ -3,6 +3,7 @@ import tanjun
 from typing import Annotated, Optional
 from tanjun.annotations import Member, Positional
 
+from .models import *
 
 # Create your commands here.
 
