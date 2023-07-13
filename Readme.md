@@ -189,6 +189,8 @@ it's time to run it!
 python manage.py run
 ```
 
+![docs/img/hi_bot.png](docs/img/hi_bot.png)
+
 ## Special thanks to
 - The Hikari Discord for help and feedback
 - FasterSpeeding for Tanjun
