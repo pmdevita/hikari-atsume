@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install Poetry
-      - run: |
+        run: |
           pip install poetry
           poetry install
       - name: Build docs
