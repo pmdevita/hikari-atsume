@@ -4,8 +4,12 @@
 ![mypy](https://badgen.net/badge/mypy/checked/2A6DB2)
 ![code-style-black](https://img.shields.io/badge/code%20style-black-black)
 
+
+[Documentation](https://pmdevita.github.io/hikari-atsume/atsume.html)
+
 An opinionated Discord bot framework inspired by Django and built on 
 top of Hikari, Tanjun, Ormar, and Alembic.
+
 
 ## Features
 
@@ -48,13 +52,14 @@ Todo:
  - [x] Implement Django-like components and loading through configuration
  - [x] Implement per-guild and DM permissions
  - [x] Implement support for Ormar models
- - [ ] Implement Alembic migrations/port from nextcord-ormar
+ - [x] Implement Alembic migrations/port from nextcord-ormar
+ - [ ] Project scaffolding
  - [x] Code clean up
  - [ ] Beatrice move out
  - [x] MyPy hints
  - [ ] Documentation
  - [ ] Test
- - [ ] Actions/Automation
+ - [x] Actions/Automation
 
 
 ## Special thanks to
