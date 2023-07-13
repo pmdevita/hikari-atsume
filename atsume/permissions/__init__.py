@@ -1,3 +1,14 @@
+"""
+# Atsume Permissions
+
+Atsume can limit components to run only in the guilds (or DM channel) you specify.
+You can load the default `SettingsPermissions` class, which lets you configure permissions
+from your local.py or settings.py. You can also subclass `AbstractComponentPermissions`
+and write your own permissions handler.
+
+"""
+
+
 import importlib
 import typing
 

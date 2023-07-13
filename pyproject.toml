@@ -27,6 +27,7 @@ pre-commit = "^3.3.3"
 nox = "^2023.4.22"
 nox-poetry = "^1.0.3"
 sqlalchemy-stubs = "^0.4"
+pdoc = "^14.0.0"
 
 [tool.poetry.extras]
 postgresql = ["asyncpg", "psycopg2-binary"]

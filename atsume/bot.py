@@ -1,3 +1,11 @@
+"""
+# Atsume Bot
+
+These are a set of functions called to coordinate the bootstrapping of the Atsume framework.
+You probably shouldn't ever have to call these unless you're building something on top of them.
+
+"""
+
 import importlib
 import importlib.util
 import logging
@@ -26,6 +34,10 @@ from atsume.utils import module_to_path
 
 
 def initialize_atsume(bot_module: str) -> None:
+    """
+    Initializes Atsume's settings and database. Should be called first
+    when bootstrapping the framework.
+    """
     settings._initialize(bot_module)
     sys.path.insert(0, module_to_path(bot_module))
     if settings.HIKARI_LOGGING:
@@ -35,6 +47,11 @@ def initialize_atsume(bot_module: str) -> None:
 
 
 def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
+    """
+    Instantiate the Hikari bot and Tanjun client. Should be called after
+    `initialize_atsume`.
+    :return:
+    """
     bot = hikari.impl.GatewayBot(
         settings.TOKEN, intents=hikari.Intents(settings.INTENTS)
     )
@@ -48,6 +65,16 @@ def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
 
 
 def create_bot(bot_module: str) -> hikari.GatewayBot:
+    """
+    Given the module path for an Atsume project, bootstrap the framework and load it.
+    The bootstrapping steps in order are:
+    1. `initialize_atsume`
+    2. `initialize_discord`
+    3. `atsume.middleware.loader.attach_middleware`
+    4. `load_components`
+    :param bot_module:
+    :return:
+    """
     initialize_atsume(bot_module)
     bot, client = initialize_discord()
     attach_middleware(client)
@@ -62,6 +89,11 @@ def start_bot(bot: hikari.GatewayBot) -> None:
 
 
 def load_components(client: tanjun.abc.Client) -> None:
+    """
+    Load the ComponentConfigs as dictated by the settings and then load the component for each of them.
+    :param client:
+    :return:
+    """
     permission_class = import_permission_class(settings.COMPONENT_PERMISSIONS_CLASS)
     component_manager._load_components()
     for component_config in component_manager.component_configs:
@@ -73,6 +105,13 @@ def load_component(
     component_config: ComponentConfig,
     permission_class: typing.Type[AbstractComponentPermissions],
 ) -> None:
+    """
+    Load a Component from its config, attach permissions, and attach it to the client.
+    :param client:
+    :param component_config:
+    :param permission_class:
+    :return:
+    """
     try:
         models_module = importlib.import_module(component_config.models_path)
     except ModuleNotFoundError:

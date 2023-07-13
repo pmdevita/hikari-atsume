@@ -1,3 +1,13 @@
+"""
+mypy settings plugin
+
+This plugin helps type check for atsume's settings module. Due to the way settings load dynamically
+from the global defaults and user settings, it's not possible to type check this purely through
+type hints.
+
+"""
+
+
 import typing
 
 import mypy.types
@@ -13,6 +23,7 @@ class SettingsPlugin(Plugin):
     def get_attribute_hook(
         self, fullname: str
     ) -> typing.Callable[[AttributeContext], mypy.types.Type] | None:
+        """If given a settings property, return the type hint for that setting."""
         if not fullname.startswith("atsume.settings.Settings"):
             return None
         if fullname.startswith("atsume.settings.Settings._"):

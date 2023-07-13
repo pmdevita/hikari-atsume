@@ -7,6 +7,10 @@ logger = logging.getLogger(__name__)
 
 
 class SettingsPermissions(AbstractComponentPermissions):
+    """
+    Permissions implementation that can be configured through Atsume's settings.
+    """
+
     def __init__(self, component_path: str):
         self.component_path = component_path
 
