@@ -114,7 +114,7 @@ python manage.py run
 
 ## Special thanks to
 - The Hikari Discord for help and feedback
-**- FasterSpeeding for Tanjun**
+- FasterSpeeding for Tanjun
 - Lunarmagpie for help with the CI and linting
 - The Django project for their amazing work and some 
 code that I borrowed.
