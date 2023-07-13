@@ -94,7 +94,9 @@ def load_components(client: tanjun.abc.Client) -> None:
     :param client:
     :return:
     """
-    permission_class = import_permission_class(settings.COMPONENT_PERMISSIONS_CLASS)
+    permission_class = None
+    if settings.COMPONENT_PERMISSIONS_CLASS:
+        permission_class = import_permission_class(settings.COMPONENT_PERMISSIONS_CLASS)
     component_manager._load_components()
     for component_config in component_manager.component_configs:
         load_component(client, component_config, permission_class)
@@ -103,7 +105,7 @@ def load_components(client: tanjun.abc.Client) -> None:
 def load_component(
     client: tanjun.abc.Client,
     component_config: ComponentConfig,
-    permission_class: typing.Type[AbstractComponentPermissions],
+    permission_class: typing.Optional[typing.Type[AbstractComponentPermissions]] = None,
 ) -> None:
     """
     Load a Component from its config, attach permissions, and attach it to the client.
@@ -123,14 +125,16 @@ def load_component(
     module_attrs = vars(module)
     component.load_from_scope(scope=module_attrs)
     # Create the permissions class and check and add it to the component
-    permissions = permission_class(component_config.module_path)
-    component.add_check(permission_check(permissions))
+    if permission_class:
+        permissions = permission_class(component_config.module_path)
+        component.add_check(permission_check(permissions))
 
     # Todo: Remove this once this feature is added to Tanjun
     # Temporary fix: Add event listeners and schedulers to the component
     for value in module_attrs.values():
         if isinstance(value, AtsumeEventListener):
-            value.permissions = permissions
+            if permission_class:
+                value.permissions = permissions
             component.add_listener(value.event_type, value)
         # if isinstance(value, tanjun.schedules.TimeSchedule):
         #     component.add_schedule(value)

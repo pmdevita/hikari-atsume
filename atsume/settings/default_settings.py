@@ -3,7 +3,7 @@ from atsume.settings.type_hints import *
 
 COMPONENTS = []
 
-COMPONENT_PERMISSIONS_CLASS = "atsume.permissions.SettingsPermissions"
+COMPONENT_PERMISSIONS_CLASS = None
 
 COMPONENT_ALL_GUILDS_PERMISSIONS = []
 
