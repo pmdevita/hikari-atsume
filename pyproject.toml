@@ -36,6 +36,9 @@ aiopg = ["aiopg", "psycopg2-binary"]
 mysql = ["aiomysql", "PyMySQL"]
 sqlite = ["aiosqlite"]
 
+[tool.poetry.scripts]
+atsume = "atsume.cli.project:cli"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

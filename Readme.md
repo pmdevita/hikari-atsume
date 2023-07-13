@@ -53,7 +53,7 @@ Todo:
  - [x] Implement per-guild and DM permissions
  - [x] Implement support for Ormar models
  - [x] Implement Alembic migrations/port from nextcord-ormar
- - [ ] Project scaffolding
+ - [x] Project scaffolding
  - [x] Code clean up
  - [ ] Beatrice move out
  - [x] MyPy hints

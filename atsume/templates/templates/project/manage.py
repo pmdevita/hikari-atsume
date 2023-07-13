@@ -17,7 +17,7 @@ def main() -> None:
     project_dir = Path(__file__).parent
     sys.path.append(str(project_dir))
     # Set the management module path
-    os.environ.setdefault("ATSUME_SETTINGS_MODULE", "bot_module")
+    os.environ.setdefault("ATSUME_SETTINGS_MODULE", "project_name")
     try:
         from atsume.cli import run_command
     except ImportError as exc:
