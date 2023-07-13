@@ -3,6 +3,7 @@ __pycache__
 *.db
 *.sqlite
 local.py
+!atsume/templates/templates/project/project_name/local.py
 .mypy_cache
 dist
 .nox
