@@ -20,7 +20,7 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    run_command()
+    run_command(project_dir)
 
 
 if __name__ == "__main__":

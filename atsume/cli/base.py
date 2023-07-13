@@ -1,6 +1,13 @@
 import os
+from pathlib import Path
 
 import click
+import hikari
+
+
+class CLIContext(click.Context):
+    bot: hikari.GatewayBot
+    project_dir: Path
 
 
 @click.group()
@@ -10,3 +17,6 @@ def cli(ctx: click.Context) -> None:
     from atsume.bot import create_bot
 
     ctx.obj = create_bot(bot_module)
+
+
+cli.context_class = CLIContext
