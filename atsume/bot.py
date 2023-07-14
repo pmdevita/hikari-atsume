@@ -21,14 +21,10 @@ import tanjun
 from atsume.settings import settings
 from atsume.component.component_config import ComponentConfig
 from atsume.component.decorators import AtsumeEventListener
-from atsume.permissions import (
-    import_permission_class,
-    AbstractComponentPermissions,
-    permission_check,
-)
 from atsume.cli.base import cli
-from atsume.db.manager import hook_database, database
+from atsume.db.manager import database
 from atsume.component.manager import manager as component_manager
+from atsume.component import Component
 from atsume.middleware.loader import attach_middleware
 from atsume.utils import module_to_path
 
@@ -94,18 +90,13 @@ def load_components(client: tanjun.abc.Client) -> None:
     :param client:
     :return:
     """
-    permission_class = None
-    if settings.COMPONENT_PERMISSIONS_CLASS:
-        permission_class = import_permission_class(settings.COMPONENT_PERMISSIONS_CLASS)
     component_manager._load_components()
     for component_config in component_manager.component_configs:
-        load_component(client, component_config, permission_class)
+        load_component(client, component_config)
 
 
 def load_component(
-    client: tanjun.abc.Client,
-    component_config: ComponentConfig,
-    permission_class: typing.Optional[typing.Type[AbstractComponentPermissions]] = None,
+    client: tanjun.abc.Client, component_config: ComponentConfig
 ) -> None:
     """
     Load a Component from its config, attach permissions, and attach it to the client.
@@ -120,22 +111,19 @@ def load_component(
         logging.warning(f"Was not able to load database models for {component_config}")
 
     # Create the component and load the commands into it
-    component = tanjun.Component(name=component_config.name)
+    component = Component(name=component_config.name)
     module = importlib.import_module(component_config.commands_path)
     module_attrs = vars(module)
     component.load_from_scope(scope=module_attrs)
     # Create the permissions class and check and add it to the component
-    if permission_class:
-        permissions = permission_class(component_config.module_path)
-        component.add_check(permission_check(permissions))
+    if component_config.permissions:
+        component.set_permissions(component_config.permissions)
 
     # Todo: Remove this once this feature is added to Tanjun
     # Temporary fix: Add event listeners and schedulers to the component
     for value in module_attrs.values():
         if isinstance(value, AtsumeEventListener):
-            if permission_class:
-                value.permissions = permissions
+            if component_config.permissions:
+                value.permissions = component_config.permissions
             component.add_listener(value.event_type, value)
-        # if isinstance(value, tanjun.schedules.TimeSchedule):
-        #     component.add_schedule(value)
     client.add_component(component)

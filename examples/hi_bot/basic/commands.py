@@ -1,4 +1,5 @@
 import tanjun
+import atsume
 
 from typing import Annotated, Optional
 from tanjun.annotations import Member, Positional
@@ -12,7 +13,7 @@ from .models import *
 @tanjun.as_message_command("hi", "hello", "hey", "howdy")
 @tanjun.as_slash_command("hi", "The bot says hi.")
 async def hello(
-    ctx: tanjun.abc.Context,
+    ctx: atsume.Context,
     member: Annotated[Optional[Member], "The user to say hi to.", Positional()] = None,
 ) -> None:
     member = member if member else ctx.member

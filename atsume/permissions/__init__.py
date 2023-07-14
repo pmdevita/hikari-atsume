@@ -17,7 +17,12 @@ import tanjun
 from .settings_permissions import SettingsPermissions
 from .base import AbstractComponentPermissions
 
-__all__ = ["SettingsPermissions", "AbstractComponentPermissions"]
+__all__ = [
+    "SettingsPermissions",
+    "AbstractComponentPermissions",
+    "import_permission_class",
+    "permission_check",
+]
 
 
 def import_permission_class(

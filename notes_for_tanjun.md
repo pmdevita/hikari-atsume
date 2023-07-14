@@ -61,4 +61,6 @@ sure where to store data here.)
 4. Can I hook into commands/event listeners and deny them before they are run? (Doing some per-guild permissions stuff)
     - Yes you can do `add_check` on a Component to add a permissions check. However,
    this won't help for event listeners.
+    - Did it myself since Atsume currently has to wrap event listeners anyways 😎
+
 

@@ -3,10 +3,13 @@ from pathlib import Path
 
 import sqlalchemy
 
+from atsume.permissions import import_permission_class
+from atsume.settings import settings
 from atsume.utils import module_to_path
 
 if typing.TYPE_CHECKING:
     from ormar.models.metaclass import ModelMetaclass
+    from atsume.permissions.base import AbstractComponentPermissions
 
 
 class ComponentConfig:
@@ -14,6 +17,7 @@ class ComponentConfig:
     verbose_name: str
     commands_module_name = "commands"
     models_module_name = "models"
+    permissions: typing.Optional["AbstractComponentPermissions"]
 
     def __init__(self, module_path: str) -> None:
         assert self.name is not None
@@ -22,6 +26,12 @@ class ComponentConfig:
         self.module_path = module_path
         self._models: list["ModelMetaclass"] = []
         self._model_metadata = sqlalchemy.MetaData()
+        self.permissions = None
+        if settings.COMPONENT_PERMISSIONS_CLASS:
+            permission_class = import_permission_class(
+                settings.COMPONENT_PERMISSIONS_CLASS
+            )
+            self.permissions = permission_class(self.module_path)
 
     @property
     def commands_path(self) -> str:

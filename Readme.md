@@ -85,7 +85,7 @@ hi to.
 @tanjun.as_message_command("hi", "hello", "hey", "howdy")
 @tanjun.as_slash_command("hi", "The bot says hi.")
 async def hello(
-    ctx: tanjun.abc.Context,
+    ctx: atsume.Context,
     member: Annotated[Optional[Member], "The user to say hi to.", Positional()] = None,
 ) -> None:
     member = member if member else ctx.member
@@ -129,7 +129,7 @@ Now in our `commands.py`, let's increment a user's count every time they say hi.
 
 # Skipping the decorators
 async def hello(
-    ctx: tanjun.abc.Context,
+    ctx: atsume.Context,
     member: Annotated[Optional[Member], "The user to say hi to.", Positional()] = None,
 ) -> None:
     member = member if member else ctx.member
