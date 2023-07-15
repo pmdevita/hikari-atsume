@@ -4,6 +4,7 @@ __pycache__
 *.sqlite
 local.py
 !atsume/templates/templates/project/project_name/local.py
+!examples/hi_bot/my_bot/local.py
 .mypy_cache
 dist
 .nox
