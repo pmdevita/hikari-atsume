@@ -20,7 +20,11 @@ import tanjun
 
 from atsume.settings import settings
 from atsume.component.component_config import ComponentConfig
-from atsume.component.decorators import AtsumeEventListener
+from atsume.component.decorators import (
+    AtsumeEventListener,
+    AtsumeComponentClose,
+    AtsumeComponentOpen,
+)
 from atsume.cli.base import cli
 from atsume.db.manager import database
 from atsume.component.manager import manager as component_manager
@@ -126,4 +130,8 @@ def load_component(
             if component_config.permissions:
                 value.permissions = component_config.permissions
             component.add_listener(value.event_type, value)
+        elif isinstance(value, AtsumeComponentOpen):
+            component.add_on_open(value)
+        elif isinstance(value, AtsumeComponentClose):
+            component.add_on_close(value)
     client.add_component(component)
