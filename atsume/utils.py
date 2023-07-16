@@ -30,3 +30,21 @@ def pad_number(num: int, pad: int) -> str:
     """
     n = str(num)
     return "".join(["0" for i in range(pad - len(n))]) + n
+
+
+# Define some specification, see documentation
+P = typing.ParamSpec("P")
+T = typing.TypeVar("T")
+
+
+# For a help about decorator with parameters see
+# https://stackoverflow.com/questions/5929107/decorators-with-parameters
+def copy_kwargs(
+    kwargs_call: typing.Callable[P, typing.Any]
+) -> typing.Callable[[typing.Callable[..., T]], typing.Callable[P, T]]:
+    """Decorator does nothing but returning the cast original function"""
+
+    def return_func(func: typing.Callable[..., T]) -> typing.Callable[P, T]:
+        return typing.cast(typing.Callable[P, T], func)
+
+    return return_func

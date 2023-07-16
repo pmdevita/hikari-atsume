@@ -21,9 +21,11 @@ import tanjun
 from atsume.settings import settings
 from atsume.component.component_config import ComponentConfig
 from atsume.component.decorators import (
+    BaseCallback,
     AtsumeEventListener,
     AtsumeComponentClose,
     AtsumeComponentOpen,
+    AtsumeTimeSchedule,
 )
 from atsume.cli.base import cli
 from atsume.db.manager import database
@@ -124,14 +126,18 @@ def load_component(
         component.set_permissions(component_config.permissions)
 
     # Todo: Remove this once this feature is added to Tanjun
-    # Temporary fix: Add event listeners and schedulers to the component
+    # Update: Might not since we're appending in extra functionality here
     for value in module_attrs.values():
-        if isinstance(value, AtsumeEventListener):
-            if component_config.permissions:
-                value.permissions = component_config.permissions
-            component.add_listener(value.event_type, value)
-        elif isinstance(value, AtsumeComponentOpen):
-            component.add_on_open(value)
-        elif isinstance(value, AtsumeComponentClose):
-            component.add_on_close(value)
+        if isinstance(value, BaseCallback):
+            value._component = component
+            if isinstance(value, AtsumeEventListener):
+                if component_config.permissions:
+                    value.permissions = component_config.permissions
+                component.add_listener(value.event_type, value)
+            elif isinstance(value, AtsumeComponentOpen):
+                component.add_on_open(value)
+            elif isinstance(value, AtsumeComponentClose):
+                component.add_on_close(value)
+            elif isinstance(value, AtsumeTimeSchedule):
+                component.add_schedule(value.as_time_schedule())
     client.add_component(component)

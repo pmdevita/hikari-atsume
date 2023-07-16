@@ -28,3 +28,6 @@ class Component(tanjun.Component):
             ]
         else:
             return [g for g in self.client.cache.get_guilds_view()]
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self.name=}, {self.checks=}, {self.hooks=}, {self.slash_hooks=}, {self.message_hooks=})"

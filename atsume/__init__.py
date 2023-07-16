@@ -10,6 +10,7 @@ from .component import (
     Context,
     on_close,
     on_open,
+    as_time_schedule,
 )
 
 __all__ = [
@@ -19,4 +20,5 @@ __all__ = [
     "Context",
     "on_open",
     "on_close",
+    "as_time_schedule",
 ]
