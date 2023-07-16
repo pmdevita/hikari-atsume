@@ -56,11 +56,14 @@ async def hello(ctx: tanjun.abc.Context, member: Annotated[Optional[Member], "Th
 
 1. How do I store data in a component between commands? (Discord.py just used a class for their extensions, not
 sure where to store data here.)
+   - You can just store it in the script scope, seems to be OK and is kinda done in the official bot
 2. Can I access the bot object from the Component?
+   - Yes, it's the `tanjun.Client` object
 3. Can I respond to malformed message commands with custom help responses?
 4. Can I hook into commands/event listeners and deny them before they are run? (Doing some per-guild permissions stuff)
     - Yes you can do `add_check` on a Component to add a permissions check. However,
    this won't help for event listeners.
-    - Did it myself since Atsume currently has to wrap event listeners anyways 😎
+      - Did it myself since Atsume currently has to wrap event listeners anyways 😎
+      - Also did it for Component open, close, and scheduler
 
 
