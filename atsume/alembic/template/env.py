@@ -115,6 +115,8 @@ def run_migrations_online() -> None:
             render_as_batch=True,
             version_table=version_table,
             include_object=include_object,
+            # https://alembic.sqlalchemy.org/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect
+            compare_type=True,
         )
 
         with context.begin_transaction():
