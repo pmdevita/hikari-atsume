@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "atsume"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = ["Peter DeVita <mewtwo2643@yahoo.com>"]
 readme = "Readme.md"
