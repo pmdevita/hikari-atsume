@@ -10,8 +10,7 @@ from sqlalchemy.sql.schema import SchemaItem
 from alembic import context
 
 from atsume.alembic.config import Config
-from atsume.alembic.exceptions import MigrationIsEmpty
-
+from atsume.alembic.exceptions import MigrationIsEmpty, ServerDefaultRequired
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -32,6 +31,8 @@ if config.config_file_name is not None:
 target_metadata = config.app_metadata
 all_tables = config.all_tables
 version_table = config.get_main_option("version_table")
+
+
 # target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
@@ -186,6 +187,15 @@ if revision_context:
                 print(f"  Modify model {model_name}...")
                 for op in upgrade.ops:
                     if isinstance(op, ops.AddColumnOp):
+                        # If this is being added to an already existing table...
+                        if op.table_name in all_tables:
+                            # And the column is not nullable or doesn't have a server_default
+                            if (
+                                not op.column.nullable
+                                and op.column.server_default is None
+                            ):
+                                raise ServerDefaultRequired(model_name, op.column.name)
+                            print(op.column)
                         print(f"    Add Column {op.column.name}...")
                         columns.append(op.column.name)
                     elif isinstance(op, ops.DropColumnOp):
