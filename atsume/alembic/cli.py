@@ -65,8 +65,8 @@ def upgrade_command(component_name: typing.Optional[str] = None) -> None:
         upgrade(cfg, "head")
 
 
-@cli.command(name="downgrade")
-@click.argument("component_name", help="Specify a specific component to downgrade.")
+@cli.command(name="downgrade", help="Downgrade a specific component.")
+@click.argument("component_name")
 def downgrade_command(component_name: str) -> None:
     apps = [app for app in manager.component_configs if app.name == component_name]
     for app in apps:
