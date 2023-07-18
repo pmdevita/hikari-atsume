@@ -49,5 +49,9 @@ class ComponentConfig:
     def db_migration_path(self) -> Path:
         return Path(module_to_path(self.__class__.__module__)).parent / "migrations"
 
+    def _unload(self) -> None:
+        while self._models:
+            self._models.pop()
+
     def __str__(self) -> str:
         return f'ComponentConfig(name"{self.name}")'
