@@ -14,8 +14,18 @@ from atsume.utils import pad_number
 
 
 @cli.command("makemigrations")
-def make_migrations() -> None:
+@click.option(
+    "--component_name",
+    "-c",
+    help="Specify a specific component to make migrations for.",
+)
+@click.option(
+    "--empty", is_flag=True, default=False, help="Create an empty migration file."
+)
+def make_migrations(component_name: typing.Optional[str] = None) -> None:
     apps = manager.component_configs
+    if component_name:
+        apps = [app for app in apps if app.name == component_name]
     for app in apps:
         # If the app has no models, skip it
         if len(app.models) == 0:
@@ -42,7 +52,7 @@ def make_migrations() -> None:
 
 
 @cli.command(name="upgrade")
-@click.option("--component_name", "-c")
+@click.option("--component_name", "-c", help="Specify a specific component to upgrade.")
 def upgrade_command(component_name: typing.Optional[str] = None) -> None:
     apps = manager.component_configs
     if component_name:
@@ -56,7 +66,7 @@ def upgrade_command(component_name: typing.Optional[str] = None) -> None:
 
 
 @cli.command(name="downgrade")
-@click.argument("component_name")
+@click.argument("component_name", help="Specify a specific component to downgrade.")
 def downgrade_command(component_name: str) -> None:
     apps = [app for app in manager.component_configs if app.name == component_name]
     for app in apps:

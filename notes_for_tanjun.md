@@ -67,3 +67,7 @@ sure where to store data here.)
       - Also did it for Component open, close, and scheduler
 
 
+# Ormar 
+
+- Autoincrement is on by default on a primary key integer and this blocks manually setting 
+it in some cases (for example, creating an id of 0)
