@@ -17,6 +17,7 @@ top of Hikari, Tanjun, Ormar, and Alembic.
   - Automatic project scaffolding/file-based organization
   - Configuration instead of boilerplate
   - Functionality split into modular, independent components
+  - Automatically restart the bot on changes during development
 - Configure which components run in which servers
 - Database ORM with Ormar
 - Automatic database migrations with Alembic
