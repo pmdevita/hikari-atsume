@@ -50,7 +50,9 @@ def initialize_atsume(bot_module: str) -> None:
     database._create_database()
 
 
-def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
+def initialize_discord(
+    declare_global_commands: bool = True,
+) -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
     """
     Instantiate the Hikari bot and Tanjun client. Should be called after
     `initialize_atsume`.
@@ -61,14 +63,16 @@ def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
     )
 
     client = tanjun.Client.from_gateway_bot(
-        bot, declare_global_commands=True, mention_prefix=False
+        bot, declare_global_commands=declare_global_commands, mention_prefix=False
     )
     if settings.MESSAGE_PREFIX:
         client.add_prefix(settings.MESSAGE_PREFIX)
     return bot, client
 
 
-def create_bot(bot_module: str) -> hikari.GatewayBot:
+def create_bot(
+    bot_module: str, declare_global_commands: bool = True
+) -> hikari.GatewayBot:
     """
     Given the module path for an Atsume project, bootstrap the framework and load it.
     The bootstrapping steps in order are:
@@ -80,7 +84,7 @@ def create_bot(bot_module: str) -> hikari.GatewayBot:
     :return:
     """
     initialize_atsume(bot_module)
-    bot, client = initialize_discord()
+    bot, client = initialize_discord(declare_global_commands=declare_global_commands)
     attach_middleware(client)
     load_components(client)
     return bot
@@ -97,7 +101,9 @@ def start_bot(bot: hikari.GatewayBot, reload: bool) -> None:
 
 
 def autoreload_start_bot() -> None:
-    bot = create_bot(os.environ["ATSUME_SETTINGS_MODULE"])
+    bot = create_bot(
+        os.environ["ATSUME_SETTINGS_MODULE"], declare_global_commands=False
+    )
     bot.run()
 
 
