@@ -22,7 +22,9 @@ from atsume.utils import pad_number
 @click.option(
     "--empty", is_flag=True, default=False, help="Create an empty migration file."
 )
-def make_migrations(component_name: typing.Optional[str] = None) -> None:
+def make_migrations(
+    component_name: typing.Optional[str] = None, empty: bool = False
+) -> None:
     apps = manager.component_configs
     if component_name:
         apps = [app for app in apps if app.name == component_name]
