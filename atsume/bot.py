@@ -17,7 +17,7 @@ import aiohttp
 import alluka
 import hikari
 import click
-import hupper
+import hupper  # type: ignore
 import tanjun
 
 from atsume.settings import settings
@@ -92,12 +92,11 @@ def create_bot(bot_module: str) -> hikari.GatewayBot:
 def start_bot(bot: hikari.GatewayBot, reload: bool) -> None:
     if reload:
         reloader = hupper.start_reloader("atsume.bot.autoreload_start_bot")
-        reloader.watch_files()
     else:
         bot.run()
 
 
-def autoreload_start_bot():
+def autoreload_start_bot() -> None:
     bot = create_bot(os.environ["ATSUME_SETTINGS_MODULE"])
     bot.run()
 
