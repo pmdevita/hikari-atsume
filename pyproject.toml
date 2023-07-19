@@ -19,6 +19,7 @@ aiopg = { version = "^1.4.0", optional = true }
 aiomysql = { version = "^0.2.0", optional = true }
 pymysql = { version = "^1.1.0", optional = true }
 aiosqlite = { version = "^0.19.0", optional = true }
+hupper = "^1.12"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"

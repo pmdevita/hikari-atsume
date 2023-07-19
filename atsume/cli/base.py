@@ -12,7 +12,7 @@ class CLIContext(click.Context):
 
 @click.group()
 @click.pass_context
-def cli(ctx: click.Context) -> None:
+def cli(ctx: CLIContext) -> None:
     bot_module = os.environ["ATSUME_SETTINGS_MODULE"]
     from atsume.bot import create_bot
 

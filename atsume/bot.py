@@ -9,6 +9,7 @@ You probably shouldn't ever have to call these unless you're building something 
 import importlib
 import importlib.util
 import logging
+import os
 import sys
 import typing
 
@@ -16,6 +17,7 @@ import aiohttp
 import alluka
 import hikari
 import click
+import hupper
 import tanjun
 
 from atsume.settings import settings
@@ -85,8 +87,18 @@ def create_bot(bot_module: str) -> hikari.GatewayBot:
 
 
 @cli.command("run")
+@click.option("--reload", is_flag=True, default=False)
 @click.pass_obj
-def start_bot(bot: hikari.GatewayBot) -> None:
+def start_bot(bot: hikari.GatewayBot, reload: bool) -> None:
+    if reload:
+        reloader = hupper.start_reloader("atsume.bot.autoreload_start_bot")
+        reloader.watch_files()
+    else:
+        bot.run()
+
+
+def autoreload_start_bot():
+    bot = create_bot(os.environ["ATSUME_SETTINGS_MODULE"])
     bot.run()
 
 
