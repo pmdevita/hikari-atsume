@@ -28,7 +28,10 @@ pre-commit = "^3.3.3"
 nox = "^2023.4.22"
 nox-poetry = "^1.0.3"
 sqlalchemy-stubs = "^0.4"
-pdoc = "^14.0.0"
+sphinx = "^7.0.1"
+sphinx-reload = "^0.2.0"
+furo = "^2023.5.20"
+towncrier = "^23.6.0"
 
 [tool.poetry.extras]
 postgresql = ["asyncpg", "psycopg2-binary"]
@@ -43,3 +46,8 @@ atsume = "atsume.cli.project:cli"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.towncrier]
+package = "hikari-atsume"
+package_dir = "atsume"
+filename = "CHANGELOG.md"
