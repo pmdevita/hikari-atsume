@@ -9,7 +9,7 @@ repos:
         # https://pre-commit.com/#top_level-default_language_version
         language_version: python3.11
   - repo: https://github.com/twisted/towncrier
-    rev: 22.13.0  # run 'pre-commit autoupdate' to update
+    rev: 23.6.0  # run 'pre-commit autoupdate' to update
     hooks:
       - id: towncrier-check
         files: $changelog\.d/
