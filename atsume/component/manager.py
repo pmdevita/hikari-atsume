@@ -20,6 +20,10 @@ class ComponentNotFound(Exception):
 
 
 def get_component_config(module_path: str) -> ComponentConfig:
+    """
+    Load a ComponentConfig from a given module path. It looks for the `apps` submodule
+    in the given module path.
+    """
     app_module = import_module(f"{module_path}.{APPS_MODULE_NAME}")
     app_configs = [
         (name, candidate)
@@ -33,15 +37,20 @@ def get_component_config(module_path: str) -> ComponentConfig:
 
 
 class ComponentManager:
+    """
+    A singleton to manage the configs of all components an Atsume project has set to load.
+    """
     def __init__(self) -> None:
         self.component_configs: list[ComponentConfig] = []
         self.unloaded_components: dict[str, str] = {}
 
     def _load_components(self) -> None:
+        """Load all ComponentConfigs as defined in the Atsume project settings."""
         for component in settings.COMPONENTS:
             self._load_component(component)
 
     def _load_component(self, component: str) -> ComponentConfig:
+        """Load a single compnent from a given module path."""
         component_config = get_component_config(component)
         self.component_configs.append(component_config)
         return component_config
@@ -49,19 +58,24 @@ class ComponentManager:
     def get_config_from_models_path(
         self, models_path: str
     ) -> typing.Optional[ComponentConfig]:
-        for config in manager.component_configs:
+        """Get the ComponentConfig that matches the given module path. Returns None if it does not exist."""
+        for config in self.component_configs:
             if models_path == config.models_path:
                 return config
         return None
 
     def get_config_by_name(self, config_name: str) -> typing.Optional[ComponentConfig]:
-        for config in manager.component_configs:
+        """Get the ComponentConfig that has a matching `name` property. Returns None if it does not exist."""
+        for config in self.component_configs:
             if config.name == config_name:
                 return config
         return None
 
     def unload_component(self, component_config: ComponentConfig) -> None:
-        """Unloads a component from Python. Should be called after `tanjun.Client.remove_component_by_name"""
+        """
+        Unloads a component from Python. Should be called after `tanjun.Client.remove_component_by_name.
+        Note: This is experimental and does not actually unload the module correctly from Python.
+        """
         self.unloaded_components[component_config.name] = component_config.module_path
         component_config._unload()
         keys = []
@@ -79,6 +93,10 @@ class ComponentManager:
         component_name: typing.Optional[str] = None,
         component_path: typing.Optional[str] = None,
     ) -> ComponentConfig:
+        """
+        Load a component by either module path or name. Must also be defined in the Atsume project settings.
+        Note: This is experimental, it will readd an unloaded component but does not reload any modules.
+        """
         if component_name:
             if self.get_config_by_name(component_name):
                 raise ComponentAlreadyLoaded

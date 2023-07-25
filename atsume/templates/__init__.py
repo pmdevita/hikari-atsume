@@ -2,12 +2,16 @@ from pathlib import Path
 
 TEMPLATE_DIR = Path(__file__).parent / "templates"
 
-IGNORE_SUFFIX = set([".pyc"])
+IGNORE_SUFFIX = {".pyc"}
 
 
 def create_template(
     template_name: Path | str, dest: Path | str, **template_args: str
 ) -> None:
+    """
+    Create files from a template at a destination path,
+    replacing template placeholders with given values.
+    """
     template_path = TEMPLATE_DIR / template_name
     if not template_path.exists() or not template_path.is_dir():
         raise ValueError(f'Template "{template_name}" does not exist')
@@ -37,6 +41,7 @@ def create_template(
 
 
 def replace_in_string(string: str, **replacements: str) -> str:
+    """Replace values in a string following key->value in the given dictionary."""
     for find, replace in replacements.items():
         string = string.replace(find, replace)
     return string

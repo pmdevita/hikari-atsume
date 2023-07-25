@@ -5,7 +5,7 @@ class AbstractComponentPermissions(abc.ABC):
     """
     Abstract class for Atsume's permission system. Initialized with the module path
     of a Component, and is called to determine if it should be permitted to act
-    in the guild or DM.
+    in the guild or DM. Can be subclassed to implement your own permissions check.
     """
 
     @abc.abstractmethod

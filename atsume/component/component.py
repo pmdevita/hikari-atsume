@@ -7,14 +7,26 @@ from atsume.permissions import AbstractComponentPermissions, permission_check
 
 
 class Component(tanjun.Component):
+    """
+    Organizes related commands and functionality into a single object. Extends the Tanjun Component
+    with some features for per-guild permissions.
+    """
     permissions: typing.Optional[AbstractComponentPermissions]
 
     def set_permissions(self, permissions: AbstractComponentPermissions) -> None:
+        """
+        Sets the permissions object to be used by this component and adds the check for it.
+        """
         self.permissions = permissions
         self.add_check(permission_check(permissions))
 
     @property
     def guilds(self) -> list[hikari.Snowflake]:
+        """
+        A shortcut to `Client.cache.get_guilds_view()`. It's recommended to use this instead of
+        directly using the cache to filter to only the guilds this component is permitted to
+        run in.
+        """
         if not self.client:
             return []
         if not self.client.cache:

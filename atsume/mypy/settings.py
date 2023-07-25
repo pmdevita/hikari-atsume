@@ -1,13 +1,3 @@
-"""
-mypy settings plugin
-
-This plugin helps type check for atsume's settings module. Due to the way settings load dynamically
-from the global defaults and user settings, it's not possible to type check this purely through
-type hints.
-
-"""
-
-
 import typing
 
 import mypy.types
@@ -15,21 +5,35 @@ import mypy.checker
 import mypy.nodes
 from mypy.plugin import Plugin, AttributeContext
 
-# With a lot of help from the Django mypy plugin
-# https://github.com/typeddjango/django-stubs/blob/master/mypy_django_plugin/transformers/settings.py
+
+#
 
 
 class SettingsPlugin(Plugin):
+    """
+    Due to the way settings load dynamically
+    from the global defaults and user config, it's not possible to type check this purely through
+    type hints. This plugin resolves types for settings by examining the typing of the default setting.
+
+    This plugin is based on a similar plugin for Django's mypy typing.
+    https://github.com/typeddjango/django-stubs/blob/master/mypy_django_plugin/transformers/settings.py
+
+    """
+
     def get_attribute_hook(
-        self, fullname: str
+            self, fullname: str
     ) -> typing.Callable[[AttributeContext], mypy.types.Type] | None:
-        """If given a settings property, return the type hint for that setting."""
+        """
+        If given a settings property, return the type hint for that setting.
+        :param fullname: The module path of the variable
+        :return: A function which can be called to resolve it.
+        """
         if not fullname.startswith("atsume.settings.Settings"):
             return None
         if fullname.startswith("atsume.settings.Settings._"):
             return None
 
-        property_name = fullname[len("atsume.settings.Settings.") :]
+        property_name = fullname[len("atsume.settings.Settings."):]
 
         def func(ctx: AttributeContext) -> mypy.types.Type:
             api = ctx.api

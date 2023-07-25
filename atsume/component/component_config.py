@@ -13,6 +13,10 @@ if typing.TYPE_CHECKING:
 
 
 class ComponentConfig:
+    """
+    A dataclass for configuring an Atsume Component. Includes the component name, its permissions,
+    and the file and module paths for its commands and models.
+    """
     name: str
     verbose_name: str
     commands_module_name = "commands"

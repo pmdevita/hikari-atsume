@@ -42,33 +42,38 @@ def get_all_tables() -> typing.List[str]:
 def get_alembic_config(
     component_config: "ComponentConfig", in_memory: bool = False
 ) -> Config:
-    # Configuration is dynamically generated
+    """
+    Generate the config object for Alembic from an Atsume project's settings.
+    """
     cfg = Config(ini_section=component_config.name)
-    # NXAlembic uses a bundled env.py rather than a user one since setup is largely the same for each project
+    # Use our bundled template env.py and script.py.mako
     cfg.set_main_option("script_location", str(Path(__file__).parent / "template"))
-    # We can use an in memory database to simulate the database state without touching
-    # the developer's database
+    # We can use either Atsume's configured database settings, or an in memory database
+    # The in-memory database is used for making migrations since using a real one would
+    # require that database to be up to date on migrations.
     if in_memory:
         cfg.set_main_option("sqlalchemy.url", "sqlite://")
         cfg.engine = sqlalchemy.create_engine("sqlite://")
     else:
         cfg.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
         cfg.engine = settings.DATABASE_URL
-    # This is where this app's migration files will end up
+    # This is where this component's migration files will end up
     # Migration path needs to be a path relative to cwd
     migrations_path = component_config.db_migration_path.relative_to(Path(os.getcwd()))
     cfg.set_section_option(
         component_config.name, "version_locations", str(migrations_path)
     )
-    # This app's alembic migration table
+    # The name of this component's Alembic migration table
     cfg.set_main_option("version_table", get_alembic_table_name(component_config.name))
-    # This is used by env.py
+    # The env.py script may want to also pull certain things from the ComponentConfig
     cfg.component_config = component_config
     cfg.app_metadata = component_config._model_metadata
+    # TODO: May not be needed anymore now that make migrations simulates the database and for each component
     # Migrations also needs awareness for all tables used by the bot
     cfg.all_tables = get_all_tables()
 
-    # Get the previous revision's number
+    # Get the previous migration's revision number
+    # The ID of the next migration is the incremented previous migration
     cfg.previous_revision_number = -1
     scripts = ScriptDirectory.from_config(cfg)
     rev = scripts.get_current_head()
@@ -77,6 +82,41 @@ def get_alembic_config(
         if script:
             cfg.previous_revision_number = int(script.module.revision)
 
+    # Get the mapping of the model names to table names that reflects the
+    # current state of the migration scripts.
+    cfg.previous_model_mapping = get_model_table_names(scripts)
+
+    # Get the current mapping of model names to table names.
+    current_models = {
+        model.Meta._qual_name: model.Meta.tablename for model in component_config.models
+    }
+    # Determine the changes that we are making to these models.
+    add_models = {}
+    remove_models = {}
+    # All of the models not in the previous model mapping must be models we are adding
+    for model_name, table_name in current_models.items():
+        if model_name not in cfg.previous_model_mapping:
+            add_models[model_name] = table_name
+    # All of the models not in the current model mapping must be models we are dropping
+    for model_name, table_name in cfg.previous_model_mapping.items():
+        if model_name not in current_models:
+            remove_models[model_name] = table_name
+
+    cfg.add_models = add_models
+    cfg.remove_models = remove_models
+    # Renames are figured out in env.py after table schemas are computed.
+    cfg.rename_models = {}
+
+    return cfg
+
+
+def get_model_table_names(scripts: ScriptDirectory) -> dict[str, str]:
+    """
+    Get a dictionary mapping model names to table names. This mapping reflects the last state
+    of the migrations.
+    :param scripts: The Alembic ScriptDirectory to check through.
+    :return:
+    """
     # Get the current set of models
     previous_models: dict[str, str] = {}
     migrations = list(scripts.walk_revisions())
@@ -90,25 +130,6 @@ def get_alembic_config(
             del previous_models[key]
         for key, value in migration.module.add_models.items():
             previous_models[key] = value
+    return previous_models
 
-    cfg.previous_model_mapping = previous_models
 
-    current_models = {
-        model.Meta._qual_name: model.Meta.tablename for model in component_config.models
-    }
-    add_models = {}
-    remove_models = {}
-    # Find the models we are adding
-    for model_name, table_name in current_models.items():
-        if model_name not in previous_models:
-            add_models[model_name] = table_name
-    # Find the models we are removing
-    for model_name, table_name in previous_models.items():
-        if model_name not in current_models:
-            remove_models[model_name] = table_name
-
-    cfg.add_models = add_models
-    cfg.remove_models = remove_models
-    cfg.rename_models = {}
-
-    return cfg

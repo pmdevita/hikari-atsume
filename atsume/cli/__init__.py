@@ -1,7 +1,8 @@
 """
-# Command Line Tools
+Functions for Atsume's command line tools. Atsume has two command line interfaces:
 
-Utilities for running Atsume's command line tools.
+- `atsume` (the library CLI), the tool included with the installation of the library in your Python environment
+- `manage.py` (the project CLI), the tool used within your Atsume project for managing and running it.
 
 """
 
@@ -15,14 +16,16 @@ CLI_EXTENSIONS = [
     "atsume.bot",
     "atsume.cli.component",
 ]
-"""The default list of CLI extensions to load."""
+"""The default list of CLI extensions to load. This may be extensible in the future."""
+
+__all__ = ["run_command", CLI_EXTENSIONS]
 
 
 def run_command(project_dir: Path | str) -> None:
     """
-    Run the Atsume project command line tools. This loads all of the
-    CLI extensions and then calls the main click group.
-    :return:
+    Run the project CLI. This loads all of the
+    CLI extensions and then calls the main click group. This is what is called by your
+    project's `manage.py` file.
     """
     for extension in CLI_EXTENSIONS:
         module = importlib.import_module(extension)

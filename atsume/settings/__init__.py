@@ -5,10 +5,12 @@ import types
 from atsume.settings import default_settings as _DEFAULT
 from atsume.settings import type_hints
 
-# T = typing.TypeVar("T", bound=typing.Type[type_hints])
-
 
 class Settings:
+    """
+    A singleton to access an Atsume project's settings. Each variable defined in your `settings.py` and
+    `local.py` can be accessed as an attribute on this object.
+    """
     _SETTINGS: typing.Optional[types.ModuleType] = None
     _LOCAL: typing.Optional[types.ModuleType] = None
 

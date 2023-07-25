@@ -14,6 +14,10 @@ from .component import Component
 
 
 class Context(BaseContext, ABC):
+    """
+    A subclass of `tanjun.Context` that adds a reference to the
+    component object this command is running under.
+    """
     _component: typing.Optional[Component]
 
     @property
