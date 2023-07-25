@@ -30,7 +30,7 @@ jobs:
           make html
       - uses: actions/upload-pages-artifact@v1
         with:
-          path: _build/html/
+          path: docs/_build/html/
 
   # Deploy the artifact to GitHub pages.
   # This is a separate job so that only actions/deploy-pages has the necessary permissions.
