@@ -1,4 +1,4 @@
-```{include} ../README.md
+```{include} ../Readme.md
 :relative-docs: docs/
 :relative-images:
 ```
