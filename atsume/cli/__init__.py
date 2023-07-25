@@ -18,7 +18,7 @@ CLI_EXTENSIONS = [
 ]
 """The default list of CLI extensions to load. This may be extensible in the future."""
 
-__all__ = ["run_command", CLI_EXTENSIONS]
+__all__ = ["run_command", "CLI_EXTENSIONS"]
 
 
 def run_command(project_dir: Path | str) -> None:
