@@ -25,7 +25,7 @@ jobs:
           poetry install
       - name: Build docs
         run: |
-          poetry shell
+          source $(poetry env info --path)/bin/activate
           cd docs
           make html
       - uses: actions/upload-pages-artifact@v1
