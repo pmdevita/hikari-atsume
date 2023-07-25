@@ -11,4 +11,6 @@ Tutorial <tutorial/tutorial_1>
 
 API Reference <reference/atsume/index>
 
+genindex
+
 ```
