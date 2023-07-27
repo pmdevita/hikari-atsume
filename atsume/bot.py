@@ -3,7 +3,7 @@ These are a set of functions called to coordinate the bootstrapping of the Atsum
 You probably shouldn't ever have to call these unless you're building something on top of them.
 
 """
-
+import gc
 import importlib
 import importlib.util
 import logging
@@ -101,6 +101,9 @@ def start_bot(bot: hikari.GatewayBot, reload: bool) -> None:
     :param reload: Whether auto reloading should be enabled.
     """
     if reload:
+        # IDK if this is necessary but might reduce overhead
+        del bot
+        gc.collect()
         reloader = hupper.start_reloader("atsume.bot.autoreload_start_bot")
     else:
         bot.run()
