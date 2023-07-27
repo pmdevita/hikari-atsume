@@ -128,7 +128,7 @@ class HiCounter(Model):
 Now in our `commands.py`, let's increment a user's count every time they say hi.
 
 ```python
-# basic.models.py
+# basic/models.py
 
 # Skipping the decorators
 async def hello(

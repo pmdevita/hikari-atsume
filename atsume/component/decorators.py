@@ -12,7 +12,7 @@ from atsume.component.component import Component
 from atsume.utils import copy_kwargs
 
 if typing.TYPE_CHECKING:
-    from atsume.component.context import Context
+    from atsume.component import Context
 
 
 class BaseCallback:
@@ -21,6 +21,7 @@ class BaseCallback:
     so Tanjun can parse it, and adds the Component reference if the command has a argument with
     a matching type hint.
     """
+
     def __init__(
         self,
         callback: _CallbackSigT,
@@ -29,7 +30,9 @@ class BaseCallback:
         self.callback = callback
         # Forward the type hints
         self.__signature__ = inspect.signature(self.callback)
-        self._component: typing.Optional[Component] = None  # The component is set during listener registration
+        self._component: typing.Optional[
+            Component
+        ] = None  # The component is set during listener registration
         self._component_parameter_name: typing.Optional[str] = None
         self._should_insert_component()
 
@@ -59,6 +62,7 @@ class PermissionsCallback(BaseCallback):
     Does a permissions check before the callback is allowed through. This is done since Tanjun's
     Component checks aren't performed on event listeners.
     """
+
     def __init__(self, callback: _CallbackSigT):
         super().__init__(callback)
         self.permissions: typing.Optional[AbstractComponentPermissions] = None
@@ -91,6 +95,7 @@ class AtsumeEventListener(PermissionsCallback):
     A wrapper for an event listener callback that retrieves the desired event type
     from the function type hints.
     """
+
     def __init__(self, callback: _CallbackSigT):
         super().__init__(callback)
         key = list(self.callable_types.keys())[0]
@@ -112,6 +117,7 @@ class AtsumeTimeSchedule(BaseCallback):
     A callback wrapper for a scheduled command. The created `tanjun.TimeSchedule` object
     calls the wrapper, which then calls the callback.
     """
+
     def __init__(self, callback: _CallbackSigT, schedule_kwargs: typing.Any) -> None:
         super().__init__(callback)
         self.schedule_kwargs = schedule_kwargs
@@ -125,7 +131,9 @@ async def noop() -> None:
 
 
 def with_listener(
-    callback: typing.Callable[[hikari.events.base_events.Event], typing.Coroutine[None, None, None]]
+    callback: typing.Callable[
+        [hikari.events.base_events.Event], typing.Coroutine[None, None, None]
+    ]
 ) -> AtsumeEventListener:
     """
     Decorator to register a function as an event listener. Callback must
@@ -149,6 +157,7 @@ def as_time_schedule(
     *args: typing.Any, **kwargs: typing.Any
 ) -> typing.Callable[[_CallbackSigT], AtsumeTimeSchedule]:
     """Decorator to register a function to run on a given schedule."""
+
     def wrapper(callback: _CallbackSigT) -> AtsumeTimeSchedule:
         return AtsumeTimeSchedule(callback, schedule_kwargs=kwargs)
 

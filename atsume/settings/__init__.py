@@ -1,3 +1,11 @@
+"""
+
+Provide access to the Atsume project's settings and supply type hinting for the settings
+variables used by the Atsume framework.
+
+"""
+
+
 import importlib
 import typing
 import types
@@ -7,10 +15,6 @@ from atsume.settings import type_hints
 
 
 class Settings:
-    """
-    A singleton to access an Atsume project's settings. Each variable defined in your `settings.py` and
-    `local.py` can be accessed as an attribute on this object.
-    """
     _SETTINGS: typing.Optional[types.ModuleType] = None
     _LOCAL: typing.Optional[types.ModuleType] = None
 
@@ -32,3 +36,7 @@ class Settings:
 
 
 settings = Settings()
+"""
+A singleton to access the Atsume project's settings. Each variable defined in your `settings.py` and
+`local.py` can be accessed as an attribute on this object.
+"""

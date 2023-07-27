@@ -34,7 +34,7 @@ nox-poetry = "^1.0.3"
 sqlalchemy-stubs = "^0.4"
 sphinx = "^7.0.1"
 sphinx-reload = "^0.2.0"
-furo = "^2023.5.20"
+furo = "^2023.07.26"
 towncrier = "^23.6.0"
 
 [tool.poetry.extras]
@@ -43,6 +43,7 @@ postgres = ["asyncpg", "psycopg2-binary"]
 aiopg = ["aiopg", "psycopg2-binary"]
 mysql = ["aiomysql", "PyMySQL"]
 sqlite = ["aiosqlite"]
+mypy = ["sqlalchemy-stubs"]
 
 [tool.poetry.scripts]
 atsume = "atsume.cli.project:cli"

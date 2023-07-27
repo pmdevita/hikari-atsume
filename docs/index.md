@@ -7,7 +7,7 @@
 :titlesonly:
 :maxdepth: 2
 
-Tutorial <tutorial/tutorial_1>
+tutorial/index
 
 API Reference <reference/atsume/index>
 
