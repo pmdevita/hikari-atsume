@@ -6,9 +6,6 @@ import mypy.nodes
 from mypy.plugin import Plugin, AttributeContext
 
 
-#
-
-
 class SettingsPlugin(Plugin):
     """
     Due to the way settings load dynamically
@@ -21,7 +18,7 @@ class SettingsPlugin(Plugin):
     """
 
     def get_attribute_hook(
-            self, fullname: str
+        self, fullname: str
     ) -> typing.Callable[[AttributeContext], mypy.types.Type] | None:
         """
         If given a settings property, return the type hint for that setting.
@@ -33,7 +30,7 @@ class SettingsPlugin(Plugin):
         if fullname.startswith("atsume.settings.Settings._"):
             return None
 
-        property_name = fullname[len("atsume.settings.Settings."):]
+        property_name = fullname[len("atsume.settings.Settings.") :]
 
         def func(ctx: AttributeContext) -> mypy.types.Type:
             api = ctx.api
@@ -47,8 +44,11 @@ class SettingsPlugin(Plugin):
             sym: mypy.nodes.SymbolTableNode | None = global_settings.names.get(
                 property_name
             )
-            if not sym:
-                raise ValueError(f"Unable to get symbol {property_name}")
+            if sym is None:
+                ctx.api.fail(
+                    f"'Settings' object has no attribute {property_name!r}", ctx.context
+                )
+                return ctx.default_attr_type
             if not sym.type:
                 raise ValueError(f"Symbol {sym} has no type?")
             return sym.type
