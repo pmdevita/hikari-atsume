@@ -14,7 +14,7 @@ for any settings you'd set in your `local.py` file.
 
 :::{hint}
 If you are using git, add 
-the `local.py` file to your .gitignore file 
+the `local.py` file to your `.gitignore` file 
 so you don't accidentally make your bot token public!
 :::
 
@@ -46,4 +46,14 @@ import hikari
 INTENTS = hikari.Intents.ALL_UNPRIVILEGED | hikari.Intents.MESSAGE_CONTENT
 ```
 
+## Running the bot
 
+Now that we have our bot token configured, we can run our new Discord bot. To do so, 
+run `python manage.py run`. If all goes well, you should see in the console something like.
+
+```
+hikari.bot: started successfully in approx 1.20 seconds
+```
+
+
+With this, we should be ready to create our first component!

@@ -35,6 +35,7 @@ pip install aiosqlite
 pip install aiomysql PyMySQL
 pip install aiopg psycopg2-binary
 
+# poetry 
 poetry add aiosqlite
 poetry add aiomysql PyMySQL
 poetry add aiopg psycopg2-binary
@@ -50,11 +51,15 @@ environment for those. Then, run this command
 
 ```shell
 atsume startproject my_bot
+
+# If you get an error that there is no atsume command, try
+python -m atsume startproject my_bot
+
 ```
 
 where `my_bot` is the name of your bot project.
 
-This should generate some files in your project folder, which should not look like this.
+This will generate some files in your project folder, which should look like this.
 
 ```
 my_bot
@@ -67,8 +72,9 @@ manage.py
 :::{admonition} What is scaffolding?
 :class: tip
 
-To help ease the creation of new projects and components, Atsume provides tools to "scaffold" or generate 
-new Python files. You could set up the files yourself, but it's easier to let the command line tools help you.
+Atsume expects the Python files in your project to be set up a certain way.
+To help ease the creation of any new files, Atsume provides tools to "scaffold" or generate 
+new Python files for a project or a component. This  
 :::
 
 
