@@ -42,10 +42,16 @@ An optional module path to a Permissions class
 """
 
 COMPONENT_ALL_GUILDS_PERMISSIONS: list[str]
-"""For use with :py:class:`atsume.permissions.SettingsPermissions`, a list of component module paths for those that have access to all guilds."""
+"""
+For use with :py:class:`atsume.permissions.SettingsPermissions`, 
+a list of component module paths for those that have access to all guilds.
+"""
 
 COMPONENT_DM_PERMISSIONS: list[str]
-"""For use with :py:class:`atsume.permissions.SettingsPermissions`, a list of component module paths for those that have access to DMs."""
+"""
+For use with :py:class:`atsume.permissions.SettingsPermissions`, 
+a list of component module paths for those that have access to DMs.
+"""
 
 COMPONENT_GUILD_PERMISSIONS: dict[int, list[str]]
 """

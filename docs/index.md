@@ -33,4 +33,6 @@ API <reference/atsume/index>
 
 genindex
 
+appendix
+
 ```

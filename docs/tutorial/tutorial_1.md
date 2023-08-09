@@ -69,12 +69,17 @@ manage.py
 
 ```
 
-:::{admonition} What is scaffolding?
+:::{admonition} What is scaffolding and why does Atsume use it?
 :class: tip
 
-Atsume expects the Python files in your project to be set up a certain way.
-To help ease the creation of any new files, Atsume provides tools to "scaffold" or generate 
-new Python files for a project or a component. This  
+In Atsume, your bot code is loaded automatically through configuration rather than requiring you 
+to implement the loading yourself. In order to do this, Atsume expects your project to contain certain Python 
+files with specific names, like the `local.py` and `settings.py` files for your bot module, and `apps.py`, `models.py`, 
+and `commands.py` for components as we'll see later.
+
+Since setting up these files yourself can be a bit time-consuming, Atsume can automatically generate these files for 
+you and help "scaffold" your project. Once generated, all that should be left is to fill in the 
+blank with your new code.
 :::
 
 

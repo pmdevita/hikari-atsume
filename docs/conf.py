@@ -73,4 +73,5 @@ intersphinx_mapping = {
     "attrs": ("https://www.attrs.org/en/stable/", None),
     "hikari": ("https://docs.hikari-py.dev/en/latest/", None),
     "tanjun": ("https://tanjun.cursed.solutions/", None),
+    "alluka": ("https://alluka.cursed.solutions/", None),
 }

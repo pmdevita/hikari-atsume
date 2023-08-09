@@ -9,5 +9,6 @@ database models to store data, and managing our database through migrations.
 
 tutorial_1
 tutorial_2
+tutorial_3
 
 ```

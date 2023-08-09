@@ -11,6 +11,7 @@ class Component(tanjun.Component):
     Organizes related commands and functionality into a single object. Extends the Tanjun Component
     with some features for per-guild permissions.
     """
+
     permissions: typing.Optional[AbstractComponentPermissions]
 
     def set_permissions(self, permissions: AbstractComponentPermissions) -> None:
@@ -21,7 +22,7 @@ class Component(tanjun.Component):
         self.add_check(permission_check(permissions))
 
     @property
-    def guilds(self) -> list[hikari.Snowflake]:
+    def guilds(self) -> list[hikari.snowflakes.Snowflake]:
         """
         A shortcut to `Client.cache.get_guilds_view()`. It's recommended to use this instead of
         directly using the cache to filter to only the guilds this component is permitted to
