@@ -1,6 +1,9 @@
 [tool.poetry]
-name = "atsume"
-version = "0.3.0"
+name = "hikari-atsume"
+packages = [
+    { include="atsume" },
+]
+version = "0.3.1"
 description = "An opinionated, Django-like Discord bot framework for Hikari, Tanjun, and Ormar"
 authors = ["Peter DeVita <mewtwo2643@yahoo.com>"]
 readme = "Readme.md"
