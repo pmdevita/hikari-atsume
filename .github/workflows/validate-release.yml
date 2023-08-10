@@ -1,0 +1,24 @@
+on:
+  pull_request:
+    branches:
+      - release
+jobs:
+  check_version:
+    name: "Check Version"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Get PR version
+        run: |
+          git checkout -b ${{ github.head_ref }} origin/${{ github.head_ref }}
+          echo "SOURCE_VER=$(python -c \"from docs.conf import release; print(release, end='')\") >> "$GITHUB_ENV"
+      - name: Get Release branch version
+        run: |
+          git checkout -b ${{ github.base_ref }} origin/${{ github.base_ref }}
+          echo "TARGET_VER=$(python -c \"from docs.conf import release; print(release, end='')\") >> "$GITHUB_ENV"
+      - name: Is this a new version?
+        run: |
+          if ($SOURCE_VER == $TARGET_VER) exit 1;
