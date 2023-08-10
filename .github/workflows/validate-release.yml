@@ -26,4 +26,4 @@ jobs:
           echo "TARGET_VER=$(python -c "from docs.conf import release; print(release, end='')")" >> "$GITHUB_ENV"
       - name: Is this a new version?
         run: |
-          if ($SOURCE_VER == $TARGET_VER) exit 1;
+          if [ "$SOURCE_VER" = "$TARGET_VER" ]; then exit 1; fi;
