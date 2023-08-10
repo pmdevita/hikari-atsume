@@ -58,6 +58,7 @@ postgresql = ["asyncpg", "psycopg2-binary"]
 postgres = ["asyncpg", "psycopg2-binary"]
 aiopg = ["aiopg", "psycopg2-binary"]
 mysql = ["aiomysql", "PyMySQL"]
+mariadb = ["aiomysql", "PyMySQL"]
 sqlite = ["aiosqlite"]
 mypy = ["sqlalchemy-stubs"]
 
