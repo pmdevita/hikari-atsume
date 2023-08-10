@@ -9,16 +9,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
       - name: Get PR version
         run: |
-          git checkout -b ${{ github.head_ref }} origin/${{ github.head_ref }}
           echo "SOURCE_VER=$(python -c "from docs.conf import release; print(release, end='')")" >> "$GITHUB_ENV"
-      - name: Get Release branch version
+      - name: Checkout Release branch
         run: |
           git checkout -b ${{ github.base_ref }} origin/${{ github.base_ref }}
+      - name: Get Release branch version
+        run: |
           echo "TARGET_VER=$(python -c "from docs.conf import release; print(release, end='')")" >> "$GITHUB_ENV"
       - name: Is this a new version?
         run: |
