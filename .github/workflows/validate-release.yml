@@ -18,8 +18,9 @@ jobs:
         run: |
           echo "SOURCE_VER=$(python -c "from docs.conf import release; print(release, end='')")" >> "$GITHUB_ENV"
       - name: Checkout Release branch
-        run: |
-          git checkout -b ${{ github.base_ref }} origin/${{ github.base_ref }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.base_ref }}
       - name: Get Release branch version
         run: |
           echo "TARGET_VER=$(python -c "from docs.conf import release; print(release, end='')")" >> "$GITHUB_ENV"
