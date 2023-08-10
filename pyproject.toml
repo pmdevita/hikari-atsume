@@ -1,9 +1,22 @@
 [tool.poetry]
 name = "atsume"
-version = "0.2.2"
-description = ""
+version = "0.3.0"
+description = "An opinionated, Django-like Discord bot framework for Hikari, Tanjun, and Ormar"
 authors = ["Peter DeVita <mewtwo2643@yahoo.com>"]
 readme = "Readme.md"
+license = "MIT"
+homepage = "https://github.com/pmdevita/hikari-atsume"
+repository = "https://github.com/pmdevita/hikari-atsume"
+documentation = "https://pmdevita.github.io/hikari-atsume/"
+keywords = ["hikari", "discord", "ormar", "tanjun", "framework"]
+classifiers = [
+    "Topic :: Internet",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Framework :: AsyncIO",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Communications :: Chat",
+    "Typing :: Typed"
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"

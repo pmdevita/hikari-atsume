@@ -8,18 +8,22 @@ jobs:
     name: "Check Version"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
       - name: Get PR version
         run: |
-          git checkout -b ${{ github.head_ref }} origin/${{ github.head_ref }}
           echo "SOURCE_VER=$(python -c "from docs.conf import release; print(release, end='')")" >> "$GITHUB_ENV"
+      - name: Checkout Release branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.base_ref }}
       - name: Get Release branch version
         run: |
-          git checkout -b ${{ github.base_ref }} origin/${{ github.base_ref }}
           echo "TARGET_VER=$(python -c "from docs.conf import release; print(release, end='')")" >> "$GITHUB_ENV"
       - name: Is this a new version?
         run: |
-          if ($SOURCE_VER == $TARGET_VER) exit 1;
+          if [ "$SOURCE_VER" = "$TARGET_VER" ]; then exit 1; fi;
