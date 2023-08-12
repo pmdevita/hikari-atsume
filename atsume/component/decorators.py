@@ -1,11 +1,12 @@
 import collections
 import inspect
 import typing
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from typing import Callable, Any, Coroutine
 
 import hikari
 import tanjun
-from tanjun.schedules import TimeSchedule, _CallbackSigT, _CallbackSig
+from tanjun.schedules import TimeSchedule, _CallbackSigT, _CallbackSig, IntervalSchedule
 
 from atsume.permissions import AbstractComponentPermissions
 from atsume.component.component import Component
@@ -114,7 +115,7 @@ class AtsumeComponentClose(BaseCallback):
 
 class AtsumeTimeSchedule(BaseCallback):
     """
-    A callback wrapper for a scheduled command. The created `tanjun.TimeSchedule` object
+    A callback wrapper for a scheduled function. The created :py:class:`tanjun.TimeSchedule` object
     calls the wrapper, which then calls the callback.
     """
 
@@ -124,6 +125,28 @@ class AtsumeTimeSchedule(BaseCallback):
 
     def as_time_schedule(self) -> TimeSchedule["AtsumeTimeSchedule"]:
         return TimeSchedule(self, **self.schedule_kwargs)
+
+
+class AtsumeIntervalSchedule(BaseCallback):
+    """
+    A callback wrapper for a interval scheduled function. The created
+    :py:class:`tanjun.IntervalSchedule` object calls the wrapper, which then calls the callback.
+    """
+
+    def __init__(
+        self,
+        callback: _CallbackSigT,
+        interval: int | float | timedelta,
+        schedule_kwargs: typing.Any,
+    ) -> None:
+        super().__init__(callback)
+        self.interval = interval
+        self.schedule_kwargs = schedule_kwargs
+
+    def as_time_schedule(
+        self,
+    ) -> IntervalSchedule[Callable[..., Coroutine[Any, Any, None]] | Any]:
+        return IntervalSchedule(self, self.interval, **self.schedule_kwargs)
 
 
 async def noop() -> None:
@@ -160,5 +183,15 @@ def as_time_schedule(
 
     def wrapper(callback: _CallbackSigT) -> AtsumeTimeSchedule:
         return AtsumeTimeSchedule(callback, schedule_kwargs=kwargs)
+
+    return wrapper
+
+
+@copy_kwargs(tanjun.as_interval)
+def as_interval(
+    interval: int | float | timedelta, *args: typing.Any, **kwargs: typing.Any
+) -> typing.Callable[[_CallbackSigT], AtsumeIntervalSchedule]:
+    def wrapper(callback: _CallbackSigT) -> AtsumeIntervalSchedule:
+        return AtsumeIntervalSchedule(callback, interval, kwargs)
 
     return wrapper
