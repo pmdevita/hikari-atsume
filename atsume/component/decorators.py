@@ -6,14 +6,12 @@ from typing import Callable, Any, Coroutine
 
 import hikari
 import tanjun
-from tanjun.schedules import TimeSchedule, _CallbackSigT, _CallbackSig, IntervalSchedule
+from tanjun.schedules import TimeSchedule, _CallbackSigT, IntervalSchedule
 
 from atsume.permissions import AbstractComponentPermissions
 from atsume.component.component import Component
 from atsume.utils import copy_kwargs
-
-if typing.TYPE_CHECKING:
-    from atsume.component import Context
+from atsume.component import Context
 
 
 class BaseCallback:
@@ -51,11 +49,11 @@ class BaseCallback:
                     self._component_parameter_name = name
 
     def __call__(
-        self, *args: typing.Any, **kwargs: typing.Any
-    ) -> typing.Coroutine[None, None, None]:
+        self, first: typing.Any, *args: typing.Any, **kwargs: typing.Any
+    ) -> typing.Coroutine[typing.Any, typing.Any, None]:
         if self._component_parameter_name:
             kwargs[self._component_parameter_name] = self._component
-        return self.callback(*args, **kwargs)
+        return self.callback(first, *args, **kwargs)
 
 
 class PermissionsCallback(BaseCallback):
@@ -82,13 +80,14 @@ class PermissionsCallback(BaseCallback):
 
     def __call__(
         self,
-        hikari_obj: typing.Union[hikari.Event, "Context"],
+        first: typing.Any,
         *args: typing.Any,
         **kwargs: typing.Any,
-    ) -> typing.Coroutine[None, None, None]:
-        if not self.has_permission(hikari_obj):
+    ) -> typing.Coroutine[typing.Any, typing.Any, None]:
+        assert isinstance(first, hikari.Event) or isinstance(first, Context)
+        if not self.has_permission(first):
             return noop()
-        return super().__call__(hikari_obj, *args, **kwargs)
+        return super().__call__(first, *args, **kwargs)
 
 
 class AtsumeEventListener(PermissionsCallback):
