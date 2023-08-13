@@ -142,7 +142,7 @@ class AtsumeIntervalSchedule(BaseCallback):
         self.interval = interval
         self.schedule_kwargs = schedule_kwargs
 
-    def as_time_schedule(
+    def as_interval(
         self,
     ) -> IntervalSchedule[Callable[..., Coroutine[Any, Any, None]] | Any]:
         return IntervalSchedule(self, self.interval, **self.schedule_kwargs)
