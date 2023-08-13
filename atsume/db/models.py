@@ -13,6 +13,7 @@ class ModelMeta(ormar.ModelMeta):
     """
     A subclass of the Ormar ModelMeta that carries a few extra properties.
     """
+
     _qual_name: str
     component_config: "ComponentConfig"
     name: typing.Optional[str] = None
@@ -32,8 +33,9 @@ class ModelMetaclass(OrmarModelMetaclass):
     A subclass of the Ormar ModelMetaclass. Adds and configures some extra properties during
     Model class creation.
     """
-    @staticmethod
-    def __new__(
+
+    # Ormar is ignoring the types for this, guess we have to too ¯\_(ツ)_/¯
+    def __new__(  # type: ignore
         mcs: "ModelMetaclass",
         name: str,
         bases: typing.Any,
@@ -51,6 +53,7 @@ class ModelMetaclass(OrmarModelMetaclass):
 
         # If this model doesn't have a Meta class property, create it
         if "Meta" not in attrs:
+
             class Meta(ModelMeta):
                 pass
 
@@ -82,4 +85,5 @@ class ModelMetaclass(OrmarModelMetaclass):
 
 class Model(ormar.Model, metaclass=ModelMetaclass):
     """Class to compose the Ormar Model class with Atsume's custom ModelMetaclass"""
+
     pass
