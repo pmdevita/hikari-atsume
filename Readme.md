@@ -32,18 +32,13 @@ Create a new project directory and install hikari-atsume
 your Python dependency should be `python = "^3.10,<3.12"`)
 
 ```shell
-# PyPI coming soon!
+# Install with your preferred database backend, SQLite recommended for beginners
 
-pip install git+https://github.com/pmdevita/hikari-atsume.git
+pip install hikari-atsume[sqlite]
 
-# You currently can't install database libraries as extras so you'll also need 
-# to pick the libraries yourself.
+pip install hikari-atsume[mysql]
 
-pip install aiosqlite
-
-pip install aiomysql PyMySQL
-
-pip install aiopg psycopg2-binary
+pip install hikari-atsume[postgresql]
 ```
 
 ### Start a new project

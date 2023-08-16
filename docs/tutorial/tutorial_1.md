@@ -9,37 +9,17 @@ libraries along the way.
 ## Installing Atsume
 
 To get started, create a new project directory for your bot. It's recommended to install your 
-libraries into a virtual environment, or use Poetry to track your dependencies.
-
-:::{tip}
-At the moment, Atsume is not yet available on PyPI, but it will be soon once 
-the proper release processes have been ironed out. This also means database 
-libraries need to be installed directly, rather than as extras from Atsume.
-:::
+libraries into a virtual environment, or use Poetry to track your dependencies. SQLite is 
+generally recommended for use when developing, or as an easy way to get started for beginners.
 
 ```shell
-# pip
-pip install https://github.com/pmdevita/hikari-atsume.git
+# Install with your preferred database backend
 
-# poetry
-poetry install https://github.com/pmdevita/hikari-atsume.git
-```
+pip install hikari-atsume[sqlite]
 
-You'll also need to install database libraries for your preferred database 
-backend. If you are unsure of which database backend to use, it's recommended 
-to start with SQLite.
+pip install hikari-atsume[mysql]
 
-```shell
-# Install the corresponding libraries for your backend
-pip install aiosqlite
-pip install aiomysql PyMySQL
-pip install aiopg psycopg2-binary
-
-# poetry 
-poetry add aiosqlite
-poetry add aiomysql PyMySQL
-poetry add aiopg psycopg2-binary
-
+pip install hikari-atsume[postgresql]
 ```
 
 ## Creating the Atsume project

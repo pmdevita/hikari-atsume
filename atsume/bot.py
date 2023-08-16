@@ -25,6 +25,7 @@ from atsume.component.decorators import (
     AtsumeComponentClose,
     AtsumeComponentOpen,
     AtsumeTimeSchedule,
+    AtsumeIntervalSchedule,
 )
 from atsume.cli.base import cli
 from atsume.db.manager import database
@@ -166,4 +167,6 @@ def load_component(
                 component.add_on_close(value)
             elif isinstance(value, AtsumeTimeSchedule):
                 component.add_schedule(value.as_time_schedule())
+            elif isinstance(value, AtsumeIntervalSchedule):
+                component.add_schedule(value.as_interval())
     client.add_component(component)
