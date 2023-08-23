@@ -5,6 +5,7 @@ import sys
 import mypy.types
 from mypy.options import Options
 from mypy.plugin import Plugin, AttributeContext
+import mypy.nodes
 from mypy.modulefinder import mypy_path
 from pathlib import Path
 from .settings import SettingsPlugin
@@ -26,15 +27,29 @@ class AtsumePlugin(Plugin):
         sys.path.extend(mypy_path())
         # Add paths from mypy_path config option
         sys.path.extend(options.mypy_path)
+        assert self.plugin_config.atsume_settings_module is not None
 
         # This isn't a very extensible or flexible way of doing this
         # But it's fine as long as there's only really one plugin
-        self.settings_plugin = SettingsPlugin(options)
+        self.settings_plugin = SettingsPlugin(
+            options, atsume_settings_module=self.plugin_config.atsume_settings_module
+        )
 
     def get_attribute_hook(
         self, fullname: str
     ) -> typing.Callable[[AttributeContext], mypy.types.Type] | None:
         return self.settings_plugin.get_attribute_hook(fullname)
+
+    def get_additional_deps(
+        self, file: mypy.nodes.MypyFile
+    ) -> list[tuple[int, str, int]]:
+        # If we're loading Atsume settings, load the project's settings files with it
+        if file.fullname == "atsume.settings":
+            return [
+                (10, f"{self.plugin_config.atsume_settings_module}.settings", -1),
+                (10, f"{self.plugin_config.atsume_settings_module}.local", -1),
+            ]
+        return []
 
 
 class AtsumePluginConfig:
