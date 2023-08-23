@@ -11,7 +11,7 @@ from tanjun.schedules import TimeSchedule, _CallbackSigT, IntervalSchedule
 from atsume.permissions import AbstractComponentPermissions
 from atsume.component.component import Component
 from atsume.utils import copy_kwargs
-from atsume.component import Context
+from atsume.component.context import Context
 
 
 class BaseCallback:
