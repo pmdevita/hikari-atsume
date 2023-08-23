@@ -3,6 +3,7 @@ import typing
 import mypy.types
 import mypy.checker
 import mypy.nodes
+from mypy.options import Options
 from mypy.plugin import Plugin, AttributeContext
 
 
@@ -16,6 +17,14 @@ class SettingsPlugin(Plugin):
     https://github.com/typeddjango/django-stubs/blob/master/mypy_django_plugin/transformers/settings.py
 
     """
+
+    def __init__(
+        self, options: Options, atsume_settings_module: typing.Optional[str] = None
+    ):
+        super().__init__(options)
+        self.atsume_project_module: typing.Optional[str] = None
+        if atsume_settings_module:
+            self.atsume_project_module = atsume_settings_module
 
     def get_attribute_hook(
         self, fullname: str
@@ -36,14 +45,36 @@ class SettingsPlugin(Plugin):
             api = ctx.api
             if not isinstance(api, mypy.checker.TypeChecker):
                 raise ValueError("Not a Typechecker")
+            project_settings: mypy.nodes.MypyFile | None = None
+            local_settings: mypy.nodes.MypyFile | None = None
             global_settings: mypy.nodes.MypyFile | None = api.modules.get(
                 "atsume.settings.default_settings"
             )
             if not global_settings:
                 raise ValueError(f"Error getting global Atsume settings")
+            if self.atsume_project_module:
+                project_settings = api.modules.get(
+                    f"{self.atsume_project_module}.settings"
+                )
+                local_settings = api.modules.get(f"{self.atsume_project_module}.local")
+                if not project_settings:
+                    raise ValueError(
+                        f"Error getting project Atsume settings {self.atsume_project_module}.settings"
+                    )
+                if not local_settings:
+                    raise ValueError(
+                        f"Error getting global Atsume settings {self.atsume_project_module}.local"
+                    )
             sym: mypy.nodes.SymbolTableNode | None = global_settings.names.get(
                 property_name
             )
+            if sym is None and self.atsume_project_module:
+                assert project_settings is not None
+                assert local_settings is not None
+                sym = project_settings.names.get(property_name)
+                if sym is None:
+                    sym = local_settings.names.get(property_name)
+
             if sym is None:
                 ctx.api.fail(
                     f"'Settings' object has no attribute {property_name!r}", ctx.context

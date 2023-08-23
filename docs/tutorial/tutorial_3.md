@@ -58,13 +58,14 @@ async def hello(ctx: atsume.Context) -> None:
 
 Let's explain each line here:
 - Our first line starts with an `@` symbol, making this a Python decorator. Tanjun uses decorators to create 
-commands out of functions you write. Here, we are asking Tanjun to make a message command that will invoke our function
+commands out of functions you write. Here, we are asking Tanjun to make a message command that will call our function
 whenever someone uses the command `hi`, `hello`, `hey`, or `howdy`.
 - The second line is where we define our function. Tanjun commands always need to be async functions, and should always 
 have at least one parameter, the "context", which is abbreviated to `ctx`. We also use a type hint to tell Python this 
-is an `atsume.Context` object.
+is an {py:class}`atsume.Context` object.
 - Finally, on the third line, we respond to the command by saying hi to the display name of the Discord server member 
-that used the command. Any command that sends data to Discord will likely need to be `await`ed.
+that used the command. As a general rule of them, functions that send data to Discord are coroutines and need to 
+be `await`ed.
 
 
 
