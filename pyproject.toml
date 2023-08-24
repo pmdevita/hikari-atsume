@@ -51,7 +51,6 @@ sqlalchemy-stubs = "^0.4"
 sphinx = "^7.0.1"
 sphinx-reload = "^0.2.0"
 furo = "^2023.07.26"
-towncrier = "^23.6.0"
 
 [tool.poetry.extras]
 postgresql = ["asyncpg", "psycopg2-binary"]
