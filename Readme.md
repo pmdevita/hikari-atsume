@@ -9,7 +9,8 @@
 [Documentation](https://pmdevita.github.io/hikari-atsume/)
 
 An opinionated Discord bot framework inspired by Django and built on 
-top of Hikari, Tanjun, Ormar, and Alembic.
+top of [Hikari](https://github.com/hikari-py/hikari), [Tanjun](https://github.com/FasterSpeeding/Tanjun), 
+[Ormar](https://github.com/collerek/ormar), and [Alembic](https://alembic.sqlalchemy.org/en/latest/).
 
 
 ## Features
@@ -72,9 +73,8 @@ In `basic/commands.py`, write your commands using [Tanjun](https://tanjun.cursed
 Commands are declared without explicitly attaching to a Component object 
 (Atsume takes care of that using `load_from_scope`).
 
-At the moment, Atsume generates apps with an example default hi command. This is an example 
-of a hybrid slash/message command that takes one optional positional argument, the user to say 
-hi to.
+This is an example of a hybrid slash/message command that takes one 
+optional positional argument, the user to say hi to.
 
 ```python
 # basic/commands.py
@@ -191,9 +191,9 @@ python manage.py run
 
 ## Special thanks to
 - The Hikari Discord for help and feedback
-- FasterSpeeding for Tanjun
+- FasterSpeeding for [Tanjun](https://github.com/FasterSpeeding/Tanjun)
 - Lunarmagpie for help with the CI and linting
-- The Django and django-stubs projects for their amazing work and some 
+- The [Django](https://www.djangoproject.com/) and [django-stubs](https://github.com/typeddjango/django-stubs) projects for their amazing work and some 
 code that I borrowed.
 
 
