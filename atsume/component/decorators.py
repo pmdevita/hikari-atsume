@@ -49,11 +49,11 @@ class BaseCallback:
                     self._component_parameter_name = name
 
     def __call__(
-        self, first: typing.Any, *args: typing.Any, **kwargs: typing.Any
-    ) -> typing.Coroutine[typing.Any, typing.Any, None]:
+        self, *args: typing.Any, **kwargs: typing.Any
+    ) -> Coroutine[Any, Any, None]:
         if self._component_parameter_name:
             kwargs[self._component_parameter_name] = self._component
-        return self.callback(first, *args, **kwargs)
+        return self.callback(*args, **kwargs)
 
 
 class PermissionsCallback(BaseCallback):
@@ -79,15 +79,14 @@ class PermissionsCallback(BaseCallback):
         return True
 
     def __call__(
-        self,
-        first: typing.Any,
-        *args: typing.Any,
-        **kwargs: typing.Any,
-    ) -> typing.Coroutine[typing.Any, typing.Any, None]:
+        self, *args: typing.Any, **kwargs: typing.Any
+    ) -> Coroutine[Any, Any, None]:
+        assert len(args) > 0
+        first = args[0]
         assert isinstance(first, hikari.Event) or isinstance(first, Context)
         if not self.has_permission(first):
             return noop()
-        return super().__call__(first, *args, **kwargs)
+        return super().__call__(*args, **kwargs)
 
 
 class AtsumeEventListener(PermissionsCallback):
