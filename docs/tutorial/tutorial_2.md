@@ -22,8 +22,7 @@ so you don't accidentally make your bot token public!
 
 Let's set the Discord bot token for our new Atsume project. In your `local.py` file, set the 
 `TOKEN` variable to your Discord bot token. If you haven't made one yet, you can log into 
-the [Discord Developer Portal](https://discord.com/developers/applications) and make one. (The Discord-IRC project has a good 
-tutorial [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)).
+the [Discord Developer Portal](https://discord.com/developers/applications) and make one.
 
 Once you have your token, set the `TOKEN` string to it.
 

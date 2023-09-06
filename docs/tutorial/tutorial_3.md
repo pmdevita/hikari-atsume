@@ -82,15 +82,20 @@ it needs to download a lot of files or perform other tasks in the meantime (and 
 needs to be able to handle a lot of simultaneous tasks such as its heartbeat, the listening and handling of many events 
 simultaneously, scheduled tasks, etc.)
 
-In async programming, we can "await" an IO-related task (networking, file IO, etc.), and allow the Python interpreter 
+In async programming, we can "await" an IO-related task (sending or receiving data over the network, reading or 
+writing to a file, etc.), and allow the Python interpreter 
 to perform other tasks while we wait for that IO to complete. By doing this, our application can handle multiple IO 
 related tasks at once and improve performance and responsiveness.
 
-Here, since we are telling Discord to send a message, that's network IO, so we'll need to await its completion. 
+Here, since we are telling Discord to send a message, that's network IO, so we'll need to `await` its completion. 
 You can find out what functions need to be awaited through the Tanjun and Hikari documentation, through PyCharm 
 and VSCode linting, and if nothing else, through error messages.
 :::
 
+Now we should be ready to start the bot with our command! Run `python manage.py run` and start the bot again.
 
+In the Discord server you invited it to, give the commands a try.
+
+![docs/img/hi_bot.png](./docs/img/hi_bot.png)
 
 

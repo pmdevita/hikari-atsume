@@ -6,6 +6,14 @@ backends (SQLite, MySQL/MariaDB, or PostgreSQL). Knowledge of the Hikari, Tanjun
 Ormar libraries is a plus, but this tutorial will try to cover the basics for these 
 libraries along the way.
 
+## Registering a new bot with Discord.
+
+This tutorial won't cover the details for registering a bot, but to summarize, you'll need to register a 
+bot on the [Discord Developer Portal](https://discord.com/developers/applications) (The Discord-IRC project has a good 
+tutorial [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)) and add it 
+to a Discord server to test and use it. You may also want to be familiar with what Intents are, especially if 
+you want to make a bot that responds to message commands.
+
 ## Installing Atsume
 
 To get started, create a new project directory for your bot. It's recommended to install your 
