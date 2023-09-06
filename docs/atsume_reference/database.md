@@ -25,7 +25,7 @@ pip install hikari-atsume[postgresql]
 
 ## Connecting to the database
 
-You can set the database connection URL in your `local.py` file. Here are some example depending 
+You can set the database connection URL in your `local.py` file. Here are some examples depending 
 on your database of choice. For more information, check the 
 [SQLAlchemy docs](https://docs.sqlalchemy.org/en/20/core/engines.html#backend-specific-urls).
 
