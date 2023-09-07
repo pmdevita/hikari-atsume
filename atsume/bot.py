@@ -46,7 +46,8 @@ def initialize_atsume(bot_module: str) -> None:
         logging.basicConfig(level=logging.DEBUG)
     if not settings.DISABLE_UVLOOP:
         try:
-            import uvloop
+            # Has to be ignored to keep tests passing on Windows
+            import uvloop  # type: ignore
 
             uvloop.install()
             logging.info("Enabling uvloop...")
