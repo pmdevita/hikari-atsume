@@ -33,11 +33,11 @@ TOKEN: str
 """Your Discord bot token."""
 
 DEBUG: bool
-"""Whether to run the bot in Debug or Production mode. """
+"""Whether to run the bot in Debug or Production mode. (default: False)"""
 
 GLOBAL_COMMANDS: bool
 """
-Whether to register commands globally or per-guild. Global commands can take """
+Whether to register commands globally or per-guild. (default: False)"""
 
 COMPONENTS: list[str]
 """A list of module paths to Component that will be loaded."""
@@ -67,7 +67,7 @@ to a list of allowed component module paths.
 """
 
 HIKARI_LOGGING: bool
-"""Enable more verbose logging."""
+"""Enable more verbose logging. (default: False)"""
 
 INTENTS: Intents
 """The intents to use for Hikari."""
@@ -80,3 +80,6 @@ DATABASE_URL: str
 
 MIDDLEWARE: list[str]
 """A list of middleware module paths to load."""
+
+DISABLE_UVLOOP: bool
+"""Prevent running with uvloop even if installed. (default: False)"""

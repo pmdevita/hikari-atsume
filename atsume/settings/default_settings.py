@@ -24,3 +24,5 @@ DATABASE_URL = "sqlite:///db.sqlite"
 DEBUG = False
 
 GLOBAL_COMMANDS = False
+
+DISABLE_UVLOOP = False
