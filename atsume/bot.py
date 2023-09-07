@@ -11,8 +11,6 @@ import os
 import sys
 import typing
 
-import aiohttp
-import alluka
 import hikari
 import click
 import hupper  # type: ignore
@@ -46,6 +44,15 @@ def initialize_atsume(bot_module: str) -> None:
         sys.path.insert(0, module_to_path(bot_module))
     if settings.HIKARI_LOGGING:
         logging.basicConfig(level=logging.DEBUG)
+    if not settings.DISABLE_UVLOOP:
+        try:
+            import uvloop
+
+            uvloop.install()
+            logging.info("Enabling uvloop...")
+        except ImportError:
+            pass
+
     # This needs to get done before we load any database models
     database._create_database()
 
