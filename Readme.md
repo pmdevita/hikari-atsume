@@ -166,13 +166,14 @@ python manage.py upgrade
 
 #### Note about Atsume Migrations
 
-Atsume's migrations are still very much a work in progress. 
+Atsume's migrations are still very much a work in progress (you can track it 
+[here](https://github.com/pmdevita/hikari-atsume/issues/2)).
 As a general rule of thumb, Atsume is good at migrations that create and delete 
 models and fields, but currently struggles with renames. You can always review 
 a migration and make any needed changes by looking in the component's 
 generated migration folder. Atsume uses 
 [Alembic](https://alembic.sqlalchemy.org/en/latest/) 
-for migrations so you can look at the 
+for migrations, so you can look at the 
 [Alembic operations docs](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations)
 to figure out how to write migrations manually.
 
