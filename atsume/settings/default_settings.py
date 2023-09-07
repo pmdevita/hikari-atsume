@@ -20,3 +20,7 @@ INTENTS = hikari.Intents.ALL_UNPRIVILEGED
 MESSAGE_PREFIX = None
 
 DATABASE_URL = "sqlite:///db.sqlite"
+
+DEBUG = False
+
+GLOBAL_COMMANDS = False

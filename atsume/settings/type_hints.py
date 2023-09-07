@@ -32,6 +32,13 @@ from hikari import Intents
 TOKEN: str
 """Your Discord bot token."""
 
+DEBUG: bool
+"""Whether to run the bot in Debug or Production mode. """
+
+GLOBAL_COMMANDS: bool
+"""
+Whether to register commands globally or per-guild. Global commands can take """
+
 COMPONENTS: list[str]
 """A list of module paths to Component that will be loaded."""
 

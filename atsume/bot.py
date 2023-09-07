@@ -41,16 +41,16 @@ def initialize_atsume(bot_module: str) -> None:
     when bootstrapping the framework.
     """
     settings._initialize(bot_module)
-    sys.path.insert(0, module_to_path(bot_module))
+    path = module_to_path(bot_module)
+    if path not in sys.path:
+        sys.path.insert(0, module_to_path(bot_module))
     if settings.HIKARI_LOGGING:
         logging.basicConfig(level=logging.DEBUG)
     # This needs to get done before we load any database models
     database._create_database()
 
 
-def initialize_discord(
-    declare_global_commands: bool = True,
-) -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
+def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
     """
     Instantiate the Hikari bot and Tanjun client. Should be called after
     `initialize_atsume`.
@@ -60,8 +60,10 @@ def initialize_discord(
         settings.TOKEN, intents=hikari.Intents(settings.INTENTS)
     )
 
+    global_commands = not settings.DEBUG and settings.GLOBAL_COMMANDS
+
     client = tanjun.Client.from_gateway_bot(
-        bot, declare_global_commands=declare_global_commands, mention_prefix=False
+        bot, declare_global_commands=global_commands, mention_prefix=False
     )
     if settings.MESSAGE_PREFIX:
         client.add_prefix(settings.MESSAGE_PREFIX)
@@ -85,36 +87,36 @@ def create_bot(
     :return: An initialized :py:class:`hikari.GatewayBot` object.
     """
     initialize_atsume(bot_module)
-    bot, client = initialize_discord(declare_global_commands=declare_global_commands)
+    bot, client = initialize_discord()
     attach_middleware(client)
     load_components(client)
     return bot
 
 
+def run_bot(bot: hikari.GatewayBot) -> None:
+    bot.run(asyncio_debug=settings.DEBUG)
+
+
 @cli.command("run")
-@click.option("--reload", is_flag=True, default=False)
 @click.pass_obj
-def start_bot(bot: hikari.GatewayBot, reload: bool) -> None:
+def start_bot(bot: hikari.GatewayBot) -> None:
     """
     The project CLI command to run the bot
 
     :param bot: The bot instance to run.
-    :param reload: Whether auto reloading should be enabled.
     """
-    if reload:
+    if settings.DEBUG:
         # IDK if this is necessary but might reduce overhead
         del bot
         gc.collect()
         reloader = hupper.start_reloader("atsume.bot.autoreload_start_bot")
     else:
-        bot.run()
+        run_bot(bot)
 
 
 def autoreload_start_bot() -> None:
-    bot = create_bot(
-        os.environ["ATSUME_SETTINGS_MODULE"], declare_global_commands=False
-    )
-    bot.run()
+    bot = create_bot(os.environ["ATSUME_SETTINGS_MODULE"])
+    run_bot(bot)
 
 
 def load_components(client: tanjun.abc.Client) -> None:
