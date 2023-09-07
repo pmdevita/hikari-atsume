@@ -1,4 +1,6 @@
 from nox_poetry import session
+import platform
+
 
 @session
 def lint(session):
@@ -8,5 +10,7 @@ def lint(session):
 
 @session
 def mypy(session):
+    if platform.system() != "Windows":
+        session.install("uvloop")
     session.install("mypy", "sqlalchemy-stubs", ".")
     session.run("mypy", "--strict", "-p", "atsume")
