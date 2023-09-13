@@ -107,6 +107,8 @@ def get_alembic_config(
     # Renames are figured out in env.py after table schemas are computed.
     cfg.rename_models = {}
 
+    get_formatting(cfg)
+
     return cfg
 
 
@@ -133,3 +135,14 @@ def get_model_table_names(scripts: ScriptDirectory) -> dict[str, str]:
     return previous_models
 
 
+def get_formatting(config: Config) -> None:
+    """If Black is installed, add configuration to use it for formatting"""
+    try:
+        import black
+    except ImportError:
+        return
+
+    config.set_section_option("post_write_hooks", "hooks", "black")
+    config.set_section_option("post_write_hooks", "black.type", "console_scripts")
+    config.set_section_option("post_write_hooks", "black.entrypoint", "black")
+    config.set_section_option("post_write_hooks", "black.options", "-q")
