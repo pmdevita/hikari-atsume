@@ -11,6 +11,6 @@ def lint(session):
 @session
 def mypy(session):
     if platform.system() != "Windows":
-        session.install("uvloop")
+        session.install("uvloop", "black")
     session.install("mypy", "sqlalchemy-stubs", ".")
     session.run("mypy", "--strict", "-p", "atsume")
