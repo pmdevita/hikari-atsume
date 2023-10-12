@@ -1,6 +1,8 @@
 import hikari
 from atsume.settings.type_hints import *
 
+VOICE_COMPONENT = None
+
 COMPONENTS = []
 
 COMPONENT_PERMISSIONS_CLASS = None

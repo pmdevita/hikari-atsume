@@ -39,6 +39,11 @@ GLOBAL_COMMANDS: bool
 """
 Whether to register commands globally or per-guild. (default: False)"""
 
+VOICE_COMPONENT: typing.Optional[str]
+"""
+The VoiceComponentImpl implementation to use. Must be a subclass of :py:class:`hikari.impl.voice.VoiceComponentImpl`.
+"""
+
 COMPONENTS: list[str]
 """A list of module paths to Component that will be loaded."""
 

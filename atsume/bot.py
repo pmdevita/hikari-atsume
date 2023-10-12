@@ -29,7 +29,7 @@ from atsume.cli.base import cli
 from atsume.db.manager import database
 from atsume.component.manager import manager as component_manager
 from atsume.component import Component, ComponentConfig
-from atsume.middleware.loader import attach_middleware
+from atsume.middleware.loader import attach_middleware, load_module_setting
 from atsume.utils import module_to_path
 
 
@@ -67,6 +67,11 @@ def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
     bot = hikari.impl.GatewayBot(
         settings.TOKEN, intents=hikari.Intents(settings.INTENTS)
     )
+
+    if settings.VOICE_COMPONENT:
+        bot._voice = load_module_setting(
+            "VOICE_COMPONENT", hikari.impl.VoiceComponentImpl
+        )
 
     global_commands = not settings.DEBUG and settings.GLOBAL_COMMANDS
 
