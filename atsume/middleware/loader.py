@@ -11,7 +11,7 @@ ATSUME_MIDDLEWARE = ["atsume.db.manager.hook_database"]
 
 
 class MiddlewareCallable:
-    def __call__(self, client: tanjun.Client):
+    def __call__(self, client: tanjun.Client) -> None:
         ...
 
 
