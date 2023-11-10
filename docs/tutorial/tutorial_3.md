@@ -1,4 +1,4 @@
-# Making a First Component
+# Making A First Component
 
 Atsume divides bot functionality into separate "components", which are modular units that are meant to contain a 
 single cohesive set of functionality for your bot. It could be a set of unrelated fun commands, 
@@ -44,12 +44,17 @@ Now we're ready to write some commands!
 
 ## A first command
 
-Let's write a hello world command to begin with. When writing commands, you'll want to keep a reference to the 
-[Tanjun docs](https://tanjun.cursed.solutions/usage/) around.
+Let's write a hello world command to begin with. Atsume supports all valid Tanjun commands, so you 
+can also reference from the [Tanjun command docs](https://tanjun.cursed.solutions/usage/#declaring-commands).
 
 In your `commands.py` file, add the following.
 
 ```python
+# basic/commands.py
+
+import atsume
+import tanjun
+
 @tanjun.as_message_command("hi", "hello", "hey", "howdy")
 async def hello(ctx: atsume.Context) -> None:
     await ctx.respond(f"Hi {ctx.member.display_name}!")
@@ -96,6 +101,56 @@ Now we should be ready to start the bot with our command! Run `python manage.py 
 
 In the Discord server you invited it to, give the commands a try.
 
-![docs/img/hi_bot.png](./docs/img/hi_bot.png)
+![../img/hi_bot.png](../img/hi_bot_simple.png)
 
+
+## Slash commands and hybrid commands
+
+Tanjun supports defining commands as both message and slash commands. Doing this 
+is as easy as adding the slash command decorator to our command.
+
+```python
+# basic/commands.py
+
+import atsume
+import tanjun
+
+@tanjun.as_slash_command("hi", "The bot says hi.")
+@tanjun.as_message_command("hi", "hello", "hey", "howdy")
+async def hello(ctx: atsume.Context) -> None:
+    await ctx.respond(f"Hi {ctx.member.display_name}!")
+
+```
+
+## Command arguments
+
+Now that we've looked at defining basic commands, let's look at adding arguments to our commands. 
+Tanjun supports several ways of adding arguments to a command but in this tutorial, we'll look at 
+using type annotations to add them.
+
+Tanjun supports two kinds of arguments, Positional and Optional arguments. Positional arguments 
+work based on position in the command (if you are coming from Discord.py, this is what you'll be 
+used to). Optional arguments are specified with a flag first and the value after, 
+like `--fruit pineapple`.
+
+Here's our hi command with an additional positional argument. Note that our typing for this is 
+`Optional[Member]` (not to be confused with an Optional argument). This means the command can be 
+run without supplying this argument, and the default will be None.
+
+
+```python
+import atsume
+import tanjun
+from typing import Annotated, Optional
+from tanjun.annotations import Member, Positional
+
+
+@tanjun.annotations.with_annotated_args(follow_wrapped=True)
+@tanjun.as_message_command("hi", "hello", "hey", "howdy")
+@tanjun.as_slash_command("hi", "Bot says hi")
+async def hello(ctx: atsume.Context, member: Annotated[Optional[Member], "The user to say hi to.", Positional()] = None):
+    member = member if member else ctx.member
+    await ctx.respond(f"Hi {member.display_name}!")
+
+```
 
