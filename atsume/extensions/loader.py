@@ -6,25 +6,25 @@ import tanjun
 
 from atsume.settings import settings
 
-# Middleware that Atsume always needs to load
-ATSUME_MIDDLEWARE = ["atsume.db.manager.hook_database"]
+# Extensions that Atsume always needs to load
+ATSUME_EXTENSIONS = ["atsume.db.manager.hook_database"]
 
 
-class MiddlewareCallable:
+class ExtensionCallable:
     def __call__(self, client: tanjun.Client) -> None:
         ...
 
 
-def attach_middleware(client: tanjun.Client) -> None:
+def attach_extensions(client: tanjun.Client) -> None:
     """
-    Load the middleware modules from the Atsume project settings and hook them
+    Load the extension modules from the Atsume project settings and hook them
     on to the given `tanjun.Client`.
     """
-    middleware = set()
-    middleware.update(settings.MIDDLEWARE)
-    middleware.update(ATSUME_MIDDLEWARE)
-    for module_path in middleware:
-        func = load_module_setting(module_path, MiddlewareCallable)
+    extensions = set()
+    extensions.update(settings.EXTENSIONS)
+    extensions.update(ATSUME_EXTENSIONS)
+    for module_path in extensions:
+        func = load_module_setting(module_path, ExtensionCallable)
         func(client)
 
 
