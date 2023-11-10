@@ -167,6 +167,9 @@ class Timer:
             print("Tried scheduling balancing after task cancel, got", e)
 
     def _start(self) -> None:
+        if self._has_started:
+            logger.warning("Timer was started again!")
+            return
         self._has_started = True
         self.sort_tasks()
 
