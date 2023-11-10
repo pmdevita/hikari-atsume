@@ -7,7 +7,7 @@ COMPONENT_PERMISSIONS_CLASS = "atsume.permissions.SettingsPermissions"
 
 COMPONENT_ALL_GUILDS_PERMISSIONS = ["basic"]
 
-MIDDLEWARE = []
+EXTENSIONS = []
 
 HIKARI_LOGGING = False
 
