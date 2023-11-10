@@ -7,6 +7,9 @@ from zoneinfo import ZoneInfo
 
 import alluka
 import tanjun
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 CallableArgs = typing.TypeVar("CallableArgs")
@@ -25,7 +28,7 @@ class TimerTask:
     ) -> None:
         self.timer = timer
         self.time = time
-        self._callback = weakref.WeakMethod(callback)
+        self._callback = callback
         self.repeat = repeat
         self._cancelled = False
         self._run = False
@@ -34,17 +37,17 @@ class TimerTask:
 
     async def callback(self) -> None:
         if self._cancelled:
-            print(
-                "Warning: Callback was attempted on a cancelled task!!!", self._callback
+            logger.warning(
+                f"Callback was attempted on a cancelled task {self._callback}!"
             )
-        callback = self._callback()
-        if callback is not None:
-            if not self.repeat:
-                self._run = True  # Done in case the running task wants to know if it should cancel it
-            try:
-                await callback(*self.args, **self.kwargs)
-            except:
-                print(traceback.format_exc())
+
+        if not self.repeat:
+            self._run = True  # Done in case the running task wants to know if it should cancel it
+        try:
+            await self._callback(*self.args, **self.kwargs)
+        except:
+            print(traceback.format_exc())
+
         if self.repeat:
             self.time += self.repeat
             # Readd instead of recreate so API doesn't lose handler to the task
@@ -59,11 +62,10 @@ class TimerTask:
 
     def _cancel(self, unregister: bool = True) -> None:
         if self._cancelled:
-            print("Warning: Callback was cancelled twice!!!", self._callback)
+            logger.warning(f"Callback was cancelled twice {self._callback}!")
             return
         if self._run:
-            print("Warning: Cancelling task that was already run!", self._callback)
-            print(self.timer.tasks)
+            logger.warning(f"Cancelling task that was already run {self._callback}!")
             return
         self._cancelled = True
         if unregister:
