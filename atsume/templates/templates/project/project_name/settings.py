@@ -3,7 +3,7 @@ from atsume.settings.type_hints import *
 
 COMPONENTS = []
 
-MIDDLEWARE = []
+EXTENSIONS = []
 
 HIKARI_LOGGING = False
 

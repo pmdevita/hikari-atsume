@@ -18,8 +18,8 @@ Example
 
   INTENTS = hikari.
 
-  MIDDLEWARE = [
-      "atsume.middleware.aiohttp"
+  EXTENSIONS = [
+      "atsume.extensions.aiohttp"
   ]
 
 """
@@ -83,8 +83,8 @@ MESSAGE_PREFIX: typing.Optional[str]
 DATABASE_URL: str
 """A database URL for Ormar to use to connect to the database."""
 
-MIDDLEWARE: list[str]
-"""A list of middleware module paths to load."""
+EXTENSIONS: list[str]
+"""A list of extension module paths to load."""
 
 DISABLE_UVLOOP: bool
 """Prevent running with uvloop even if installed. (default: False)"""

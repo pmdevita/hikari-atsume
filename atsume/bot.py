@@ -29,7 +29,7 @@ from atsume.cli.base import cli
 from atsume.db.manager import database
 from atsume.component.manager import manager as component_manager
 from atsume.component import Component, ComponentConfig
-from atsume.middleware.loader import attach_middleware, load_module_setting
+from atsume.extensions.loader import attach_extensions, load_module_setting
 from atsume.utils import module_to_path
 
 
@@ -92,7 +92,7 @@ def create_bot(
 
     1. :py:func:`initialize_atsume`
     2. :py:func:`initialize_discord`
-    3. :py:func:`atsume.middleware.loader.attach_middleware`
+    3. :py:func:`atsume.extensions.loader.attach_extensions`
     4. :py:func:`load_components`
 
     :param bot_module: The module path for the Atsume project to start.
@@ -101,7 +101,7 @@ def create_bot(
     """
     initialize_atsume(bot_module)
     bot, client = initialize_discord()
-    attach_middleware(client)
+    attach_extensions(client)
     load_components(client)
     return bot
 
