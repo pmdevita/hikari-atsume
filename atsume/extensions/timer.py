@@ -169,7 +169,7 @@ class Timer:
 def hook_extension(c: tanjun.Client) -> None:
     @c.with_client_callback(tanjun.ClientCallbackNames.STARTING)
     async def on_starting(client: alluka.Injected[tanjun.abc.Client]) -> None:
-        client.set_type_dependency(Timer, Timer)
+        client.set_type_dependency(Timer, Timer())
 
     @c.with_client_callback(tanjun.ClientCallbackNames.CLOSING)
     async def on_closing(timer: alluka.Injected[Timer]) -> None:
