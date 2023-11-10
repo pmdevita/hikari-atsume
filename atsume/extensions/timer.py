@@ -166,7 +166,7 @@ class Timer:
         except RuntimeError as e:
             print("Tried scheduling balancing after task cancel, got", e)
 
-    def _start(self):
+    def _start(self) -> None:
         self._has_started = True
         self.sort_tasks()
 
@@ -222,10 +222,6 @@ def hook_extension(c: tanjun.Client) -> None:
         timer = Timer()
         client.set_type_dependency(Timer, timer)
         _cache_tracker.start(client, timer._start)
-
-    # @c.with_client_callback(tanjun.ClientCallbackNames.STARTED)
-    # async def on_starting(timer: alluka.Injected[Timer]) -> None:
-    #     _cache_tracker.start(client, timer)
 
     @c.with_client_callback(tanjun.ClientCallbackNames.CLOSING)
     async def on_closing(timer: alluka.Injected[Timer]) -> None:
