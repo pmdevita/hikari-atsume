@@ -21,8 +21,8 @@ bot in production, it's recommended to run with at least first level optimizatio
 optimization by passing a flag in the run command.
 
 ```shell
-python manage.py run - no optimization - this is the default.
-python -O manage.py run - first level optimization - features such as internal assertions will be disabled.
-python -OO manage.py run - second level optimization - more features (including all docstrings) will be removed from the loaded code at runtime.
+python manage.py run  # no optimization - this is the default.
+python -O manage.py run  # first level optimization - features such as internal assertions will be disabled.
+python -OO manage.py run  # second level optimization - more features (including all docstrings) will be removed from the loaded code at runtime.
 ```
 
