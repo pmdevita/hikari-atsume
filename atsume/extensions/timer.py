@@ -86,8 +86,11 @@ class Timer:
         self._running_task: typing.Optional[asyncio.Task[None]] = None
         self._sort_task: typing.Optional[asyncio.Task[None]] = None
         self.timezone = datetime(2020, 1, 1, 1).astimezone().tzinfo
+        self._has_started = False  # Wait until the bot has started to send off tasks
 
     def sort_tasks(self) -> None:
+        if not self._has_started:
+            return
         self._sort_task = asyncio.create_task(self._sort_tasks())
 
     async def _sort_tasks(self) -> None:
@@ -162,6 +165,10 @@ class Timer:
         except RuntimeError as e:
             print("Tried scheduling balancing after task cancel, got", e)
 
+    def _start(self):
+        self._has_started = True
+        self.sort_tasks()
+
     async def close(self) -> None:
         while len(self.tasks):
             task = self.tasks.pop(0)
@@ -172,6 +179,10 @@ def hook_extension(c: tanjun.Client) -> None:
     @c.with_client_callback(tanjun.ClientCallbackNames.STARTING)
     async def on_starting(client: alluka.Injected[tanjun.abc.Client]) -> None:
         client.set_type_dependency(Timer, Timer())
+
+    @c.with_client_callback(tanjun.ClientCallbackNames.STARTED)
+    async def on_starting(timer: alluka.Injected[Timer]) -> None:
+        timer._start()
 
     @c.with_client_callback(tanjun.ClientCallbackNames.CLOSING)
     async def on_closing(timer: alluka.Injected[Timer]) -> None:
