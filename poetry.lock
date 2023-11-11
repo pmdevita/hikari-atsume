@@ -1048,13 +1048,13 @@ speedups = ["aiohttp[speedups] (>=3.8,<4.0)", "ciso8601 (>=2.3,<3.0)", "orjson (
 
 [[package]]
 name = "hikari-tanjun"
-version = "2.16.1"
+version = "2.17.1"
 description = "A flexible command framework designed to extend Hikari."
 optional = false
 python-versions = ">=3.9.0,<3.12"
 files = [
-    {file = "hikari_tanjun-2.16.1-py3-none-any.whl", hash = "sha256:b7d91e167fe2cbdd001a58d1a83fef1976ab74c96813ef4d09251092ab006407"},
-    {file = "hikari_tanjun-2.16.1.tar.gz", hash = "sha256:2dccb6bb6fd7ecbe008ebf7420f70fa9d70dfe284ba35566dd1602ae5405b6b1"},
+    {file = "hikari_tanjun-2.17.1-py3-none-any.whl", hash = "sha256:aa1b5d73d044256f5135ac7e5f1376fbcb0fbbd481a5e966e5805a7ebbc2db6f"},
+    {file = "hikari_tanjun-2.17.1.tar.gz", hash = "sha256:9fd1184601e5378c351c0b01ef617f5abbccfbe68f8888194b6dd04cc6cd7ba4"},
 ]
 
 [package.dependencies]
@@ -2690,4 +2690,4 @@ sqlite = ["aiosqlite"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "cdcfcf9d64db0e50d0c275aab9b04b406525bbf342c2bd3f01d5491d7247cfd2"
+content-hash = "dbe84a5868e67f3a79674496968eda456184ca890113e119149393c31337285c"
