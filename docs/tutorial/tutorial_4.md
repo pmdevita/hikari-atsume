@@ -1,4 +1,4 @@
-# Working With The Database
+# Database Models and Queries
 
 Atsume integrates the [Ormar](https://collerek.github.io/ormar/) library for handling 
 database operations. Ormar is an ORM, so it works through defining your 
