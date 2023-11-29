@@ -12,7 +12,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 CallableArgs = typing.TypeVar("CallableArgs")
 CallableKwargs = typing.TypeVar("CallableKwargs")
 
@@ -179,52 +178,12 @@ class Timer:
             task._cancel(unregister=False)
 
 
-class CacheTracker:
-    def __init__(self) -> None:
-        self.count = 0
-        self.client: typing.Optional[tanjun.abc.Client] = None
-        self.callback: typing.Optional[typing.Callable[..., None]] = None
-
-    def start(
-        self, client: tanjun.abc.Client, callback: typing.Callable[..., None]
-    ) -> None:
-        self.client = client
-        self.callback = callback
-        assert self.client.events is not None
-        self.client.events.subscribe(hikari.events.ShardReadyEvent, self.on_ready)
-        self.client.events.subscribe(
-            hikari.events.MemberChunkEvent, self.on_member_chunk
-        )
-
-    async def on_ready(self, event: hikari.events.ShardReadyEvent) -> None:
-        self.count += len(event.unavailable_guilds)
-
-    async def on_member_chunk(self, event: hikari.events.MemberChunkEvent) -> None:
-        self.count -= 1
-        if self.count == 0:
-            await self.finish()
-
-    async def finish(self) -> None:
-        assert self.client is not None
-        assert self.client.events is not None
-        self.client.events.unsubscribe(hikari.events.ShardReadyEvent, self.on_ready)
-        self.client.events.unsubscribe(
-            hikari.events.MemberChunkEvent, self.on_member_chunk
-        )
-
-        assert self.callback is not None
-        self.callback()
-
-
-_cache_tracker = CacheTracker()
-
-
 def hook_extension(c: tanjun.Client) -> None:
-    @c.with_client_callback(tanjun.ClientCallbackNames.STARTING)
-    async def on_starting(client: alluka.Injected[tanjun.abc.Client]) -> None:
-        timer = Timer()
-        client.set_type_dependency(Timer, timer)
-        _cache_tracker.start(client, timer._start)
+    c.set_type_dependency(Timer, Timer())
+
+    @c.with_client_callback(tanjun.ClientCallbackNames.STARTED)
+    async def on_started(timer: alluka.Injected[Timer]) -> None:
+        timer._start()
 
     @c.with_client_callback(tanjun.ClientCallbackNames.CLOSING)
     async def on_closing(timer: alluka.Injected[Timer]) -> None:

@@ -24,7 +24,7 @@ def attach_extensions(client: tanjun.Client) -> None:
     extensions.update(settings.EXTENSIONS)
     extensions.update(ATSUME_EXTENSIONS)
     for module_path in extensions:
-        func = load_module_setting(module_path, ExtensionCallable)
+        func = load_module_func(module_path, ExtensionCallable)
         func(client)
 
 
@@ -36,7 +36,17 @@ class ModulePathNotFound(Exception):
 T = typing.TypeVar("T")
 
 
-def load_module_setting(module_path: str, return_type: typing.Type[T]) -> T:
+def load_module_func(module_path: str, return_type: typing.Type[T]) -> T:
+    path = module_path.split(".")
+    try:
+        module = importlib.import_module(".".join(path[:-1]))
+        func = getattr(module, path[-1])
+    except (ModuleNotFoundError, AttributeError):
+        raise ModulePathNotFound(module_path)
+    return typing.cast(T, func)
+
+
+def load_module_class(module_path: str, return_type: T) -> T:
     path = module_path.split(".")
     try:
         module = importlib.import_module(".".join(path[:-1]))

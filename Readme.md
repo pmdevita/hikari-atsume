@@ -12,6 +12,9 @@ An opinionated Discord bot framework inspired by Django and built on
 top of [Hikari](https://github.com/hikari-py/hikari), [Tanjun](https://github.com/FasterSpeeding/Tanjun), 
 [Ormar](https://github.com/collerek/ormar), and [Alembic](https://alembic.sqlalchemy.org/en/latest/).
 
+Atsume is in alpha and breaking changes should be expected. If you have any feedback or advice, feel free 
+to find me in the [Hikari Discord](https://discord.gg/Jx4cNGG).
+
 
 ## Features
 
