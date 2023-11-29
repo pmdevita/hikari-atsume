@@ -29,7 +29,7 @@ from atsume.cli.base import cli
 from atsume.db.manager import database
 from atsume.component.manager import manager as component_manager
 from atsume.component import Component, ComponentConfig
-from atsume.extensions.loader import attach_extensions, load_module_setting
+from atsume.extensions.loader import attach_extensions, load_module_class
 from atsume.utils import module_to_path
 
 
@@ -69,9 +69,9 @@ def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
     )
 
     if settings.VOICE_COMPONENT:
-        bot._voice = load_module_setting(
-            "VOICE_COMPONENT", hikari.impl.VoiceComponentImpl
-        )
+        bot._voice = load_module_class(
+            settings.VOICE_COMPONENT, hikari.impl.VoiceComponentImpl
+        )(bot)
 
     global_commands = not settings.DEBUG and settings.GLOBAL_COMMANDS
 
