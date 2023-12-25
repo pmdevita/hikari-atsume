@@ -48,7 +48,7 @@ myst-parser = "^2.0.0"
 sphinx-autodoc2 = "^0.4.2"
 sphinx-autoapi = ">=2.1.1,<4.0.0"
 sphinxcontrib-asyncio = "^0.3.0"
-mypy = {version = "^1.4.1,<1.6.0", extras = ["mypyc"]}
+mypy = {version = ">=1.4.1,<2.0.0", extras = ["mypyc"]}
 black = "^23.7.0"
 pre-commit = "^3.3.3"
 nox = "^2023.4.22"
