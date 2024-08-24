@@ -25,21 +25,21 @@ def get_component_config(module_path: str) -> ComponentConfig:
     in the given module path.
     """
     app_module = import_module(f"{module_path}.{APPS_MODULE_NAME}")
-    app_configs = [
-        (name, candidate)
+    app_configs: list[typing.Type[ComponentConfig]] = [
+        candidate
         for name, candidate in inspect.getmembers(app_module, inspect.isclass)
         if (issubclass(candidate, ComponentConfig) and candidate is not ComponentConfig)
     ]
     # You could declare multiple apps in a package but for right now we're not going to do that
     assert len(app_configs) == 1
-
-    return app_configs[0][1](module_path)
+    return app_configs[0](module_path)
 
 
 class ComponentManager:
     """
     A singleton to manage the configs of all components an Atsume project has set to load.
     """
+
     def __init__(self) -> None:
         self.component_configs: list[ComponentConfig] = []
         self.unloaded_components: dict[str, str] = {}

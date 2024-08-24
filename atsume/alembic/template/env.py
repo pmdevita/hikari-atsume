@@ -3,6 +3,7 @@ from logging.config import fileConfig
 
 from alembic.autogenerate.api import RevisionContext
 from alembic.operations import ops
+from alembic.operations.ops import MigrateOperation, CreateForeignKeyOp
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy.sql.schema import SchemaItem
@@ -137,16 +138,23 @@ if revision_context:
     # If the migration is empty, don't output anything
     is_empty = True
     for revision in revision_context.generated_revisions:
-        if len(revision.downgrade_ops.ops) > 0:
+        if revision.downgrade_ops is None or len(revision.downgrade_ops.ops) > 0:
             is_empty = False
-        if len(revision.upgrade_ops.ops) > 0:
+        if revision.upgrade_ops is None or len(revision.upgrade_ops.ops) > 0:
             is_empty = False
 
     if is_empty:
         raise MigrationIsEmpty()
 
 
-def table_name_to_model_name(table_name: str) -> typing.Optional[str]:
+def upgrade_to_model_name(upgrade: MigrateOperation) -> typing.Optional[str]:
+    if hasattr(upgrade, "table_name"):
+        table_name = upgrade.table_name
+    elif isinstance(upgrade, CreateForeignKeyOp):
+        table_name = upgrade.source_table
+    else:
+        raise Exception(f"Unknown migration type {upgrade}")
+
     for model in config.component_config._models:
         if model.Meta.tablename == table_name:
             # Something funny happened with the types but this should be a string
@@ -173,9 +181,12 @@ if revision_context:
         if revision.message != "New migration":
             continue
         actions = []
-        for upgrade in revision.upgrade_ops.ops:
+        upgrade_ops: list[MigrateOperation] = (
+            revision.upgrade_ops.ops if revision.upgrade_ops else []
+        )
+        for upgrade in upgrade_ops:
             template = OPERATION_NAME_TEMPLATES.get(upgrade.__class__, "")
-            model_name = table_name_to_model_name(upgrade.table_name)
+            model_name = upgrade_to_model_name(upgrade)
             if not model_name:
                 model_name = ""
             columns = []
