@@ -13,7 +13,7 @@ from .models import *
 @tanjun.as_message_command("hi", "hello", "hey", "howdy")
 @tanjun.as_slash_command("hi", "The bot says hi.")
 async def hello(
-    ctx: atsume.Context,
+    ctx: tanjun.abc.Context,
     member: Annotated[Optional[Member], "The user to say hi to.", Positional()] = None,
 ) -> None:
     member = member if member else ctx.member
