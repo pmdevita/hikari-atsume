@@ -35,19 +35,15 @@ class AtsumeConfig:
 class OrmarAttrs(dict[str, typing.Any]):
     """Ormar currently sets (not appends) ignored_types so we need to stop it from doing that"""
 
-    def __init__(self, data: dict[str, typing.Any]) -> None:
-        super().__init__()
-        self._data = data
-
     def __getitem__(self, item: str) -> typing.Any:
         if item == "model_config":
-            return self._data[item].copy()
-        return self._data[item]
+            return super().__getitem__(item).copy()
+        return super().__getitem__(item)
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
         if key == "model_config":
             return
-        self._data[key] = value
+        super().__setitem__(key, value)
 
 
 class ModelMetaclass(OrmarModelMetaclass):
