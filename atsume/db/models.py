@@ -118,11 +118,16 @@ class ModelMetaclass(OrmarModelMetaclass):
 
         model_class = typing.cast(
             ModelMetaclass,
-            super().__new__(mcs, name, bases, OrmarAttrs(attrs)),
-            __pydantic_generic_metadata__,
-            __pydantic_reset_parent_namespace__,
-            _create_model_module,
-            **kwargs,
+            super().__new__(
+                mcs,
+                name,
+                bases,
+                OrmarAttrs(attrs),
+                __pydantic_generic_metadata__,
+                __pydantic_reset_parent_namespace__,
+                _create_model_module,
+                **kwargs,
+            ),
         )
         config._models.append(model_class)
         return model_class
