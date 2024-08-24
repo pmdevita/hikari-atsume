@@ -69,15 +69,28 @@ def upgrade_command(component_name: typing.Optional[str] = None) -> None:
 
 @cli.command(name="downgrade", help="Downgrade a specific component.")
 @click.argument("component_name")
-def downgrade_command(component_name: str) -> None:
+@click.argument("revision_num")
+def downgrade_command(
+    component_name: str, revision: typing.Optional[int] = None
+) -> None:
     apps = [app for app in manager.component_configs if app.name == component_name]
-    for app in apps:
-        cfg = get_alembic_config(app)
-        # If the app has no models, skip it
-        if len(app.models) == 0:
-            continue
-        try:
-            downgrade(cfg, "-1")
-        except alembic.util.exc.CommandError as e:
-            if e.args[0] == "Relative revision -1 didn't produce 1 migrations":
-                print(f"{app} cannot be downgraded any further.")
+    if not apps:
+        return
+    app = apps[0]
+    cfg = get_alembic_config(app)
+
+    revision = cfg.previous_revision_number if revision is None else revision
+    assert cfg.previous_revision_number > revision
+    downgrade_number = str(cfg.previous_revision_number - revision)
+
+    # If the app has no models, skip it
+    if len(app.models) == 0:
+        return
+    try:
+        downgrade(cfg, downgrade_number)
+    except alembic.util.exc.CommandError as e:
+        if (
+            e.args[0]
+            == f"Relative revision {downgrade_number} didn't produce 1 migrations"
+        ):
+            print(f"{app} cannot be downgraded any further.")
