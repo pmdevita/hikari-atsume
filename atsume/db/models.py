@@ -67,7 +67,10 @@ class ModelMetaclass(OrmarModelMetaclass):
         # This condition is true when the Atsume ModelMetaclass itself is being created.
         # Since this isn't a normal model class creation, many properties are missing so
         # the rest of this should be skipped.
-        if attrs["__module__"] == "atsume.db.models":
+        if (
+            attrs["__module__"] == "atsume.db.models"
+            or attrs["__module__"] == "ormar.models.helpers.relations"
+        ):
             return super().__new__(mcs, name, bases, attrs)
 
         # Get the component config for the component this model belongs to.
