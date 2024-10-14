@@ -51,7 +51,7 @@ sphinxcontrib-asyncio = "^0.3.0"
 mypy = {version = "^1.4.1"}
 black = ">=23.7,<25.0"
 pre-commit = "^3.3.3"
-nox = "^2023.4.22"
+nox = ">=2023.4.22,<2025.0.0"
 nox-poetry = "^1.0.3"
 sqlalchemy-stubs = "^0.4"
 sphinx = "^7.0.1"
