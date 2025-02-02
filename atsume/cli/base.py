@@ -25,9 +25,9 @@ def cli(ctx: click.Context) -> None:
     """
     assert isinstance(ctx, CLIContext)
     bot_module = os.environ["ATSUME_SETTINGS_MODULE"]
-    from atsume.bot import create_bot
+    from atsume.bot import initialize_atsume
 
-    ctx.obj = create_bot(bot_module)
+    initialize_atsume(bot_module)
 
 
 cli.context_class = CLIContext

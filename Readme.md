@@ -9,11 +9,12 @@
 [Documentation](https://pmdevita.github.io/hikari-atsume/)
 
 An opinionated Discord bot framework inspired by Django and built on 
-top of [Hikari](https://github.com/hikari-py/hikari), [Tanjun](https://github.com/FasterSpeeding/Tanjun), 
+top of [Hikari](https://github.com/hikari-py/hikari), ~~[Tanjun](https://github.com/FasterSpeeding/Tanjun),~~ 
 [Ormar](https://github.com/collerek/ormar), and [Alembic](https://alembic.sqlalchemy.org/en/latest/).
 
-Atsume is in alpha and breaking changes should be expected. If you have any feedback or advice, feel free 
-to find me in the [Hikari Discord](https://discord.gg/Jx4cNGG).
+Atsume is very much still in alpha and breaking changes should be expected. Progress is a bit slow 
+due to my other responsibilities but it'll eventually be working lol.
+If you have any feedback or advice, feel free to find me in the [Hikari Discord](https://discord.gg/Jx4cNGG).
 
 
 ## Features
@@ -32,7 +33,7 @@ to find me in the [Hikari Discord](https://discord.gg/Jx4cNGG).
 
 Create a new project directory and install hikari-atsume 
 (make sure you are using Python 3.10+. If you are using Poetry, 
-your Python dependency should be `python = "^3.10,<3.12"`)
+your Python dependency should be `python = "^3.10,<3.13"`)
 
 ```shell
 # Install with your preferred database backend, SQLite recommended for beginners
@@ -199,4 +200,6 @@ python manage.py run
 - The [Django](https://www.djangoproject.com/) and [django-stubs](https://github.com/typeddjango/django-stubs) projects for their amazing work and some 
 code that I borrowed.
 
+hikari-atsume's name means "to gather light", which was chosen to reflect how it can gather multiple 
+components and extensions into a single bot, and as a lyric from the J-pop song [Kimigairu by Ikimonogakari](https://www.youtube.com/watch?v=fLcSUrlS9us).
 

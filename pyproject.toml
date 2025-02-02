@@ -41,6 +41,7 @@ orjson = { version = ">=3.9,<4.0", optional = true }
 aiodns = { version = "^3.0.0", optional = true }
 brotli = { version = "^1.0.9", optional = true }
 uvloop = { version = ">=0.17,<0.20", optional = true, markers = "sys_platform == 'darwin' or sys_platform == 'linux'" }
+pydantic = "2.5.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -57,6 +58,7 @@ sqlalchemy-stubs = "^0.4"
 sphinx = "^7.0.1"
 sphinx-reload = "^0.2.0"
 furo = "^2023.07.26"
+ruff = { version = "^0.6.3", optional = true }
 
 [tool.poetry.extras]
 postgresql = ["asyncpg", "psycopg2-binary"]
@@ -74,8 +76,3 @@ atsume = "atsume.cli.project:cli"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.towncrier]
-package = "hikari-atsume"
-package_dir = "atsume"
-filename = "CHANGELOG.md"

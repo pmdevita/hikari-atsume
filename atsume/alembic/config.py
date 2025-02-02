@@ -50,7 +50,7 @@ def get_alembic_config(
     cfg.set_main_option("script_location", str(Path(__file__).parent / "template"))
     # We can use either Atsume's configured database settings, or an in memory database
     # The in-memory database is used for making migrations since using a real one would
-    # require that database to be up to date on migrations.
+    # require that database to be up-to-date on migrations.
     if in_memory:
         cfg.set_main_option("sqlalchemy.url", "sqlite://")
         cfg.engine = sqlalchemy.create_engine("sqlite://")
@@ -68,7 +68,6 @@ def get_alembic_config(
     # The env.py script may want to also pull certain things from the ComponentConfig
     cfg.component_config = component_config
     cfg.app_metadata = component_config._model_metadata
-    # TODO: May not be needed anymore now that make migrations simulates the database and for each component
     # Migrations also needs awareness for all tables used by the bot
     cfg.all_tables = get_all_tables()
 
@@ -84,32 +83,40 @@ def get_alembic_config(
 
     # Get the mapping of the model names to table names that reflects the
     # current state of the migration scripts.
+
     cfg.previous_model_mapping = get_model_table_names(scripts)
 
     # Get the current mapping of model names to table names.
     current_models = {
         model.Meta._qual_name: model.Meta.tablename for model in component_config.models
     }
-    # Determine the changes that we are making to these models.
-    add_models = {}
-    remove_models = {}
-    # All of the models not in the previous model mapping must be models we are adding
-    for model_name, table_name in current_models.items():
-        if model_name not in cfg.previous_model_mapping:
-            add_models[model_name] = table_name
-    # All of the models not in the current model mapping must be models we are dropping
-    for model_name, table_name in cfg.previous_model_mapping.items():
-        if model_name not in current_models:
-            remove_models[model_name] = table_name
 
-    cfg.add_models = add_models
-    cfg.remove_models = remove_models
+    cfg.add_models, cfg.remove_models = get_model_ops(
+        cfg.previous_model_mapping, current_models
+    )
     # Renames are figured out in env.py after table schemas are computed.
     cfg.rename_models = {}
 
     get_formatting(cfg)
 
     return cfg
+
+
+def get_model_ops(
+    previous_models: dict[str, str], current_models: dict[str, str]
+) -> tuple[dict[str, str], dict[str, str]]:
+    # Determine the changes that we are making to these models.
+    add_models = {}
+    remove_models = {}
+    # All of the models not in the previous model mapping must be models we are adding
+    for model_name, table_name in current_models.items():
+        if model_name not in previous_models:
+            add_models[model_name] = table_name
+    # All of the models not in the current model mapping must be models we are dropping
+    for model_name, table_name in previous_models.items():
+        if model_name not in current_models:
+            remove_models[model_name] = table_name
+    return add_models, remove_models
 
 
 def get_model_table_names(scripts: ScriptDirectory) -> dict[str, str]:
@@ -126,7 +133,7 @@ def get_model_table_names(scripts: ScriptDirectory) -> dict[str, str]:
         # Order here might eliminate instances of models stepping on each other's toes
         for key in migration.module.remove_models.keys():
             del previous_models[key]
-        # Renames are before: after
+        # Renames are { before: after }
         for key, value in migration.module.rename_models.items():
             previous_models[value] = previous_models[key]
             del previous_models[key]

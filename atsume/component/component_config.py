@@ -3,6 +3,7 @@ from pathlib import Path
 
 import sqlalchemy
 
+from atsume.command.model import Command
 from atsume.permissions import import_permission_class
 from atsume.settings import settings
 from atsume.utils import module_to_path
@@ -17,6 +18,7 @@ class ComponentConfig:
     A dataclass for configuring an Atsume Component. Includes the component name, its permissions,
     and the file and module paths for its commands and models.
     """
+
     name: str
     verbose_name: str
     commands_module_name = "commands"
@@ -36,6 +38,7 @@ class ComponentConfig:
                 settings.COMPONENT_PERMISSIONS_CLASS
             )
             self.permissions = permission_class(self.module_path)
+        self.commands: typing.List[Command] = []
 
     @property
     def commands_path(self) -> str:

@@ -1,12 +1,30 @@
+import asyncio
+import importlib
 import inspect
 import logging
 import sys
 import typing
+from typing import cast
 from importlib import import_module
+
+import hikari
+from hikari import (
+    StartingEvent,
+    StoppingEvent,
+    InteractionCreateEvent,
+    InteractionType,
+    CommandInteraction,
+    ResponseType,
+)
 
 from atsume.settings import settings
 from .component_config import ComponentConfig
+from .. import Component
+from ..command.client import CommandManager
+from ..command.model import Command
+from ..extensions.loader import load_module_class
 
+logger = logging.getLogger(__name__)
 
 APPS_MODULE_NAME = "apps"
 
@@ -44,16 +62,53 @@ class ComponentManager:
         self.component_configs: list[ComponentConfig] = []
         self.unloaded_components: dict[str, str] = {}
 
+    def _setting_init(self):
+        self.bot = hikari.impl.GatewayBot(
+            settings.TOKEN, intents=hikari.Intents(settings.INTENTS)
+        )
+
+        if settings.VOICE_COMPONENT:
+            self.bot._voice = load_module_class(
+                settings.VOICE_COMPONENT, hikari.impl.VoiceComponentImpl
+            )(self.bot)
+
+        self._load_components()
+
+        self.commands = CommandManager(self)
+        self.bot.subscribe(hikari.StartingEvent, self._on_starting)
+        self.bot.subscribe(hikari.StoppingEvent, self._on_stopping)
+
     def _load_components(self) -> None:
         """Load all ComponentConfigs as defined in the Atsume project settings."""
         for component in settings.COMPONENTS:
             self._load_component(component)
 
+    def _set_bot(self, bot: hikari.GatewayBot):
+        self.bot = bot
+
+    async def _on_starting(self, event: StartingEvent):
+        print(event)
+
+    async def _on_stopping(self, event: StoppingEvent):
+        print(event)
+
     def _load_component(self, component: str) -> ComponentConfig:
-        """Load a single compnent from a given module path."""
+        """Load a single component from a given module path."""
         component_config = get_component_config(component)
         self.component_configs.append(component_config)
-        return component_config
+
+        try:
+            models_module = importlib.import_module(component_config.models_path)
+        except ModuleNotFoundError:
+            logging.warning(
+                f"Was not able to load database models for {component_config}"
+            )
+
+        # Create the permissions class and check and add it to the component
+        # if component_config.permissions:
+        #     component.set_permissions(component_config.permissions)
+
+        self.component_configs.append(component_config)
 
     def get_config_from_models_path(
         self, models_path: str
