@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 import hikari
-from hikari import GatewayBot, CommandInteraction, undefined
+from hikari import CommandInteraction, GatewayBot, undefined
 
 from atsume.discord import fetch_guild
 

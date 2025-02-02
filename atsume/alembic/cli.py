@@ -2,14 +2,12 @@ import typing
 
 import alembic.util.exc
 import click
+from alembic.command import downgrade, revision, upgrade
 
-from alembic.command import revision, upgrade, downgrade
-
-from atsume.bot import create_bot
 from atsume.alembic.config import get_alembic_config
 from atsume.alembic.exceptions import MigrationIsEmpty
-from atsume.component.manager import manager
 from atsume.cli.base import cli
+from atsume.component.manager import manager
 from atsume.utils import pad_number
 
 

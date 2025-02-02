@@ -1,14 +1,12 @@
-import hikari
-import tanjun
-import atsume
+from typing import Optional
 
-from typing import Annotated, Optional
+import hikari
+
 from atsume.command import CommandModel
-from atsume.command.annotations import Member
 from atsume.command.context import Context
 from atsume.command.model import command
 
-from .models import *
+from .models import *  # noqa: F403
 
 # Create your commands here.
 

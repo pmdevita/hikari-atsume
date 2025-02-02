@@ -1,28 +1,18 @@
-import asyncio
 import importlib
 import inspect
 import logging
 import sys
 import typing
-from typing import cast
 from importlib import import_module
 
 import hikari
-from hikari import (
-    StartingEvent,
-    StoppingEvent,
-    InteractionCreateEvent,
-    InteractionType,
-    CommandInteraction,
-    ResponseType,
-)
+from hikari import StartingEvent, StoppingEvent
 
 from atsume.settings import settings
-from .component_config import ComponentConfig
-from .. import Component
+
 from ..command.client import CommandManager
-from ..command.model import Command
 from ..extensions.loader import load_module_class
+from .component_config import ComponentConfig
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +88,7 @@ class ComponentManager:
         self.component_configs.append(component_config)
 
         try:
-            models_module = importlib.import_module(component_config.models_path)
+            importlib.import_module(component_config.models_path)
         except ModuleNotFoundError:
             logging.warning(
                 f"Was not able to load database models for {component_config}"

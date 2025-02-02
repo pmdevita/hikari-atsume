@@ -5,13 +5,11 @@ variables used by the Atsume framework.
 
 """
 
-
 import importlib
-import typing
 import types
+import typing
 
 from atsume.settings import default_settings as _DEFAULT
-from atsume.settings import type_hints
 
 
 class Settings:

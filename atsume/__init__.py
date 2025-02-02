@@ -1,16 +1,13 @@
-"""
-
-
-"""
+""" """
 
 from .component import (
-    with_listener,
     Component,
     ComponentConfig,
     Context,
+    as_time_schedule,
     on_close,
     on_open,
-    as_time_schedule,
+    with_listener,
 )
 
 __all__ = [

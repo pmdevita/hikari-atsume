@@ -8,11 +8,11 @@
 
 [Documentation](https://pmdevita.github.io/hikari-atsume/)
 
-An opinionated Discord bot framework inspired by Django and built on 
-top of [Hikari](https://github.com/hikari-py/hikari), ~~[Tanjun](https://github.com/FasterSpeeding/Tanjun),~~ 
+An opinionated Discord bot framework inspired by Django and built on
+top of [Hikari](https://github.com/hikari-py/hikari), ~~[Tanjun](https://github.com/FasterSpeeding/Tanjun),~~
 [Ormar](https://github.com/collerek/ormar), and [Alembic](https://alembic.sqlalchemy.org/en/latest/).
 
-Atsume is very much still in alpha and breaking changes should be expected. Progress is a bit slow 
+Atsume is very much still in alpha and breaking changes should be expected. Progress is a bit slow
 due to my other responsibilities but it'll eventually be working lol.
 If you have any feedback or advice, feel free to find me in the [Hikari Discord](https://discord.gg/Jx4cNGG).
 
@@ -31,8 +31,8 @@ If you have any feedback or advice, feel free to find me in the [Hikari Discord]
 
 ### Installation
 
-Create a new project directory and install hikari-atsume 
-(make sure you are using Python 3.10+. If you are using Poetry, 
+Create a new project directory and install hikari-atsume
+(make sure you are using Python 3.10+. If you are using Poetry,
 your Python dependency should be `python = "^3.10,<3.13"`)
 
 ```shell
@@ -47,14 +47,14 @@ pip install hikari-atsume[postgresql]
 
 ### Start a new project
 
-Now to start your new project, run 
+Now to start your new project, run
 
 ```shell
 atsume startproject my_bot
 ```
 
 which should generate some files for your project. In `my_bot/local.py`, add your
-Discord bot token in. If you want to use message commands, make sure to set your 
+Discord bot token in. If you want to use message commands, make sure to set your
 `MESSAGE_PREFIX` and add `hikari.Intents.MESSAGE_CONTENT` to your `INTENTS`.
 
 ```python
@@ -73,10 +73,10 @@ python manage.py startapp basic
 which should generate a new directory called `basic`.
 
 In `basic/commands.py`, write your commands using [Tanjun](https://tanjun.cursed.solutions/usage/#declaring-commands).
-Commands are declared without explicitly attaching to a Component object 
+Commands are declared without explicitly attaching to a Component object
 (Atsume takes care of that using `load_from_scope`).
 
-This is an example of a hybrid slash/message command that takes one 
+This is an example of a hybrid slash/message command that takes one
 optional positional argument, the user to say hi to.
 
 ```python
@@ -107,8 +107,8 @@ COMPONENTS = [
 
 ### Working with the database
 
-Let's say we want to track how many times each member of a guild has said 
-hi to the bot. In our `models.py` file, let's create a new database model 
+Let's say we want to track how many times each member of a guild has said
+hi to the bot. In our `models.py` file, let's create a new database model
 to keep track of this. Atsume uses [Ormar](https://collerek.github.io/ormar/)
 for its database models and queries.
 
@@ -143,9 +143,9 @@ async def hello(
 
 ### Migrating the database
 
-Before we run this though, we need to add our HiCounter model to the database! To do this, 
-we can generate a database migration that will migrate the database from it's current 
-state (nothing) to the state we want (a database with a table for HiCounter). Atsume 
+Before we run this though, we need to add our HiCounter model to the database! To do this,
+we can generate a database migration that will migrate the database from it's current
+state (nothing) to the state we want (a database with a table for HiCounter). Atsume
 can generate migrations automatically in most cases so we'll use it's tool for that here.
 
 Run this command to generate migrations.
@@ -161,7 +161,7 @@ Migrating ComponentConfig(name"basic")...
   Create model hicounter...
 ```
 
-Once that's done, your migration is ready to go! Run it on the database with 
+Once that's done, your migration is ready to go! Run it on the database with
 
 ```shell
 python manage.py upgrade
@@ -169,21 +169,21 @@ python manage.py upgrade
 
 #### Note about Atsume Migrations
 
-Atsume's migrations are still very much a work in progress (you can track it 
+Atsume's migrations are still very much a work in progress (you can track it
 [here](https://github.com/pmdevita/hikari-atsume/issues/2)).
-As a general rule of thumb, Atsume is good at migrations that create and delete 
-models and fields, but currently struggles with renames. You can always review 
-a migration and make any needed changes by looking in the component's 
-generated migration folder. Atsume uses 
-[Alembic](https://alembic.sqlalchemy.org/en/latest/) 
-for migrations, so you can look at the 
+As a general rule of thumb, Atsume is good at migrations that create and delete
+models and fields, but currently struggles with renames. You can always review
+a migration and make any needed changes by looking in the component's
+generated migration folder. Atsume uses
+[Alembic](https://alembic.sqlalchemy.org/en/latest/)
+for migrations, so you can look at the
 [Alembic operations docs](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations)
 to figure out how to write migrations manually.
 
 
 ### Run the bot
 
-Finally, with the bot configured and our component's commands and models ready , 
+Finally, with the bot configured and our component's commands and models ready ,
 it's time to run it!
 
 
@@ -197,9 +197,8 @@ python manage.py run
 - The Hikari Discord for help and feedback
 - FasterSpeeding for [Tanjun](https://github.com/FasterSpeeding/Tanjun)
 - Lunarmagpie for help with the CI and linting
-- The [Django](https://www.djangoproject.com/) and [django-stubs](https://github.com/typeddjango/django-stubs) projects for their amazing work and some 
+- The [Django](https://www.djangoproject.com/) and [django-stubs](https://github.com/typeddjango/django-stubs) projects for their amazing work and some
 code that I borrowed.
 
-hikari-atsume's name means "to gather light", which was chosen to reflect how it can gather multiple 
+hikari-atsume's name means "to gather light", which was chosen to reflect how it can gather multiple
 components and extensions into a single bot, and as a lyric from the J-pop song [Kimigairu by Ikimonogakari](https://www.youtube.com/watch?v=fLcSUrlS9us).
-

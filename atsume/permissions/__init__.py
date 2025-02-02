@@ -6,14 +6,13 @@ and write your own permissions handler.
 
 """
 
-
 import importlib
 import typing
 
 import tanjun
 
-from .settings_permissions import SettingsPermissions
 from .base import AbstractComponentPermissions
+from .settings_permissions import SettingsPermissions
 
 __all__ = [
     "SettingsPermissions",
@@ -52,6 +51,7 @@ def permission_check(
     :param permissions: The permissions object to use
     :returns: An async callable that can be used as a Tanjun check.
     """
+
     async def check(
         ctx: tanjun.abc.Context, *args: typing.Any, **kwargs: typing.Any
     ) -> bool:

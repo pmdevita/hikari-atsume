@@ -1,17 +1,16 @@
-import collections
 import inspect
 import typing
-from datetime import datetime, timezone, timedelta
-from typing import Callable, Any, Coroutine
+from datetime import timedelta
+from typing import Any, Callable, Coroutine
 
 import hikari
 import tanjun
-from tanjun.schedules import TimeSchedule, _CallbackSigT, IntervalSchedule
+from tanjun.schedules import IntervalSchedule, TimeSchedule, _CallbackSigT
 
-from atsume.permissions import AbstractComponentPermissions
 from atsume.component.component import Component
-from atsume.utils import copy_kwargs
 from atsume.component.context import Context
+from atsume.permissions import AbstractComponentPermissions
+from atsume.utils import copy_kwargs
 
 
 class BaseCallback:
@@ -29,9 +28,9 @@ class BaseCallback:
         self.callback = callback
         # Forward the type hints
         self.__signature__ = inspect.signature(self.callback)
-        self._component: typing.Optional[
-            Component
-        ] = None  # The component is set during listener registration
+        self._component: typing.Optional[Component] = (
+            None  # The component is set during listener registration
+        )
         self._component_parameter_name: typing.Optional[str] = None
         self._should_insert_component()
 
@@ -154,7 +153,7 @@ async def noop() -> None:
 def with_listener(
     callback: typing.Callable[
         [hikari.events.base_events.Event], typing.Coroutine[None, None, None]
-    ]
+    ],
 ) -> AtsumeEventListener:
     """
     Decorator to register a function as an event listener. Callback must

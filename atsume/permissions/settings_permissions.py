@@ -1,6 +1,7 @@
 import logging
 
 from atsume.settings import settings
+
 from .base import AbstractComponentPermissions
 
 logger = logging.getLogger(__name__)

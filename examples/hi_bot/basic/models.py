@@ -1,5 +1,6 @@
-from atsume.db import Model
 import ormar
+
+from atsume.db import Model
 
 
 class HiCounter(Model):

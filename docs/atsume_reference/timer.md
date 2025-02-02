@@ -1,7 +1,7 @@
 # Timer
 
-Tanjun's built-in scheduling is useful for running functions on a regular interval. However, for functions that 
-need to run at variable times with extra context, this may not be enough. To handle tasks like this, you 
+Tanjun's built-in scheduling is useful for running functions on a regular interval. However, for functions that
+need to run at variable times with extra context, this may not be enough. To handle tasks like this, you
 can use atsume's Timer.
 
 ## Setup
@@ -19,7 +19,7 @@ EXTENSIONS = [
 
 ## Usage
 
-You can request the Timer through Alluka in a command. From there, you can pass it an async function and a datetime 
+You can request the Timer through Alluka in a command. From there, you can pass it an async function and a datetime
 to run it at.
 
 ```python
@@ -41,4 +41,3 @@ async def callback(ctx: atsume.Context, member_name: hikari.Member) -> None:
 
 
 ```
-

@@ -2,9 +2,9 @@ import typing
 from abc import ABC
 
 from tanjun.context.base import BaseContext
+from tanjun.context.menu import MenuContext as TanjunMenuContext
 from tanjun.context.message import MessageContext as TanjunMessageContext
 from tanjun.context.slash import SlashContext as TanjunSlashContext
-from tanjun.context.menu import MenuContext as TanjunMenuContext
 
 # from tanjun.context.autocomplete import AutocompleteContext as TanjunAutocompleteContext
 from .component import Component
@@ -18,6 +18,7 @@ class Context(BaseContext, ABC):
     A subclass of `tanjun.Context` that adds a reference to the
     component object this command is running under.
     """
+
     _component: typing.Optional[Component]
 
     @property

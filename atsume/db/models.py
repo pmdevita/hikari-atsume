@@ -1,8 +1,7 @@
 import dataclasses
-
-import ormar
 import typing
 
+import ormar
 from ormar import OrmarConfig
 from ormar.models.helpers import merge_or_generate_pydantic_config
 from ormar.models.metaclass import ModelMetaclass as OrmarModelMetaclass

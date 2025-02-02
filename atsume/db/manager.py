@@ -2,9 +2,10 @@ import logging
 import typing
 
 import alluka
-import tanjun
 import databases
 import sqlalchemy
+import tanjun
+
 from atsume.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class DatabaseManager:
     """A singleton to manage the database connection."""
+
     def __init__(self) -> None:
         self.database: typing.Optional[databases.Database] = None
         self.engine: typing.Optional[sqlalchemy.engine.Engine] = None
@@ -28,6 +30,7 @@ def hook_database(client: alluka.Injected[tanjun.abc.Client]) -> None:
     Tanjun lifecycle hooks to create and destroy the database connection when
     Tanjun is starting or finishing closing.
     """
+
     @client.with_client_callback(tanjun.ClientCallbackNames.STARTING)
     async def on_starting(client: alluka.Injected[tanjun.abc.Client]) -> None:
         logger.info("Connecting to database...")

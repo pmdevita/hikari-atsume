@@ -1,23 +1,20 @@
-import asyncio
 import importlib
 import logging
 import shlex
-
-import hikari
-
 from typing import TYPE_CHECKING, cast
 
+import hikari
 from hikari import (
-    StartingEvent,
-    InteractionCreateEvent,
     CommandInteraction,
+    InteractionCreateEvent,
     InteractionType,
-    ResponseType,
     MessageCreateEvent,
+    ResponseType,
+    StartingEvent,
 )
 
 from atsume.command.context import CommandInteractionContext
-from atsume.command.model import Command, command_model_context
+from atsume.command.model import Command
 from atsume.settings import settings
 from atsume.utils.interactions import interaction_options_to_objects
 

@@ -1,13 +1,13 @@
 """create_hicounter
 
 Revision ID: 0000
-Revises: 
+Revises:
 Create Date: 2023-07-13 11:40:56.495818
 
 """
-from alembic import op
-import sqlalchemy as sa
 
+import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "0000"

@@ -1,19 +1,11 @@
 from typing import Annotated, Any
 
 import hikari
-from hikari import Snowflakeish, GatewayBot, OptionType
-from pydantic import (
-    BeforeValidator,
-    GetCoreSchemaHandler,
-    GetPydanticSchema,
-    ValidationInfo,
-)
-from pydantic_core import CoreSchema, core_schema
+from hikari import OptionType, Snowflakeish
 
 # from pydantic_async_validation import ValidationInfo
-from hikari.api import cache
-
-from atsume.command.context import Context
+from pydantic import GetPydanticSchema, ValidationInfo
+from pydantic_core import core_schema
 
 
 def validate_member(tp, handler):

@@ -9,7 +9,7 @@ Functions for Atsume's command line tools. Atsume has two command line interface
 import importlib
 from pathlib import Path
 
-from atsume.cli.base import cli, CLIContext
+from atsume.cli.base import CLIContext, cli
 
 CLI_EXTENSIONS = [
     "atsume.alembic.cli",
@@ -28,7 +28,7 @@ def run_command(project_dir: Path | str) -> None:
     project's `manage.py` file.
     """
     for extension in CLI_EXTENSIONS:
-        module = importlib.import_module(extension)
+        importlib.import_module(extension)
     context = cli.context_class
     if not issubclass(context, CLIContext):
         raise ValueError("CLI's context is not the custom class.")

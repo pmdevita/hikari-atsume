@@ -40,7 +40,7 @@ T = typing.TypeVar("T")
 # For a help about decorator with parameters see
 # https://stackoverflow.com/questions/5929107/decorators-with-parameters
 def copy_kwargs(
-    kwargs_call: typing.Callable[P, typing.Any]
+    kwargs_call: typing.Callable[P, typing.Any],
 ) -> typing.Callable[[typing.Callable[..., T]], typing.Callable[P, T]]:
     """Decorator does nothing but returning the cast original function"""
 

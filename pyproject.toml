@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
+python = ">=3.11,<3.13"
 hikari = "^2.0.0.dev126"
 click = ">=8.1.6"
 hikari-tanjun = "^2.17.0"
@@ -76,3 +76,10 @@ atsume = "atsume.cli.project:cli"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[isort]
+profile = "black"
+skip = ["atsume/templates/templates"]
+
+[tool.ruff.lint.per-file-ignores]
+"atsume/templates/templates/**/*" = ["F401", "F403"]

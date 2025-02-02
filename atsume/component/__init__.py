@@ -8,11 +8,10 @@
 
 """
 
-
-from .component_config import ComponentConfig
-from .decorators import with_listener, on_open, on_close, as_time_schedule
 from .component import Component
+from .component_config import ComponentConfig
 from .context import Context
+from .decorators import as_time_schedule, on_close, on_open, with_listener
 
 __all__ = [
     "with_listener",

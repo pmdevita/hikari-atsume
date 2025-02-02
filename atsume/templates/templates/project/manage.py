@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 """Atsume's command-line utility for administrative tasks."""
+
+import os
+import sys
+from pathlib import Path
+
 """
 Code adapted from Django.
 Copyright (c) Django Software Foundation and individual contributors.
 All rights reserved.
 """
-
-import os
-import sys
-from pathlib import Path
 
 
 def main() -> None:

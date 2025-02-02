@@ -1,10 +1,26 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 23.7.0
+- repo: https://github.com/pycqa/isort
+  rev: 5.13.2
+  hooks:
+    - id: isort
+      name: isort (python)
+      args: ["--profile", "black", "--filter-files"]
+- repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+  rev: v0.4.1
+  hooks:
+      # Run the linter.
+      - id: ruff
+        args: [--fix]
+      # Run the formatter.
+      - id: ruff-format
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
     hooks:
-      - id: black
-        # It is recommended to specify the latest version of Python
-        # supported by your project here, or alternatively use
-        # pre-commit's default_language_version, see
-        # https://pre-commit.com/#top_level-default_language_version
-        language_version: python3.12
+    -   id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+    -   id: end-of-file-fixer
+    -   id: pretty-format-json
+        args: [--autofix, --no-sort-keys]
+    -   id: check-yaml
+    -   id: check-added-large-files

@@ -10,6 +10,7 @@ from atsume.utils import module_to_path
 
 if typing.TYPE_CHECKING:
     from ormar.models.metaclass import ModelMetaclass
+
     from atsume.permissions.base import AbstractComponentPermissions
 
 

@@ -1,5 +1,6 @@
 import hikari
-from atsume.settings.type_hints import *
+
+from atsume.settings.type_hints import *  # noqa: F403
 
 COMPONENTS = ["basic"]
 

@@ -1,35 +1,25 @@
-import dataclasses
 import inspect
-import re
 from contextlib import contextmanager
 from contextvars import ContextVar
 from inspect import isfunction
 from typing import (
     Any,
-    TypedDict,
     Callable,
-    TypeVar,
-    ParamSpec,
+    Generator,
     Generic,
     Optional,
+    ParamSpec,
     Type,
-    get_args,
     cast,
+    get_args,
     overload,
-    Generator,
 )
 
-
-from contextlib import contextmanager
-from contextvars import ContextVar
-from typing import Any, Generator
-
-from hikari import GatewayBot, CommandOption, OptionType
+from hikari import CommandOption, GatewayBot
 from hikari.api import SlashCommandBuilder
 from pydantic import BaseModel, ConfigDict, GetPydanticSchema
 from pydantic._internal._generics import PydanticGenericMetadata
 from pydantic._internal._model_construction import ModelMetaclass
-from pydantic_async_validation import AsyncValidationModelMixin
 
 from atsume.command.annotations import HIKARI_TO_OPTION_TYPE
 
@@ -164,14 +154,12 @@ class Command(Generic[ArgT]):
         return command_builder
 
     @overload
-    def subcommand(self, func: Callable[ArgT, None]) -> "Command[ArgT]":
-        ...
+    def subcommand(self, func: Callable[ArgT, None]) -> "Command[ArgT]": ...
 
     @overload
     def subcommand(
         self, name: Optional[str] = None, description: Optional[str] = None
-    ) -> "Callable[[Callable[ArgT, None]], Command[ArgT]]":
-        ...
+    ) -> "Callable[[Callable[ArgT, None]], Command[ArgT]]": ...
 
     def subcommand(
         self, name: Optional[str] = None, description: Optional[str] = None
@@ -234,15 +222,13 @@ def type_annotation_to_option(
 
 
 @overload
-def command(func: Callable[ArgT, None]) -> Command[ArgT]:
-    ...
+def command(func: Callable[ArgT, None]) -> Command[ArgT]: ...
 
 
 @overload
 def command(
     name: Optional[str] = None, description: Optional[str] = None
-) -> Callable[[Callable[ArgT, None]], Command[ArgT]]:
-    ...
+) -> Callable[[Callable[ArgT, None]], Command[ArgT]]: ...
 
 
 def command(

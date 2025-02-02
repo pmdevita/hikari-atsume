@@ -1,13 +1,13 @@
-import typing
 import os
+import typing
 from pathlib import Path
 
 import sqlalchemy
 from alembic.config import Config as AlembicConfig
 from alembic.script import ScriptDirectory
 
-from atsume.settings import settings
 from atsume.component.manager import manager
+from atsume.settings import settings
 
 if typing.TYPE_CHECKING:
     from atsume.component.component_config import ComponentConfig
@@ -145,7 +145,7 @@ def get_model_table_names(scripts: ScriptDirectory) -> dict[str, str]:
 def get_formatting(config: Config) -> None:
     """If Black is installed, add configuration to use it for formatting"""
     try:
-        import black
+        import black  # noqa: F401
     except ImportError:
         return
 

@@ -3,34 +3,32 @@ These are a set of functions called to coordinate the bootstrapping of the Atsum
 You probably shouldn't ever have to call these unless you're building something on top of them.
 
 """
-import gc
+
 import importlib
 import importlib.util
 import logging
-import os
 import sys
 import typing
 
 import hikari
-import click
 import hupper  # type: ignore
 import tanjun
 
+from atsume.cli.base import cli
 from atsume.command.model import Command
-from atsume.settings import settings
+from atsume.component import Component, ComponentConfig
 from atsume.component.decorators import (
-    BaseCallback,
-    AtsumeEventListener,
     AtsumeComponentClose,
     AtsumeComponentOpen,
-    AtsumeTimeSchedule,
+    AtsumeEventListener,
     AtsumeIntervalSchedule,
+    AtsumeTimeSchedule,
+    BaseCallback,
 )
-from atsume.cli.base import cli
-from atsume.db.manager import database
 from atsume.component.manager import manager as component_manager
-from atsume.component import Component, ComponentConfig
-from atsume.extensions.loader import attach_extensions, load_module_class
+from atsume.db.manager import database
+from atsume.extensions.loader import load_module_class
+from atsume.settings import settings
 from atsume.utils import module_to_path
 
 
@@ -76,7 +74,7 @@ def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
             settings.VOICE_COMPONENT, hikari.impl.VoiceComponentImpl
         )(bot)
 
-    global_commands = not settings.DEBUG and settings.GLOBAL_COMMANDS
+    # global_commands = not settings.DEBUG and settings.GLOBAL_COMMANDS
 
     # client = tanjun.Client.from_gateway_bot(
     #     bot, declare_global_commands=global_commands, mention_prefix=False
@@ -122,7 +120,7 @@ def start_bot() -> None:
     :param bot: The bot instance to run.
     """
     if settings.DEBUG:
-        reloader = hupper.start_reloader("atsume.bot.autoreload_start_bot")
+        hupper.start_reloader("atsume.bot.autoreload_start_bot")
     else:
         run_bot()
 
@@ -151,7 +149,7 @@ def load_component(component_config: ComponentConfig) -> None:
     :return:
     """
     try:
-        models_module = importlib.import_module(component_config.models_path)
+        importlib.import_module(component_config.models_path)
     except ModuleNotFoundError:
         logging.warning(f"Was not able to load database models for {component_config}")
 

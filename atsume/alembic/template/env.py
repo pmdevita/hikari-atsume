@@ -1,14 +1,12 @@
 import typing
 from logging.config import fileConfig
 
+from alembic import context
 from alembic.autogenerate.api import RevisionContext
 from alembic.operations import ops
-from alembic.operations.ops import MigrateOperation, CreateForeignKeyOp
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from alembic.operations.ops import CreateForeignKeyOp, MigrateOperation
+from sqlalchemy import engine_from_config, pool
 from sqlalchemy.sql.schema import SchemaItem
-
-from alembic import context
 
 from atsume.alembic.config import Config
 from atsume.alembic.exceptions import MigrationIsEmpty, ServerDefaultRequired
@@ -131,7 +129,9 @@ else:
     run_migrations_online()
 
 # Not sure what's going on here but this property totally does exist at runtime
-revision_context: typing.Optional[RevisionContext] = context._proxy.context_opts.get("revision_context")  # type: ignore
+revision_context: typing.Optional[RevisionContext] = context._proxy.context_opts.get(
+    "revision_context"
+)  # type: ignore
 
 # If we are making migrations
 if revision_context:
