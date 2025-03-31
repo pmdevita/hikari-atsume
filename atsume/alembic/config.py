@@ -88,7 +88,8 @@ def get_alembic_config(
 
     # Get the current mapping of model names to table names.
     current_models = {
-        model.Meta._qual_name: model.Meta.tablename for model in component_config.models
+        model.atsume_config.qual_name: model.ormar_config.tablename
+        for model in component_config.models
     }
     # Determine the changes that we are making to these models.
     add_models = {}

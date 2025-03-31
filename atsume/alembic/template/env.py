@@ -156,10 +156,10 @@ def upgrade_to_model_name(upgrade: MigrateOperation) -> typing.Optional[str]:
         raise Exception(f"Unknown migration type {upgrade}")
 
     for model in config.component_config._models:
-        if model.Meta.tablename == table_name:
+        if model.ormar_config.tablename == table_name:
             # Something funny happened with the types but this should be a string
-            assert isinstance(model.Meta._qual_name, str)
-            return model.Meta._qual_name
+            assert isinstance(model.atsume_config.qual_name, str)
+            return model.atsume_config.qual_name
     for old_model, old_table_name in config.previous_model_mapping.items():
         if old_table_name == table_name:
             return old_model
