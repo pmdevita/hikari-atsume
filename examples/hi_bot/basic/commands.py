@@ -12,6 +12,8 @@ from .models import *  # noqa: F403
 
 class Hi(CommandModel):
     member: Optional[hikari.Member]
+    channel: Optional[hikari.GuildChannel]
+    role: Optional[hikari.Role]
 
 
 test_group = Group("group")
@@ -38,7 +40,7 @@ async def hi_subgroup(ctx: Context, args: Hi) -> None:
 async def hi(ctx: Context, args: Hi) -> None:
     member = args.member if args.member else ctx.author
 
-    await ctx.respond(f"Hello {member.display_name}. (root)")
+    await ctx.respond(f"Hello {member.display_name}. (root) {args.model_dump()}")
 
 
 # @tanjun.annotations.with_annotated_args(follow_wrapped=True)

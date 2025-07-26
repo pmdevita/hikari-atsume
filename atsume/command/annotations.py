@@ -23,6 +23,7 @@ Member = Annotated[hikari.Member, GetPydanticSchema(validate_member)]
 HIKARI_TO_OPTION_TYPE: dict[Type, OptionType] = {
     hikari.Member: OptionType.USER,
     hikari.GuildChannel: OptionType.CHANNEL,
+    hikari.Role: OptionType.ROLE,
     int: OptionType.INTEGER,
     float: OptionType.FLOAT,
     str: OptionType.STRING,
