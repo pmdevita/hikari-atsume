@@ -11,6 +11,10 @@ import typing
 
 from atsume.settings import default_settings as _DEFAULT
 
+from .env import env
+
+__all__ = ["env", "settings"]
+
 
 class Settings:
     _SETTINGS: typing.Optional[types.ModuleType] = None

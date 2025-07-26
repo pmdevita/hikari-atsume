@@ -8,3 +8,5 @@ local.py
 .mypy_cache
 dist
 .nox
+.env
+*.env

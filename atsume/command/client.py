@@ -13,10 +13,9 @@ from hikari import (
     StartingEvent,
 )
 
-from atsume.command.context import CommandInteractionContext
-from atsume.command.model import Command
+from atsume.command.exceptions import CommandNotFound
+from atsume.command.model import CommandMixin, RootCommand
 from atsume.settings import settings
-from atsume.utils.interactions import interaction_options_to_objects
 
 if TYPE_CHECKING:
     from atsume.component.manager import ComponentManager
@@ -32,29 +31,29 @@ class CommandManager:
         self.manager.bot.subscribe(hikari.InteractionCreateEvent, self._on_interaction)
         self.manager.bot.subscribe(hikari.MessageCreateEvent, self._on_message)
 
-        self.commands = {}
+        self.commands: dict[str, RootCommand] = {}
         for component in self.manager.component_configs:
             # Create the component and load the commands into it
             module = importlib.import_module(component.commands_path)
             module_attrs = vars(module)
 
             for value in module_attrs.values():
-                if isinstance(value, Command):
+                if isinstance(value, RootCommand):
                     self.commands[value.name] = value
 
-    async def _on_starting(self, event: StartingEvent):
+    async def _on_starting(self, event: StartingEvent) -> None:
         logger.info("Registering commands...")
 
         self.application = await self.manager.bot.rest.fetch_application()
 
-        commands = [i.as_slash_command(self.bot) for i in self.commands.values()]
+        commands = [i.as_command() for i in self.commands.values()]
 
         async for guild in self.bot.rest.fetch_my_guilds():
             await self.bot.rest.set_application_commands(
                 self.application, commands, guild.id
             )
 
-    async def _on_interaction(self, event: InteractionCreateEvent):
+    async def _on_interaction(self, event: InteractionCreateEvent) -> None:
         print(event)
         match event.interaction.type:
             case InteractionType.APPLICATION_COMMAND:
@@ -64,7 +63,7 @@ class CommandManager:
             case _:
                 pass
 
-    async def _on_application_command(self, interaction: CommandInteraction):
+    async def _on_application_command(self, interaction: CommandInteraction) -> None:
         command = self.commands.get(interaction.command_name, None)
 
         if command is None:
@@ -76,12 +75,9 @@ class CommandManager:
         await interaction.create_initial_response(ResponseType.DEFERRED_MESSAGE_CREATE)
 
         try:
-            kwargs = await interaction_options_to_objects(self.bot, interaction)
-
-            options = command.command_model(**kwargs)
-            ctx = CommandInteractionContext(self.bot, interaction)
-
-            await command(ctx, options)
+            ctx = await command.call_with_interaction(
+                self.bot, interaction, interaction.options
+            )
 
             if not ctx.has_replied:
                 logger.warning(
@@ -92,7 +88,7 @@ class CommandManager:
             await interaction.edit_initial_response("An error has occurred.")
             raise
 
-    async def _on_message(self, event: MessageCreateEvent):
+    async def _on_message(self, event: MessageCreateEvent) -> None:
         if event.message.content is None:
             return
 
@@ -101,3 +97,16 @@ class CommandManager:
 
         command = shlex.split(event.message.content)
         print(command)
+
+    async def _route_message_command(self, command_args: list[str]) -> CommandMixin:
+        value, command_args = command_args[0], command_args[1:]
+
+        try:
+            entry_command = self.command_tree.get(value, None)
+
+            if not entry_command:
+                raise CommandNotFound(value)
+
+            return entry_command.get_subcommand(command_args)
+        except CommandNotFound as e:
+            logger.info(f"Command {e.name} does not exist")

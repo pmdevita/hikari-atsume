@@ -2,9 +2,8 @@ from typing import Optional
 
 import hikari
 
-from atsume.command import CommandModel
+from atsume.command import CommandModel, Group, command
 from atsume.command.context import Context
-from atsume.command.model import command
 
 from .models import *  # noqa: F403
 
@@ -15,11 +14,31 @@ class Hi(CommandModel):
     member: Optional[hikari.Member]
 
 
+test_group = Group("group")
+
+
+@test_group.subcommand("hi")
+async def hi_group(ctx: Context, args: Hi) -> None:
+    member = args.member if args.member else ctx.author
+
+    await ctx.respond(f"Hello {member.display_name}. (group)")
+
+
+sub_group = test_group.subgroup("subgroup")
+
+
+@sub_group.subcommand("hi")
+async def hi_subgroup(ctx: Context, args: Hi) -> None:
+    member = args.member if args.member else ctx.author
+
+    await ctx.respond(f"Hello {member.display_name}. (subgroup)")
+
+
 @command
 async def hi(ctx: Context, args: Hi) -> None:
     member = args.member if args.member else ctx.author
 
-    await ctx.respond(f"Hello {member.display_name}.")
+    await ctx.respond(f"Hello {member.display_name}. (root)")
 
 
 # @tanjun.annotations.with_annotated_args(follow_wrapped=True)

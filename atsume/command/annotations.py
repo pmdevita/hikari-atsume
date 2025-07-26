@@ -1,9 +1,7 @@
-from typing import Annotated, Any
+from typing import Annotated, Type
 
 import hikari
 from hikari import OptionType, Snowflakeish
-
-# from pydantic_async_validation import ValidationInfo
 from pydantic import GetPydanticSchema, ValidationInfo
 from pydantic_core import core_schema
 
@@ -22,7 +20,7 @@ def validate_member(tp, handler):
 Member = Annotated[hikari.Member, GetPydanticSchema(validate_member)]
 
 
-HIKARI_TO_OPTION_TYPE: dict[Any, OptionType] = {
+HIKARI_TO_OPTION_TYPE: dict[Type, OptionType] = {
     hikari.Member: OptionType.USER,
     hikari.GuildChannel: OptionType.CHANNEL,
     int: OptionType.INTEGER,

@@ -1,6 +1,7 @@
-from atsume.settings.type_hints import *
+from atsume.settings import env
+from atsume.settings.type_hints import *  # noqa: F403
 
-TOKEN = "Your Discord Token Here"
+TOKEN = env("TOKEN")
 
 MESSAGE_PREFIX = "-t "
 
