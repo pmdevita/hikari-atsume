@@ -1,3 +1,3 @@
-from .model import CommandModel, Group, command
+from .model import CommandModel, Group, command, event
 
-__all__ = ["Group", "command", "CommandModel"]
+__all__ = ["Group", "command", "CommandModel", "event"]

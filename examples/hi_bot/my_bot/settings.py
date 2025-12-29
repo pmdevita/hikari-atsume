@@ -2,7 +2,7 @@ import hikari
 
 from atsume.settings.type_hints import *  # noqa: F403
 
-COMPONENTS = ["basic"]
+COMPONENTS = ["basic", "atsume.contrib.handles_gui"]
 
 COMPONENT_PERMISSIONS_CLASS = "atsume.permissions.SettingsPermissions"
 

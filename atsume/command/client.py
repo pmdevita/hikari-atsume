@@ -13,8 +13,9 @@ from hikari import (
     StartingEvent,
 )
 
+from atsume.command.context import CommandContext
 from atsume.command.exceptions import CommandNotFound
-from atsume.command.model import CommandMixin, RootCommand
+from atsume.command.model import Event, RootCommand
 from atsume.settings import settings
 
 if TYPE_CHECKING:
@@ -32,6 +33,7 @@ class CommandManager:
         self.manager.bot.subscribe(hikari.MessageCreateEvent, self._on_message)
 
         self.commands: dict[str, RootCommand] = {}
+        self.events: dict[hikari.Event, list[Event]] = {}
         for component in self.manager.component_configs:
             # Create the component and load the commands into it
             module = importlib.import_module(component.commands_path)
@@ -40,13 +42,26 @@ class CommandManager:
             for value in module_attrs.values():
                 if isinstance(value, RootCommand):
                     self.commands[value.name] = value
+                if isinstance(value, Event):
+                    if value.event not in self.events:
+                        self.events[value.event] = []
+                    self.events[value.event].append(value)
+                    value.bot = self.bot
+
+        for event, funcs in self.events.items():
+            for func in funcs:
+                self.manager.bot.subscribe(event, func)
 
     async def _on_starting(self, event: StartingEvent) -> None:
         logger.info("Registering commands...")
 
         self.application = await self.manager.bot.rest.fetch_application()
 
-        commands = [i.as_command() for i in self.commands.values()]
+        commands = [
+            i.as_command()
+            for i in self.commands.values()
+            if i.takes_context_type(CommandContext)
+        ]
 
         async for guild in self.bot.rest.fetch_my_guilds():
             await self.bot.rest.set_application_commands(
@@ -72,20 +87,26 @@ class CommandManager:
             )
             return
 
-        await interaction.create_initial_response(ResponseType.DEFERRED_MESSAGE_CREATE)
+        # await interaction.create_initial_response(ResponseType.DEFERRED_MESSAGE_CREATE)
 
         try:
             ctx = await command.call_with_interaction(
-                self.bot, interaction, interaction.options
+                self.manager, interaction, interaction.options
             )
 
             if not ctx.has_replied:
                 logger.warning(
                     f"Command {command} did not respond to the interaction command!"
                 )
-                await interaction.edit_initial_response("The command did not respond.")
+                await interaction.create_initial_response(
+                    response_type=ResponseType.MESSAGE_CREATE,
+                    content="The command did not respond.",
+                )
         except:
-            await interaction.edit_initial_response("An error has occurred.")
+            await interaction.create_initial_response(
+                response_type=ResponseType.MESSAGE_CREATE,
+                content="An error has occurred.",
+            )
             raise
 
     async def _on_message(self, event: MessageCreateEvent) -> None:
@@ -95,18 +116,19 @@ class CommandManager:
         if not event.message.content.startswith(settings.MESSAGE_PREFIX):
             return
 
-        command = shlex.split(event.message.content)
-        print(command)
+        command = shlex.split(
+            event.message.content.removeprefix(settings.MESSAGE_PREFIX).strip()
+        )
 
-    async def _route_message_command(self, command_args: list[str]) -> CommandMixin:
-        value, command_args = command_args[0], command_args[1:]
+        first, args = command[0], command[1:]
 
         try:
-            entry_command = self.command_tree.get(value, None)
+            entry_command = self.commands.get(first, None)
 
             if not entry_command:
-                raise CommandNotFound(value)
+                raise CommandNotFound(None)
 
-            return entry_command.get_subcommand(command_args)
+            await entry_command.call_with_args(self.manager, event, args)
         except CommandNotFound as e:
+            e.prepend_command_word(first)
             logger.info(f"Command {e.name} does not exist")

@@ -1,4 +1,4 @@
-""" """
+"""Hikari Atsume"""
 
 from .component import (
     Component,

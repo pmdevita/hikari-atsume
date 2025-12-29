@@ -11,6 +11,7 @@ from hikari import StartingEvent, StoppingEvent
 from atsume.settings import settings
 
 from ..command.client import CommandManager
+from ..components.manager import ComponentManager as UIComponentManager
 from ..extensions.loader import load_module_class
 from .component_config import ComponentConfig
 
@@ -65,6 +66,7 @@ class ComponentManager:
         self._load_components()
 
         self.commands = CommandManager(self)
+        self.components = UIComponentManager(self)
         self.bot.subscribe(hikari.StartingEvent, self._on_starting)
         self.bot.subscribe(hikari.StoppingEvent, self._on_stopping)
 
@@ -98,7 +100,7 @@ class ComponentManager:
         # if component_config.permissions:
         #     component.set_permissions(component_config.permissions)
 
-        self.component_configs.append(component_config)
+        # self.component_configs.append(component_config)
 
     def get_config_from_models_path(
         self, models_path: str

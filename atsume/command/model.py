@@ -1,13 +1,16 @@
 import inspect
 from collections.abc import Awaitable
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Generic,
     Optional,
     ParamSpec,
+    Protocol,
     Sequence,
     Type,
+    TypeVar,
     cast,
     get_args,
     overload,
@@ -26,9 +29,12 @@ from pydantic._internal._generics import PydanticGenericMetadata
 from pydantic._internal._model_construction import ModelMetaclass
 
 from atsume.command.annotations import HIKARI_TO_OPTION_TYPE
-from atsume.command.context import CommandInteractionContext
+from atsume.command.context import CommandContext, Context, MessageContext
 from atsume.command.exceptions import CommandNotFound
 from atsume.utils.interactions import interaction_options_to_objects
+
+if TYPE_CHECKING:
+    from atsume.component.manager import ComponentManager
 
 
 class CommandMetaclass(ModelMetaclass):
@@ -55,7 +61,7 @@ class CommandMetaclass(ModelMetaclass):
             )
 
         # Make the Optional fields None by default if they do not have a default
-        for annotation_name, annotation in namespace["__annotations__"].items():
+        for annotation_name, annotation in namespace.get("__annotations__", {}).items():
             args = get_args(annotation)
             if type(None) in args and annotation_name not in namespace:
                 namespace[annotation_name] = None
@@ -124,12 +130,20 @@ class BaseCommand:
         """This command's suboptions, representing its children. Should be used by as_option()."""
         return []
 
+    def takes_context_type(self, ctx_class: type[Context]) -> bool:
+        raise NotImplementedError()
+
     async def call_with_interaction(
         self,
-        bot: hikari.GatewayBot,
+        bot: "ComponentManager",
         interaction: CommandInteraction,
         options: Optional[Sequence[CommandInteractionOption]],
-    ):
+    ) -> CommandContext:
+        raise NotImplementedError()
+
+    async def call_with_args(
+        self, bot: "ComponentManager", event: hikari.MessageCreateEvent, args: list[str]
+    ) -> MessageContext:
         raise NotImplementedError()
 
 
@@ -182,12 +196,21 @@ class SubCallsMixin(BaseCommand):
 
         return cmd
 
+    def takes_context_type(self, ctx_class: type[Context]) -> bool:
+        return any(
+            [i.takes_context_type(ctx_class) for i in self._subcommands.values()]
+        )
+
     def get_suboptions(self) -> list[hikari.CommandOption]:
-        return [i.as_option() for i in self._subcommands.values()]
+        return [
+            i.as_option()
+            for i in self._subcommands.values()
+            if i.takes_context_type(CommandContext)
+        ]
 
     async def call_with_interaction(
         self,
-        bot: hikari.GatewayBot,
+        bot: "ComponentManager",
         interaction: CommandInteraction,
         options: Optional[Sequence[CommandInteractionOption]],
     ):
@@ -213,6 +236,22 @@ class SubCallsMixin(BaseCommand):
         raise Exception(
             "Call to command group with one non-sub command option?", options
         )
+
+    async def call_with_args(
+        self, bot: "ComponentManager", event: hikari.MessageCreateEvent, args: list[str]
+    ):
+        if len(args) == 0:
+            raise CommandNotFound(None)
+
+        subcommand = self._subcommands.get(args[0], None)
+        if subcommand is None:
+            raise CommandNotFound(args[0])
+
+        try:
+            return await subcommand.call_with_args(bot, event, args[1:])
+        except CommandNotFound as e:
+            e.prepend_command_word(args[0])
+            raise e
 
 
 class HasSubCommandMixin(SubCallsMixin):
@@ -271,6 +310,10 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
         description: Optional[str] = None,
         parent: "Optional[BaseCommand]" = None,
     ):
+        if not inspect.iscoroutinefunction(func):
+            raise Exception(
+                f"Command {name} with function name {func.__name__} is not an async function."
+            )
         self.func = func
 
         if name is None:
@@ -284,9 +327,19 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
         self.description = description
 
         signature = inspect.signature(self.func)
+        context_model: list[Context] = []
         command_model: Optional[Type[CommandModel]] = None
 
         for param in signature.parameters.values():
+            args = get_args(param.annotation)
+            if args:
+                # Is this a union of Contexts?
+                if all([issubclass(i, Context) for i in args]):
+                    context_model = list(args)
+                continue
+            if issubclass(param.annotation, Context):
+                context_model = [param.annotation]
+
             if issubclass(param.annotation, CommandModel):
                 if command_model is None:
                     command_model = param.annotation
@@ -296,6 +349,8 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
                     )
 
         self.command_model: Optional[Type[CommandModel]] = command_model
+        self.context_model = context_model
+        print(self.context_model)
 
     async def __call__(self, *args: ArgT.args, **kwargs: ArgT.kwargs) -> None:
         await self.func(*args, **kwargs)
@@ -326,15 +381,30 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
 
     async def call_with_interaction(
         self,
-        bot: hikari.GatewayBot,
+        bot: "ComponentManager",
         interaction: CommandInteraction,
         options: Optional[Sequence[CommandInteractionOption]],
-    ):
-        kwargs = await interaction_options_to_objects(bot, interaction, options)
+    ) -> CommandContext:
+        kwargs = await interaction_options_to_objects(bot.bot, interaction, options)
         options = self.command_model(**kwargs)
-        ctx = CommandInteractionContext(bot, interaction)
+        ctx = CommandContext(bot, interaction)
         await self(ctx, options)
         return ctx
+
+    async def call_with_args(
+        self, bot: "ComponentManager", event: hikari.MessageCreateEvent, args: list[str]
+    ) -> MessageContext:
+        if not self.takes_context_type(MessageContext):
+            raise CommandNotFound()
+
+        kwargs = {}
+        options = self.command_model(**kwargs)
+        ctx = MessageContext(bot, event)
+        await self(ctx, options)
+        return ctx
+
+    def takes_context_type(self, ctx_class: type[Context]) -> bool:
+        return ctx_class in self.context_model
 
 
 class RootCommand(SubCallsMixin, BaseCommand):
@@ -442,3 +512,31 @@ def command(
         return Command(func, name=name, description=description)
 
     return wrapper
+
+
+EventType = TypeVar("EventType", bound=hikari.Event)
+
+
+class EventHandlerProtocol(Protocol):
+    async def __call__(self, bot: hikari.GatewayBot, event: EventType) -> None:
+        pass
+
+
+class Event:
+    def __init__(self, func: EventHandlerProtocol) -> None:
+        self.func = func
+        signature = inspect.signature(self.func)
+        event_parameter = list(signature.parameters.values())[1]
+        self.event = event_parameter.annotation
+        self.__name__ = func.__name__
+        self.__signature__ = signature
+        self.bot: Optional[hikari.GatewayBot] = None
+
+    async def __call__(self, *args, **kwargs) -> None:
+        assert self.bot is not None
+        await self.func(self.bot, *args, **kwargs)
+
+
+def event(func: EventHandlerProtocol) -> Event:
+    """Register an event handler."""
+    return Event(func)

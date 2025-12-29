@@ -1,15 +1,23 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import hikari
-from hikari import CommandInteraction, GatewayBot, undefined
+from hikari import CommandInteraction, GatewayBot, Message, ResponseType, undefined
 
-from atsume.discord import fetch_guild
+from atsume.discord import fetch_guild, fetch_guild_channel
+
+if TYPE_CHECKING:
+    from atsume.component.manager import ComponentManager
+    from atsume.components import ComponentModel
 
 
 class Context(ABC):
     bot: GatewayBot
     guild: hikari.Guild
+
+    def __init__(self, manager: "ComponentManager"):
+        self.manager = manager
+        self.bot = self.manager.bot
 
     @abstractmethod
     async def guild(self) -> Optional[hikari.Guild]:
@@ -26,10 +34,49 @@ class Context(ABC):
     def author(self) -> hikari.Member:
         pass
 
+    @abstractmethod
+    async def respond_with_component(self, component: "ComponentModel") -> None:
+        pass
 
-class CommandInteractionContext(Context):
-    def __init__(self, bot: hikari.GatewayBot, interaction: CommandInteraction):
-        self.bot = bot
+
+class MessageContext(Context):
+    def __init__(self, manager: "ComponentManager", event: hikari.MessageCreateEvent):
+        super().__init__(manager)
+        self._has_replied = False
+        self._event = event
+
+    async def guild(self) -> Optional[hikari.Guild]:
+        channel = await fetch_guild_channel(self.bot, self._event.channel_id)
+        if isinstance(channel, hikari.GuildChannel):
+            return await fetch_guild(self.bot, channel.guild_id)
+        raise Exception("Not in a guild")
+
+    async def respond(
+        self,
+        content: undefined.UndefinedNoneOr[Any] = undefined.UNDEFINED,
+        component: Optional["ComponentModel"] = None,
+    ) -> Message:
+        message = await self.bot.rest.create_message(
+            self._event.channel_id, content=content
+        )
+        return message
+
+    async def respond_with_component(self, component: "ComponentModel") -> None:
+        message = await self.bot.rest.create_message(
+            self._event.channel_id,
+            component=component.build(self.bot),
+            flags=hikari.MessageFlag.IS_COMPONENTS_V2,
+        )
+        self.manager.components.register_component(message.id, component)
+
+    @property
+    def author(self) -> hikari.Member | hikari.User:
+        return self._event.author
+
+
+class CommandContext(Context):
+    def __init__(self, manager: "ComponentManager", interaction: CommandInteraction):
+        super().__init__(manager)
         self._interaction = interaction
         self._has_replied = False
 
@@ -49,8 +96,26 @@ class CommandInteractionContext(Context):
     async def respond(
         self, content: undefined.UndefinedNoneOr[Any] = undefined.UNDEFINED
     ) -> None:
-        await self.interaction.edit_initial_response(content)
+        await self.interaction.create_initial_response(
+            ResponseType.MESSAGE_CREATE, content=content
+        )
         self._has_replied = True
+
+    async def respond_with_component(
+        self, component: "ComponentModel", ephemeral: bool = False
+    ) -> None:
+        flags = hikari.MessageFlag.IS_COMPONENTS_V2
+        if ephemeral:
+            flags |= hikari.MessageFlag.EPHEMERAL
+
+        await self.interaction.create_initial_response(
+            response_type=ResponseType.MESSAGE_CREATE,
+            components=component.build(self.bot),
+            flags=flags,
+        )
+        message = await self.interaction.fetch_initial_response()
+        self._has_replied = True
+        self.manager.components.register_component(message.id, component)
 
     @property
     def author(self) -> hikari.Member:

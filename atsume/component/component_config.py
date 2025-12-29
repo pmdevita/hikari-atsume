@@ -25,6 +25,7 @@ class ComponentConfig:
     commands_module_name = "commands"
     models_module_name = "models"
     permissions: typing.Optional["AbstractComponentPermissions"]
+    handles: list[str] = ["default"]
 
     def __init__(self, module_path: str) -> None:
         assert self.name is not None
