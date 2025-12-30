@@ -67,7 +67,7 @@ class MessageContext(Context):
             component=component.build(self.bot),
             flags=hikari.MessageFlag.IS_COMPONENTS_V2,
         )
-        self.manager.components.register_component(message.id, component)
+        await self.manager.components.register_component(message.id, component)
 
     @property
     def author(self) -> hikari.Member | hikari.User:
@@ -115,7 +115,7 @@ class CommandContext(Context):
         )
         message = await self.interaction.fetch_initial_response()
         self._has_replied = True
-        self.manager.components.register_component(message.id, component)
+        await self.manager.components.register_component(message.id, component)
 
     @property
     def author(self) -> hikari.Member:

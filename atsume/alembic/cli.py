@@ -11,7 +11,7 @@ from atsume.component.manager import manager
 from atsume.utils import pad_number
 
 
-@cli.command("makemigrations")
+@cli.command("old_makemigrations")
 @click.option(
     "--component_name",
     "-c",
@@ -51,7 +51,7 @@ def make_migrations(
                 raise e
 
 
-@cli.command(name="upgrade")
+@cli.command(name="old_upgrade")
 @click.option("--component_name", "-c", help="Specify a specific component to upgrade.")
 def upgrade_command(component_name: typing.Optional[str] = None) -> None:
     apps = manager.component_configs

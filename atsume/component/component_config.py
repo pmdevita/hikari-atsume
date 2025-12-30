@@ -1,3 +1,4 @@
+import inspect
 import typing
 from pathlib import Path
 
@@ -24,6 +25,7 @@ class ComponentConfig:
     verbose_name: str
     commands_module_name = "commands"
     models_module_name = "models"
+    migrations_module_name = "migrations"
     permissions: typing.Optional["AbstractComponentPermissions"]
     handles: list[str] = ["default"]
 
@@ -49,6 +51,10 @@ class ComponentConfig:
     @property
     def models_path(self) -> str:
         return f"{self.module_path}.{self.models_module_name}"
+
+    @classmethod
+    def migrations_folder_path(cls) -> Path:
+        return Path(inspect.getfile(cls)).parent / cls.migrations_module_name
 
     @property
     def models(self) -> list["ModelMetaclass"]:

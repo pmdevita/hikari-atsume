@@ -1,4 +1,4 @@
-from atsume.db import Model
-import ormar
+from piccolo import columns
+from piccolo.table import Table
 
 # Create your models here.

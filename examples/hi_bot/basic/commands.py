@@ -8,7 +8,7 @@ from atsume.command import CommandModel, Group, command, event
 from atsume.command.context import CommandContext, MessageContext
 from atsume.discord import fetch_guild_channel
 
-from .models import *  # noqa: F403
+from .models import PiccoloHiCounter
 
 # Create your commands here.
 
@@ -43,7 +43,13 @@ async def hi_subgroup(ctx: CommandContext | MessageContext, args: Hi) -> None:
 async def hi(ctx: CommandContext | MessageContext, args: Hi) -> None:
     member = args.member if args.member else ctx.author
 
-    await ctx.respond(f"Hello {member.display_name}. (root) {args.model_dump()}")
+    count_model = await PiccoloHiCounter.objects().get_or_create(
+        PiccoloHiCounter.user == member.id, defaults={"count": 0}
+    )
+    await count_model.update_self({PiccoloHiCounter.count: PiccoloHiCounter.count + 1})
+    await ctx.respond(
+        f"Hello {member.display_name}. You've said hi {count_model.count} time(s). (root) {args.model_dump()}"
+    )
 
 
 YOUTUBE = re.compile(r"https://(?:youtube.com|youtu.be)/(?:shorts/)?([\w\-_]+)\?si=")
