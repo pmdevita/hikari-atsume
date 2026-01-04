@@ -1,3 +1,4 @@
+import dataclasses
 import inspect
 import typing
 from pathlib import Path
@@ -27,7 +28,7 @@ class ComponentConfig:
     models_module_name = "models"
     migrations_module_name = "migrations"
     permissions: typing.Optional["AbstractComponentPermissions"]
-    handles: list[str] = ["default"]
+    handles: list["ChannelHandle"] = []
 
     def __init__(self, module_path: str) -> None:
         assert self.name is not None
@@ -70,3 +71,18 @@ class ComponentConfig:
 
     def __str__(self) -> str:
         return f'ComponentConfig(name"{self.name}")'
+
+
+@dataclasses.dataclass
+class ChannelHandle:
+    name: str
+    """The name of the channel handle."""
+
+    required: bool = True
+    """Whether this handle must be registered for the component to operate."""
+
+    is_multi: bool = False
+    """Whether this handle can refer to multiple channels."""
+
+    default_bot_channel: bool = False
+    """Default to the bot channel if no channel is specified."""

@@ -8,15 +8,15 @@ class AbstractComponentPermissions(abc.ABC):
     in the guild or DM. Can be subclassed to implement your own permissions check.
     """
 
-    @abc.abstractmethod
-    def __init__(self, component_path: str): ...
+    def __init__(self, component_path: str):
+        self.component_path = component_path
 
     @abc.abstractmethod
-    def allow_in_guild(self, guild_id: int) -> bool:
+    async def allow_in_guild(self, guild_id: int) -> bool:
         """Should this Component be allowed to run in the given guild ID?"""
         ...
 
     @abc.abstractmethod
-    def allow_in_dm(self) -> bool:
+    async def allow_in_dm(self) -> bool:
         """Should this Component be allowed to run in DMs?"""
         ...

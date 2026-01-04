@@ -1,4 +1,5 @@
 import inspect
+import logging
 from collections.abc import Awaitable
 from typing import (
     TYPE_CHECKING,
@@ -34,7 +35,10 @@ from atsume.command.exceptions import CommandNotFound
 from atsume.utils.interactions import interaction_options_to_objects
 
 if TYPE_CHECKING:
+    from atsume import ComponentConfig
     from atsume.component.manager import ComponentManager
+
+logger = logging.getLogger(__name__)
 
 
 class CommandMetaclass(ModelMetaclass):
@@ -121,6 +125,9 @@ class BaseCommand:
         if self.parent:
             name = f"{self.parent.command_name}_{name}"
         return name
+
+    def _get_component(self) -> Optional["ComponentConfig"]:
+        return self.parent._get_component()
 
     def as_option(self) -> hikari.CommandOption:
         """Represent this command as a CommandOption"""
@@ -213,7 +220,7 @@ class SubCallsMixin(BaseCommand):
         bot: "ComponentManager",
         interaction: CommandInteraction,
         options: Optional[Sequence[CommandInteractionOption]],
-    ):
+    ) -> CommandContext:
         if options is None:
             raise Exception("Call to command group with no further options?", options)
 
@@ -385,10 +392,13 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
         interaction: CommandInteraction,
         options: Optional[Sequence[CommandInteractionOption]],
     ) -> CommandContext:
-        kwargs = await interaction_options_to_objects(bot.bot, interaction, options)
-        options = self.command_model(**kwargs)
         ctx = CommandContext(bot, interaction)
-        await self(ctx, options)
+        if self.command_model:
+            kwargs = await interaction_options_to_objects(bot.bot, interaction, options)
+            options = self.command_model(**kwargs)
+            await self(ctx, options)
+        else:
+            await self(ctx)
         return ctx
 
     async def call_with_args(
@@ -400,6 +410,19 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
         kwargs = {}
         options = self.command_model(**kwargs)
         ctx = MessageContext(bot, event)
+
+        component = self._get_component()
+        if component and component.permissions:
+            channel = await ctx.channel()
+            if isinstance(channel, hikari.GuildChannel):
+                if not await component.permissions.allow_in_guild(channel.guild_id):
+                    logger.debug(f"Blocked command {command} due to permissions.")
+                    return ctx
+            else:
+                if not await component.permissions.allow_in_dm():
+                    logger.debug(f"Blocked command {command} due to permissions.")
+                    return ctx
+
         await self(ctx, options)
         return ctx
 
@@ -409,6 +432,17 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
 
 class RootCommand(SubCallsMixin, BaseCommand):
     """A composable class for a top level command node."""
+
+    def __init__(
+        self,
+        name: str,
+        parent: "Optional[BaseCommand]" = None,
+    ):
+        super().__init__(name, parent)
+        self.component: Optional["ComponentConfig"] = None
+
+    def _get_component(self) -> Optional["ComponentConfig"]:
+        return self.component
 
     def as_command(self) -> SlashCommandBuilder:
         cmd = hikari.impl.SlashCommandBuilder(
@@ -433,7 +467,7 @@ class Command(
 
 class Group(RootCommand, HasSubGroupMixin, HasSubCommandMixin, BaseCommand):
     def __init__(self, name: str):
-        super().__init__(name, None)
+        super().__init__(name)
 
 
 class SubCommand(CommandMixin[ArgT], BaseCommand):
@@ -531,6 +565,7 @@ class Event:
         self.__name__ = func.__name__
         self.__signature__ = signature
         self.bot: Optional[hikari.GatewayBot] = None
+        self.component: Optional["ComponentConfig"] = None
 
     async def __call__(self, *args, **kwargs) -> None:
         assert self.bot is not None

@@ -2,14 +2,14 @@ from datetime import datetime
 from importlib import import_module
 
 from hikari import Snowflake
-from piccolo.columns import JSON, BigInt, Integer, Timestamp, Varchar
+from piccolo.columns import JSON, BigInt, Serial, Timestamp, Varchar
 from piccolo.table import Table
 
 from atsume.components import ComponentModel
 
 
 class WindowState(Table):
-    id: int = Integer(primary_key=True)
+    id: int = Serial(primary_key=True)
     message_id: int = BigInt()
     module_path: str = Varchar()
     component_class: str = Varchar()

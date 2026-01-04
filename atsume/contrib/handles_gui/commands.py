@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Optional
 
 import hikari
 from hikari import Snowflake
@@ -33,6 +34,7 @@ class PanelTest(ComponentModel):
     message_index: int = 0
     selected_values: list[str] = []
     select_disabled: bool = False
+    selected_user: Optional[int] = None
 
     def get_message(self, index: int) -> str:
         match index:
@@ -45,7 +47,12 @@ class PanelTest(ComponentModel):
             case 3:
                 return "This is the fourth message!"
 
-    def render(self, bot: hikari.GatewayBot) -> list[TopLevelComponent]:
+    async def render(self, bot: hikari.GatewayBot) -> list[TopLevelComponent]:
+        selected_user_placeholder = "Select a user!"
+        if self.selected_user:
+            selected_user = await bot.rest.fetch_user(self.selected_user)
+            selected_user_placeholder = f"Selected user: {selected_user.display_name}"
+
         return [
             Container(
                 TextDisplay(self.get_message(self.message_index)),
@@ -67,7 +74,17 @@ class PanelTest(ComponentModel):
                             label="label",
                             value="value",
                             is_default="value" in self.selected_values,
-                        )
+                        ),
+                        SelectOptionBuilder(
+                            label="another option",
+                            value="value2",
+                            is_default="value2" in self.selected_values,
+                        ),
+                        SelectOptionBuilder(
+                            label="third option",
+                            value="value3",
+                            is_default="value3" in self.selected_values,
+                        ),
                     ],
                     placeholder="Select me!",
                     disabled=self.select_disabled,
@@ -78,7 +95,9 @@ class PanelTest(ComponentModel):
                 TextDisplay("hello there"),
                 Thumbnail("https://placecats.com/millie/300/150"),
             ),
-            ActionRow(UserSelect(self.user_select, placeholder="Select a user!")),
+            ActionRow(
+                UserSelect(self.user_select, placeholder=selected_user_placeholder)
+            ),
         ]
 
     async def button_callback(self, ctx: InteractionContext, index: int) -> None:
@@ -98,6 +117,7 @@ class PanelTest(ComponentModel):
 
     async def user_select(self, ctx: InteractionContext, *values: Snowflake) -> None:
         print("user select callback", values)
+        self.selected_user = int(values[0]) if values else None
         self.clicks += 1
 
 

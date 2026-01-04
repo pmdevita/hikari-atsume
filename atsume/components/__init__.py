@@ -15,6 +15,7 @@ from .blocks import (
     RoleSelect,
     Section,
     SelectMenuOption,
+    Separator,
     TextDisplay,
     TextSelect,
     Thumbnail,
@@ -42,18 +43,20 @@ __all__ = [
     "MentionableSelect",
     "Section",
     "Thumbnail",
+    "Separator",
+    "InteractionContext",
 ]
 
 
 class ComponentModel(BaseModel):
     @abstractmethod
-    def render(
+    async def render(
         self, bot: hikari.GatewayBot
     ) -> TopLevelComponent | list[TopLevelComponent]:
         raise NotImplementedError()
 
-    def build(self, bot: hikari.GatewayBot) -> list[ComponentBuilder]:
-        components = self.render(bot)
+    async def build(self, bot: hikari.GatewayBot) -> list[ComponentBuilder]:
+        components = await self.render(bot)
         if not isinstance(components, list):
             components = [components]
 

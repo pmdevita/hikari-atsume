@@ -53,13 +53,16 @@ class ComponentManager:
 
         if callback.get("a", None) or callback.get("k", None):
             await getattr(window, callback["f"])(
-                interaction_ctx, *callback.get("a", ()), **callback.get("k", {})
+                interaction_ctx,
+                *callback.get("a", ()),
+                *event.interaction.values,
+                **callback.get("k", {}),
             )
         else:
             await getattr(window, callback["f"])(
                 interaction_ctx, *event.interaction.values
             )
-        rendered = window.build(self.bot)
+        rendered = await window.build(self.bot)
         # await event.interaction.message.edit(component=rendered)
         await event.interaction.create_initial_response(
             response_type=ResponseType.MESSAGE_UPDATE, components=rendered

@@ -1,9 +1,9 @@
 from piccolo.apps.migrations.auto.migration_manager import MigrationManager
-from piccolo.columns.column_types import JSON, BigInt, Integer, Timestamp, Varchar
+from piccolo.columns.column_types import JSON, BigInt, Serial, Timestamp, Varchar
 from piccolo.columns.defaults.timestamp import TimestampNow
 from piccolo.columns.indexes import IndexMethod
 
-ID = "2025-12-29T20:23:05:073525"
+ID = "2025-12-30T00:20:16:389314"
 VERSION = "1.30.0"
 DESCRIPTION = ""
 
@@ -25,10 +25,9 @@ async def forwards():
         tablename="window_state",
         column_name="id",
         db_column_name="id",
-        column_class_name="Integer",
-        column_class=Integer,
+        column_class_name="Serial",
+        column_class=Serial,
         params={
-            "default": 0,
             "null": False,
             "primary_key": True,
             "unique": False,

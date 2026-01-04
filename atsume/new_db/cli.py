@@ -3,6 +3,7 @@ from functools import wraps
 from typing import Optional
 
 import click
+from piccolo.apps.migrations.commands.backwards import backwards
 from piccolo.apps.migrations.commands.forwards import forwards
 from piccolo.apps.migrations.commands.new import new
 
@@ -40,3 +41,10 @@ async def make_migrations(
 @sync
 async def upgrade_command(component_name: Optional[str] = None) -> None:
     await forwards("all" if component_name is None else component_name)
+
+
+@cli.command(name="downgrade", help="Downgrade a specific component.")
+@click.argument("component_name")
+@sync
+async def downgrade_command(component_name: str) -> None:
+    await backwards(component_name)

@@ -42,11 +42,13 @@ class CommandManager:
             for value in module_attrs.values():
                 if isinstance(value, RootCommand):
                     self.commands[value.name] = value
+                    value.component = component
                 if isinstance(value, Event):
                     if value.event not in self.events:
                         self.events[value.event] = []
                     self.events[value.event].append(value)
                     value.bot = self.bot
+                    value.component = component
 
         for event, funcs in self.events.items():
             for func in funcs:
@@ -89,10 +91,19 @@ class CommandManager:
 
         # await interaction.create_initial_response(ResponseType.DEFERRED_MESSAGE_CREATE)
 
+        if command.component and command.component.permissions:
+            if not command.component.permissions.allow_in_guild(interaction.guild_id):
+                logger.debug(f"Blocked command {command} due to permissions.")
+                return
+
         try:
             ctx = await command.call_with_interaction(
                 self.manager, interaction, interaction.options
             )
+
+            # Context might be None if command wasn't called
+            if ctx is None:
+                return
 
             if not ctx.has_replied:
                 logger.warning(

@@ -45,6 +45,9 @@ class MessageContext(Context):
         self._has_replied = False
         self._event = event
 
+    async def channel(self) -> hikari.PartialChannel:
+        return await fetch_guild_channel(self.bot, self._event.channel_id)
+
     async def guild(self) -> Optional[hikari.Guild]:
         channel = await fetch_guild_channel(self.bot, self._event.channel_id)
         if isinstance(channel, hikari.GuildChannel):
@@ -64,7 +67,7 @@ class MessageContext(Context):
     async def respond_with_component(self, component: "ComponentModel") -> None:
         message = await self.bot.rest.create_message(
             self._event.channel_id,
-            component=component.build(self.bot),
+            component=await component.build(self.bot),
             flags=hikari.MessageFlag.IS_COMPONENTS_V2,
         )
         await self.manager.components.register_component(message.id, component)
@@ -110,7 +113,7 @@ class CommandContext(Context):
 
         await self.interaction.create_initial_response(
             response_type=ResponseType.MESSAGE_CREATE,
-            components=component.build(self.bot),
+            components=await component.build(self.bot),
             flags=flags,
         )
         message = await self.interaction.fetch_initial_response()

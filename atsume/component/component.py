@@ -3,7 +3,7 @@ import typing
 import hikari
 import tanjun
 
-from atsume.permissions import AbstractComponentPermissions, permission_check
+from atsume.permissions import AbstractComponentPermissions
 
 
 class Component(tanjun.Component):
@@ -19,7 +19,6 @@ class Component(tanjun.Component):
         Sets the permissions object to be used by this component and adds the check for it.
         """
         self.permissions = permissions
-        self.add_check(permission_check(permissions))
 
     @property
     def guilds(self) -> list[hikari.snowflakes.Snowflake]:
