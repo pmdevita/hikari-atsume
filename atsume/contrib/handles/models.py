@@ -42,6 +42,10 @@ class ComponentGuild(Table):
         if not model._was_created:
             await model.update_self({ComponentGuild.mode: enabled})
 
+        from atsume.contrib.handles.utils import reset_cache
+
+        reset_cache()
+
     @classmethod
     async def get_guilds(cls, component_name: str) -> list["ComponentGuild"]:
         """Get the list of guild IDs for a component based on its global mode."""
@@ -71,6 +75,10 @@ class ComponentGuild(Table):
             else:
                 # Remove entry
                 await model.remove()
+
+        from atsume.contrib.handles.utils import reset_cache
+
+        reset_cache()
 
 
 class ComponentDM(Table):
