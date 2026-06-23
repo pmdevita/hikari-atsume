@@ -2,7 +2,14 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Optional
 
 import hikari
-from hikari import CommandInteraction, GatewayBot, Message, ResponseType, undefined
+from hikari import (
+    CommandInteraction,
+    GatewayBot,
+    Message,
+    MessageFlag,
+    ResponseType,
+    undefined,
+)
 
 from atsume.discord import fetch_guild, fetch_guild_channel
 
@@ -97,10 +104,16 @@ class CommandContext(Context):
         return None
 
     async def respond(
-        self, content: undefined.UndefinedNoneOr[Any] = undefined.UNDEFINED
+        self,
+        content: undefined.UndefinedNoneOr[Any] = undefined.UNDEFINED,
+        ephemeral: bool = False,
     ) -> None:
+        flags = 0
+        if ephemeral:
+            flags |= MessageFlag.EPHEMERAL
+
         await self.interaction.create_initial_response(
-            ResponseType.MESSAGE_CREATE, content=content
+            ResponseType.MESSAGE_CREATE, content=content, flags=flags
         )
         self._has_replied = True
 

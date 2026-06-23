@@ -121,4 +121,4 @@ class GuildsConfigPanel(ComponentModel):
 
 @command("config")
 async def config(ctx: CommandContext) -> None:
-    await ctx.respond_with_component(GuildsConfigPanel())
+    await ctx.respond_with_component(GuildsConfigPanel(), ephemeral=True)
