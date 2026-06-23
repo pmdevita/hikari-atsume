@@ -92,10 +92,16 @@ class CommandManager:
         # await interaction.create_initial_response(ResponseType.DEFERRED_MESSAGE_CREATE)
 
         if command.component and command.component.permissions:
-            if not command.component.permissions.allow_in_guild(interaction.guild_id):
+            if not await command.component.permissions.allow_in_guild(
+                interaction.guild_id
+            ):
                 logger.debug(f"Blocked command {command} due to permissions.")
+                await interaction.create_initial_response(
+                    ResponseType.MESSAGE_CREATE, "Command could not be run."
+                )
                 return
 
+        ctx = None
         try:
             ctx = await command.call_with_interaction(
                 self.manager, interaction, interaction.options
@@ -114,10 +120,11 @@ class CommandManager:
                     content="The command did not respond.",
                 )
         except:
-            await interaction.create_initial_response(
-                response_type=ResponseType.MESSAGE_CREATE,
-                content="An error has occurred.",
-            )
+            if ctx and not ctx.has_replied:
+                await interaction.create_initial_response(
+                    response_type=ResponseType.MESSAGE_CREATE,
+                    content="An error has occurred.",
+                )
             raise
 
     async def _on_message(self, event: MessageCreateEvent) -> None:
