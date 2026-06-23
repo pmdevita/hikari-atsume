@@ -16,28 +16,22 @@ class DatabasePermissions(AbstractComponentPermissions):
         if guild_id in self._guild_cache:
             return self._guild_cache[guild_id]
 
-        value = await ComponentGuild.exists().where(
-            (ComponentGuild.component == self.component_path)
-            # Not individually disabled
-            & ComponentGuild.component.not_in(
-                ComponentGuild.select(ComponentGuild.component).where(
-                    (ComponentGuild.guild_id == guild_id)
-                    & (ComponentGuild.mode == False)
-                )
+        result = (
+            await ComponentGuild.select(ComponentGuild.mode)
+            .where(
+                (ComponentGuild.component == self.component_path)
+                & ((ComponentGuild.guild_id == guild_id) | (ComponentGuild.all == True))
             )
-            # Not globally disabled or is individually enabled
-            & ComponentGuild.component.is_in(
-                ComponentGuild.select(ComponentGuild.component).where(
-                    # Either globally enabled
-                    ((ComponentGuild.all == True) & (ComponentGuild.mode == True))
-                    # Or individually enabled
-                    | (
-                        (ComponentGuild.guild_id == guild_id)
-                        & (ComponentGuild.mode == True)
-                    )
-                )
-            )
+            .order_by(ComponentGuild.all, ascending=True)
+            .first()
         )
+
+        if result:
+            value = result["mode"]
+        # There's no permission configured at all, default to False
+        else:
+            value = False
+
         self._guild_cache[guild_id] = value
         return value
 

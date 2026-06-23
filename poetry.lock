@@ -1932,14 +1932,14 @@ files = [
 
 [[package]]
 name = "piccolo"
-version = "1.30.0"
+version = "1.34.0"
 description = "A fast, user friendly ORM and query builder which supports asyncio."
 optional = false
 python-versions = ">=3.10.0"
 groups = ["main"]
 files = [
-    {file = "piccolo-1.30.0-py3-none-any.whl", hash = "sha256:664bed38cc09db1421acf23adb6d33e404edd6498a2a3beab134476b80019d4f"},
-    {file = "piccolo-1.30.0.tar.gz", hash = "sha256:3f41d01bc0c5a36e74ef8ef3b4a52cf899c4f874ec2e916b51cbac5ffe47dd89"},
+    {file = "piccolo-1.34.0-py3-none-any.whl", hash = "sha256:fff1aeb79b8e24d43c27b3586e5b7dd90712d0a55555771e65812f2c8e6fd1f5"},
+    {file = "piccolo-1.34.0.tar.gz", hash = "sha256:72e27ff89fd26f78c03888d8b30b82d8707f409464fbc356e02447b5dc0145d8"},
 ]
 
 [package.dependencies]
