@@ -19,13 +19,14 @@ from atsume.components import (
 )
 
 from ...command import command
-from .models import ComponentGuild
+from .models import ComponentGuild, ComponentSafetyException
 
 # Create your commands here.
 
 
 class GuildsConfigPanel(ComponentModel):
     selected_component: Optional[str] = None
+    messages: list[str] = []
 
     async def render(
         self, bot: hikari.GatewayBot
@@ -47,6 +48,11 @@ class GuildsConfigPanel(ComponentModel):
             )
         ]
 
+        if self.messages:
+            for m in self.messages:
+                panel.insert(0, TextDisplay(f"❌ {m}"))
+            self.messages = []
+
         if self.selected_component:
             # Is this component in global whitelist or blacklist mode?
             is_enabled = await ComponentGuild.get_global_mode(self.selected_component)
@@ -58,6 +64,11 @@ class GuildsConfigPanel(ComponentModel):
             guilds = await manager.bot.rest.fetch_my_guilds()
 
             guild_options = []
+            verbose_name = [
+                c.verbose_name
+                for c in manager.component_configs
+                if c.name == self.selected_component
+            ][0]
             for guild in guilds:
                 guild_mode = "Default"
                 if guild.id in guild_state:
@@ -71,7 +82,7 @@ class GuildsConfigPanel(ComponentModel):
                     Separator(),
                     Container(
                         TextDisplay(
-                            f"By default, {self.selected_component} is **{"Enabled" if is_enabled else "Disabled"}** globally."
+                            f"By default, {verbose_name} is **{"Enabled" if is_enabled else "Disabled"}** globally."
                         ),
                         ActionRow(
                             Button(
@@ -108,15 +119,32 @@ class GuildsConfigPanel(ComponentModel):
     ) -> None:
         if self.selected_component != component_name:
             return
-        await ComponentGuild.toggle_global_mode(component_name, to_whitelist)
+        ensure_guild_id = None
+        if component_name == "handles":
+            ensure_guild_id = ctx.interaction.interaction.guild_id
+        try:
+            await ComponentGuild.set_global_mode(
+                component_name, to_whitelist, ensure_guild_id=ensure_guild_id
+            )
+        except ComponentSafetyException as e:
+            self.messages.append(str(e))
 
     async def toggle_guild(
         self, ctx: InteractionContext, component_name: str, guild_id: str
     ) -> None:
         if self.selected_component != component_name:
             return
-        print(component_name, guild_id)
-        await ComponentGuild.toggle_guild(component_name, int(guild_id))
+        try:
+            await ComponentGuild.toggle_guild(
+                component_name,
+                int(guild_id),
+                block_inaccess=(
+                    component_name == "handles"
+                    and ctx.interaction.interaction.guild_id == int(guild_id)
+                ),
+            )
+        except ComponentSafetyException as e:
+            self.messages.append(str(e))
 
 
 @command("config")

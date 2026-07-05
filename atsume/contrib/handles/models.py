@@ -1,5 +1,17 @@
+from typing import Optional
+
 from piccolo.columns import BigInt, Boolean, Serial, Varchar
 from piccolo.table import Table
+
+from atsume.component.manager import manager
+
+
+class ComponentSafetyException(Exception):
+    pass
+
+
+def component_name_to_path(name: str) -> str:
+    return next(i for i in manager.component_configs if i.name == name).module_path
 
 
 class ComponentGuild(Table):
@@ -16,10 +28,11 @@ class ComponentGuild(Table):
     @classmethod
     async def get_global_mode(cls, component_name: str) -> bool:
         """Get the global default mode for a component. Returns True for Enabled, False for Disabled."""
+        component_path = component_name_to_path(component_name)
         model = (
             await cls.objects()
             .where(
-                (ComponentGuild.component == component_name)
+                (ComponentGuild.component == component_path)
                 & (ComponentGuild.all == True)
             )
             .first()
@@ -29,12 +42,31 @@ class ComponentGuild(Table):
         return False  # Default to disabled mode
 
     @classmethod
-    async def toggle_global_mode(cls, component_name: str, enabled: bool) -> None:
+    async def set_global_mode(
+        cls, component_name: str, enabled: bool, ensure_guild_id: Optional[int] = None
+    ) -> None:
         """Toggle the global mode for a component."""
+        component_path = component_name_to_path(component_name)
+
+        if (
+            ensure_guild_id
+            and not enabled
+            and not (
+                await cls.exists().where(
+                    ComponentGuild.component == component_path,
+                    ComponentGuild.guild_id == ensure_guild_id,
+                    ComponentGuild.mode == True,
+                )
+            )
+        ):
+            raise ComponentSafetyException(
+                "Cannot disable access from within the same guild."
+            )
+
         model = await cls.objects().get_or_create(
-            (ComponentGuild.component == component_name) & (ComponentGuild.all == True),
+            (ComponentGuild.component == component_path) & (ComponentGuild.all == True),
             defaults={
-                ComponentGuild.component: component_name,
+                ComponentGuild.component: component_path,
                 ComponentGuild.all: True,
                 ComponentGuild.mode: enabled,
             },
@@ -49,20 +81,24 @@ class ComponentGuild(Table):
     @classmethod
     async def get_guilds(cls, component_name: str) -> list["ComponentGuild"]:
         """Get the list of guild IDs for a component based on its global mode."""
+        component_path = component_name_to_path(component_name)
         return await cls.objects().where(
-            (ComponentGuild.component == component_name) & (ComponentGuild.all == False)
+            (ComponentGuild.component == component_path) & (ComponentGuild.all == False)
         )
 
     @classmethod
-    async def toggle_guild(cls, component_name: str, guild_id: int) -> None:
+    async def toggle_guild(
+        cls, component_name: str, guild_id: int, block_inaccess: bool = False
+    ) -> None:
         """Toggle a guild's inclusion/exclusion for a component."""
         # Toggling cycles mode true -> false -> removed
+        component_path = component_name_to_path(component_name)
         model = await cls.objects().get_or_create(
-            (ComponentGuild.component == component_name)
+            (ComponentGuild.component == component_path)
             & (ComponentGuild.all == False)
             & (ComponentGuild.guild_id == guild_id),
             defaults={
-                ComponentGuild.component: component_name,
+                ComponentGuild.component: component_path,
                 ComponentGuild.all: False,
                 ComponentGuild.guild_id: guild_id,
                 ComponentGuild.mode: True,
@@ -71,9 +107,20 @@ class ComponentGuild(Table):
         if not model._was_created:
             if model.mode:
                 # Switch to Disabled
+                if block_inaccess:
+                    raise ComponentSafetyException(
+                        "Cannot disable access from within the same guild."
+                    )
                 await model.update_self({ComponentGuild.mode: False})
             else:
                 # Remove entry
+                if block_inaccess and cls.exists().where(
+                    ComponentGuild.component == component_path,
+                    ComponentGuild.all == False,
+                ):
+                    raise ComponentSafetyException(
+                        "Cannot disable access from within the same guild."
+                    )
                 await model.remove()
 
         from atsume.contrib.handles.utils import reset_cache
