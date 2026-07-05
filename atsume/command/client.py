@@ -1,11 +1,13 @@
 import importlib
 import logging
 import shlex
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Optional, cast
 
 import hikari
+from hikari import CommandInteraction
+from hikari import Event as HikariBaseEvent
 from hikari import (
-    CommandInteraction,
+    GuildJoinEvent,
     InteractionCreateEvent,
     InteractionType,
     MessageCreateEvent,
@@ -29,6 +31,7 @@ class CommandManager:
         self.manager = manager
         self.bot = self.manager.bot
         self.manager.bot.subscribe(StartingEvent, self._on_starting)
+        self.manager.bot.subscribe(GuildJoinEvent, self._on_guild_join)
         self.manager.bot.subscribe(hikari.InteractionCreateEvent, self._on_interaction)
         self.manager.bot.subscribe(hikari.MessageCreateEvent, self._on_message)
 
@@ -55,6 +58,12 @@ class CommandManager:
                 self.manager.bot.subscribe(event, func)
 
     async def _on_starting(self, event: StartingEvent) -> None:
+        await self._register_commands(event)
+
+    async def _on_guild_join(self, event: GuildJoinEvent) -> None:
+        await self._register_commands(event)
+
+    async def _register_commands(self, event: Optional[HikariBaseEvent] = None):
         logger.info("Registering commands...")
 
         self.application = await self.manager.bot.rest.fetch_application()
@@ -65,10 +74,16 @@ class CommandManager:
             if i.takes_context_type(CommandContext)
         ]
 
-        async for guild in self.bot.rest.fetch_my_guilds():
+        if isinstance(event, GuildJoinEvent):
+            # Single register
             await self.bot.rest.set_application_commands(
-                self.application, commands, guild.id
+                self.application, commands, event.guild_id
             )
+        else:
+            async for guild in self.bot.rest.fetch_my_guilds():
+                await self.bot.rest.set_application_commands(
+                    self.application, commands, guild.id
+                )
 
     async def _on_interaction(self, event: InteractionCreateEvent) -> None:
         print(event)
