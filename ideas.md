@@ -203,6 +203,17 @@ Ultimately I think hurricane channels likely need to be implemented from scratch
 for the application, and I think knowing this lays out a key boundary for the
 handles system.
 
+
+#### Postscript: How would hurricane actually configure then?
+
+App would keep a table of hurricanes and a table of guild-user locations. When
+hurricane and users match, it creates another channel and keeps track in another table
+of hurricane-guild channels. It would then lookup channels for messaging updates by
+hurricane-guild.
+
+It's really hard to say how we could abstract this any further. We will always need to
+know hurricane and guild at runtime anyways, we can't handwave away this lookup any further.
+
 ### Star Board
 
 Star Board is an application that allows users to save the "best of" messages in
@@ -242,3 +253,5 @@ types to ensure users don't accidentally try to lookup multiple target channels
   it should be encouraged.
 - As handles do not help every use case, handles are generally optional. Apps
 should never be required to use them to interact with channels.
+
+Single target should be called "interaction channel" and multi target should be "listening channels".
