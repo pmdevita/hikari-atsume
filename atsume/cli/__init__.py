@@ -12,10 +12,9 @@ from pathlib import Path
 from atsume.cli.base import CLIContext, cli
 
 CLI_EXTENSIONS = [
-    "atsume.alembic.cli",
     "atsume.bot",
     "atsume.cli.component",
-    "atsume.new_db.cli",
+    "atsume.db.cli",
 ]
 """The default list of CLI extensions to load. This may be extensible in the future."""
 
