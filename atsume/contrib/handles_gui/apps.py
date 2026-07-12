@@ -1,6 +1,6 @@
-from atsume.component import ComponentConfig
+from atsume.apps import AppConfig
 
 
-class HandlesGUI(ComponentConfig):
+class HandlesGUI(AppConfig):
     name = "handles_gui"
     verbose_name = "Component UI"

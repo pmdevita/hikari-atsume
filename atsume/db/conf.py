@@ -4,7 +4,7 @@ from importlib import import_module
 from piccolo.conf.apps import AppConfig, AppRegistry
 from piccolo.engine import SQLiteEngine
 
-from atsume.component.manager import manager
+from atsume.apps.manager import manager
 from atsume.settings import settings
 
 logger = logging.getLogger(__name__)

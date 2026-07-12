@@ -35,8 +35,8 @@ from atsume.command.exceptions import CommandNotFound
 from atsume.utils.interactions import interaction_options_to_objects
 
 if TYPE_CHECKING:
-    from atsume import ComponentConfig
-    from atsume.component.manager import ComponentManager
+    from atsume.apps import AppConfig
+    from atsume.apps.manager import ComponentManager
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +126,7 @@ class BaseCommand:
             name = f"{self.parent.command_name}_{name}"
         return name
 
-    def _get_component(self) -> Optional["ComponentConfig"]:
+    def _get_component(self) -> Optional["AppConfig"]:
         return self.parent._get_component()
 
     def as_option(self) -> hikari.CommandOption:
@@ -439,9 +439,9 @@ class RootCommand(SubCallsMixin, BaseCommand):
         parent: "Optional[BaseCommand]" = None,
     ):
         super().__init__(name, parent)
-        self.component: Optional["ComponentConfig"] = None
+        self.component: Optional["AppConfig"] = None
 
-    def _get_component(self) -> Optional["ComponentConfig"]:
+    def _get_component(self) -> Optional["AppConfig"]:
         return self.component
 
     def as_command(self) -> SlashCommandBuilder:
@@ -565,7 +565,7 @@ class Event:
         self.__name__ = func.__name__
         self.__signature__ = signature
         self.bot: Optional[hikari.GatewayBot] = None
-        self.component: Optional["ComponentConfig"] = None
+        self.component: Optional["AppConfig"] = None
 
     async def __call__(self, *args, **kwargs) -> None:
         assert self.bot is not None

@@ -21,7 +21,7 @@ from atsume.command.model import Event, RootCommand
 from atsume.settings import settings
 
 if TYPE_CHECKING:
-    from atsume.component.manager import ComponentManager
+    from atsume.apps.manager import ComponentManager
 
 logger = logging.getLogger(__name__)
 

@@ -13,7 +13,7 @@ from atsume.settings import settings
 from ..command.client import CommandManager
 from ..components.manager import ComponentManager as UIComponentManager
 from ..extensions.loader import load_module_class
-from .component_config import ComponentConfig
+from .config import AppConfig
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +28,16 @@ class ComponentNotFound(Exception):
     pass
 
 
-def get_component_config(module_path: str) -> ComponentConfig:
+def get_component_config(module_path: str) -> AppConfig:
     """
-    Load a ComponentConfig from a given module path. It looks for the `apps` submodule
+    Load an AppConfig from a given module path. It looks for the `apps` submodule
     in the given module path.
     """
     app_module = import_module(f"{module_path}.{APPS_MODULE_NAME}")
-    app_configs: list[typing.Type[ComponentConfig]] = [
+    app_configs: list[typing.Type[AppConfig]] = [
         candidate
         for name, candidate in inspect.getmembers(app_module, inspect.isclass)
-        if (issubclass(candidate, ComponentConfig) and candidate is not ComponentConfig)
+        if (issubclass(candidate, AppConfig) and candidate is not AppConfig)
     ]
     # You could declare multiple apps in a package but for right now we're not going to do that
     assert len(app_configs) == 1
@@ -50,7 +50,7 @@ class ComponentManager:
     """
 
     def __init__(self) -> None:
-        self.component_configs: list[ComponentConfig] = []
+        self.component_configs: list[AppConfig] = []
         self.unloaded_components: dict[str, str] = {}
 
     def _setting_init(self):
@@ -71,7 +71,7 @@ class ComponentManager:
         self.bot.subscribe(hikari.StoppingEvent, self._on_stopping)
 
     def _load_components(self) -> None:
-        """Load all ComponentConfigs as defined in the Atsume project settings."""
+        """Load all AppConfigs as defined in the Atsume project settings."""
         for component in settings.COMPONENTS:
             self._load_component(component)
 
@@ -84,7 +84,7 @@ class ComponentManager:
     async def _on_stopping(self, event: StoppingEvent):
         print(event)
 
-    def _load_component(self, component: str) -> ComponentConfig:
+    def _load_component(self, component: str) -> AppConfig:
         """Load a single component from a given module path."""
         component_config = get_component_config(component)
         self.component_configs.append(component_config)
@@ -104,21 +104,21 @@ class ComponentManager:
 
     def get_config_from_models_path(
         self, models_path: str
-    ) -> typing.Optional[ComponentConfig]:
-        """Get the ComponentConfig that matches the given module path. Returns None if it does not exist."""
+    ) -> typing.Optional[AppConfig]:
+        """Get the AppConfig that matches the given module path. Returns None if it does not exist."""
         for config in self.component_configs:
             if models_path == config.models_path:
                 return config
         return None
 
-    def get_config_by_name(self, config_name: str) -> typing.Optional[ComponentConfig]:
-        """Get the ComponentConfig that has a matching `name` property. Returns None if it does not exist."""
+    def get_config_by_name(self, config_name: str) -> typing.Optional[AppConfig]:
+        """Get the AppConfig that has a matching `name` property. Returns None if it does not exist."""
         for config in self.component_configs:
             if config.name == config_name:
                 return config
         return None
 
-    def unload_component(self, component_config: ComponentConfig) -> None:
+    def unload_component(self, component_config: AppConfig) -> None:
         """
         Unloads a component from Python. Should be called after `tanjun.Client.remove_component_by_name.
         Note: This is experimental and does not actually unload the module correctly from Python.
@@ -139,7 +139,7 @@ class ComponentManager:
         self,
         component_name: typing.Optional[str] = None,
         component_path: typing.Optional[str] = None,
-    ) -> ComponentConfig:
+    ) -> AppConfig:
         """
         Load a component by either module path or name. Must also be defined in the Atsume project settings.
         Note: This is experimental, it will readd an unloaded component but does not reload any modules.

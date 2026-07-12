@@ -14,18 +14,10 @@ import hikari
 import hupper  # type: ignore
 import tanjun
 
+from atsume.apps import AppConfig
+from atsume.apps.manager import manager as component_manager
 from atsume.cli.base import cli
 from atsume.command.model import Command
-from atsume.component import Component, ComponentConfig
-from atsume.component.decorators import (
-    AtsumeComponentClose,
-    AtsumeComponentOpen,
-    AtsumeEventListener,
-    AtsumeIntervalSchedule,
-    AtsumeTimeSchedule,
-    BaseCallback,
-)
-from atsume.component.manager import manager as component_manager
 from atsume.db.manager import database
 from atsume.extensions.loader import load_module_class
 from atsume.settings import settings
@@ -131,7 +123,7 @@ def autoreload_start_bot() -> None:
 
 def load_components() -> None:
     """
-    Load the ComponentConfigs as dictated by the settings and then load the component for each of them.
+    Load the AppConfigs as dictated by the settings and then load the component for each of them.
 
     :param client: The Tanjun Client to load the components on to.
     """
@@ -140,12 +132,12 @@ def load_components() -> None:
         load_component(component_config)
 
 
-def load_component(component_config: ComponentConfig) -> None:
+def load_component(component_config: AppConfig) -> None:
     """
     Load a Component from its config, attach permissions, and attach it to the client.
 
     :param client: A Tanjun Client to attach the component to.
-    :param component_config: The ComponentConfig to attach it to.
+    :param component_config: The AppConfig to attach it to.
     :return:
     """
     try:
@@ -153,31 +145,9 @@ def load_component(component_config: ComponentConfig) -> None:
     except ModuleNotFoundError:
         logging.warning(f"Was not able to load database models for {component_config}")
 
-    # Create the component and load the commands into it
-    component = Component(name=component_config.name)
     module = importlib.import_module(component_config.commands_path)
     module_attrs = vars(module)
-    component.load_from_scope(scope=module_attrs)
-    # Create the permissions class and check and add it to the component
-    if component_config.permissions:
-        component.set_permissions(component_config.permissions)
 
-    # Todo: Remove this once this feature is added to Tanjun
-    # Update: Might not since we're appending in extra functionality here
     for value in module_attrs.values():
-        if isinstance(value, BaseCallback):
-            value._component = component
-            if isinstance(value, AtsumeEventListener):
-                if component_config.permissions:
-                    value.permissions = component_config.permissions
-                component.add_listener(value.event_type, value)
-            elif isinstance(value, AtsumeComponentOpen):
-                component.add_on_open(value)
-            elif isinstance(value, AtsumeComponentClose):
-                component.add_on_close(value)
-            elif isinstance(value, AtsumeTimeSchedule):
-                component.add_schedule(value.as_time_schedule())
-            elif isinstance(value, AtsumeIntervalSchedule):
-                component.add_schedule(value.as_interval())
         if isinstance(value, Command):
             component_config.commands.append(value)

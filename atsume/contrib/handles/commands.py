@@ -4,8 +4,8 @@ from typing import Optional
 import hikari
 from hikari.impl import SelectOptionBuilder
 
+from atsume.apps.manager import manager
 from atsume.command.context import CommandContext
-from atsume.component.manager import manager
 from atsume.components import (
     ActionRow,
     Button,

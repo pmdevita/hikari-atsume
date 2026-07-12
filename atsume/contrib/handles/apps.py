@@ -1,6 +1,6 @@
-from atsume.component import ComponentConfig
+from atsume.apps import AppConfig
 
 
-class Handles(ComponentConfig):
+class Handles(AppConfig):
     name = "handles"
     verbose_name = "Channel Handles"

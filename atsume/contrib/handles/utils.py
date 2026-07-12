@@ -1,4 +1,4 @@
-from atsume.component.manager import manager
+from atsume.apps.manager import manager
 from atsume.contrib.handles.permissions import DatabasePermissions
 
 

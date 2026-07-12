@@ -3,7 +3,7 @@ from typing import Optional
 from piccolo.columns import BigInt, Boolean, Serial, Varchar
 from piccolo.table import Table
 
-from atsume.component.manager import manager
+from atsume.apps.manager import manager
 
 
 class ComponentSafetyException(Exception):

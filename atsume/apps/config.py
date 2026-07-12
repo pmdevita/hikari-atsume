@@ -2,6 +2,7 @@ import dataclasses
 import inspect
 import typing
 from pathlib import Path
+from typing import Optional
 
 import sqlalchemy
 
@@ -16,7 +17,7 @@ if typing.TYPE_CHECKING:
     from atsume.permissions.base import AbstractComponentPermissions
 
 
-class ComponentConfig:
+class AppConfig:
     """
     A dataclass for configuring an Atsume Component. Includes the component name, its permissions,
     and the file and module paths for its commands and models.
@@ -28,7 +29,7 @@ class ComponentConfig:
     models_module_name = "models"
     migrations_module_name = "migrations"
     permissions: typing.Optional["AbstractComponentPermissions"]
-    handles: list["ChannelHandle"] = []
+    handles: list["BaseChannelHandle"] = []
 
     def __init__(self, module_path: str) -> None:
         assert self.name is not None
@@ -70,19 +71,26 @@ class ComponentConfig:
             self._models.pop()
 
     def __str__(self) -> str:
-        return f'ComponentConfig(name"{self.name}")'
+        return f'AppConfig(name"{self.name}")'
 
 
 @dataclasses.dataclass
-class ChannelHandle:
+class BaseChannelHandle:
     name: str
     """The name of the channel handle."""
 
-    required: bool = True
-    """Whether this handle must be registered for the component to operate."""
+    description: Optional[str] = None
+    """The description of what this handle is used for."""
 
-    is_multi: bool = False
-    """Whether this handle can refer to multiple channels."""
+
+@dataclasses.dataclass
+class ListeningHandle(BaseChannelHandle):
+    """A channel handle which maps to multiple channels, used for receiving events."""
+
+
+@dataclasses.dataclass
+class InteractionHandle:
+    """A channel handle which maps to a single channel, used for bot initiated actions or receiving events."""
 
     default_bot_channel: bool = False
-    """Default to the bot channel if no channel is specified."""
+    """Whether this channel uses a server's bot channel if unconfigured. Defaults to False."""
