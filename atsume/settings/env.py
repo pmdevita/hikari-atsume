@@ -1,11 +1,11 @@
 import os
-from typing import Optional, Type, TypeVar
+from typing import Optional, TypeVar
 
-EnvType = TypeVar("EnvType", bound=Type)
+EnvType = TypeVar("EnvType")
 
 
 def env(
-    key: str, var_type: EnvType = str, default: Optional[EnvType] = None
+    key: str, var_type: type[EnvType] = str, default: Optional[EnvType] = None
 ) -> EnvType:
     value = os.environ.get(key, default)
     if value is None:

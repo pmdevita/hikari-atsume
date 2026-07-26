@@ -22,7 +22,6 @@ async def interaction_options_to_objects(
         return objs
 
     for option in options:
-        print(option)
         match option.type:
             case OptionType.USER:
                 objs[option.name] = await fetch_member(

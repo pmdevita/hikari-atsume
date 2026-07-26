@@ -79,10 +79,10 @@ class ComponentManager:
         self.bot = bot
 
     async def _on_starting(self, event: StartingEvent):
-        print(event)
+        pass
 
     async def _on_stopping(self, event: StoppingEvent):
-        print(event)
+        pass
 
     def _load_component(self, component: str) -> AppConfig:
         """Load a single component from a given module path."""

@@ -86,7 +86,6 @@ class CommandManager:
                 )
 
     async def _on_interaction(self, event: InteractionCreateEvent) -> None:
-        print(event)
         match event.interaction.type:
             case InteractionType.APPLICATION_COMMAND:
                 await self._on_application_command(

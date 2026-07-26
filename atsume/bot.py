@@ -7,6 +7,7 @@ You probably shouldn't ever have to call these unless you're building something 
 import importlib
 import importlib.util
 import logging
+import os
 import sys
 
 import hikari
@@ -26,7 +27,6 @@ def initialize_atsume(bot_module: str) -> None:
     Initializes Atsume's settings and database. Should be called first
     when bootstrapping the framework.
     """
-    settings._initialize(bot_module)
     path = module_to_path(bot_module)
     if path not in sys.path:
         sys.path.insert(0, module_to_path(bot_module))
@@ -104,6 +104,8 @@ def start_bot() -> None:
 
 
 def autoreload_start_bot() -> None:
+    settings._initialize(os.environ["ATSUME_SETTINGS_MODULE"])
+    initialize_atsume(os.environ["ATSUME_SETTINGS_MODULE"])
     run_bot()
 
 

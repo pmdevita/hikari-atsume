@@ -16,7 +16,6 @@ class ComponentManager:
         self.manager = manager
         self.bot = self.manager.bot
         self.windows: dict[hikari.Snowflake, ComponentModel] = {}
-        print("subbed")
         self.bot.subscribe(
             hikari.ComponentInteractionCreateEvent, self._on_component_interaction
         )

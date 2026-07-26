@@ -357,7 +357,6 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
 
         self.command_model: Optional[Type[CommandModel]] = command_model
         self.context_model = context_model
-        print(self.context_model)
 
     async def __call__(self, *args: ArgT.args, **kwargs: ArgT.kwargs) -> None:
         await self.func(*args, **kwargs)
