@@ -8,17 +8,14 @@ import importlib
 import importlib.util
 import logging
 import sys
-import typing
 
 import hikari
 import hupper  # type: ignore
-import tanjun
 
 from atsume.apps import AppConfig
 from atsume.apps.manager import manager as component_manager
 from atsume.cli.base import cli
 from atsume.command.model import Command
-from atsume.db.manager import database
 from atsume.extensions.loader import load_module_class
 from atsume.settings import settings
 from atsume.utils import module_to_path
@@ -46,12 +43,11 @@ def initialize_atsume(bot_module: str) -> None:
             pass
 
     # This needs to get done before we load any database models
-    database._create_database()
     component_manager._setting_init()
     load_components()
 
 
-def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
+def initialize_discord() -> hikari.GatewayBot:
     """
     Instantiate the Hikari bot and Tanjun client. Should be called after
     `initialize_atsume`.
@@ -66,15 +62,7 @@ def initialize_discord() -> typing.Tuple[hikari.GatewayBot, tanjun.Client]:
             settings.VOICE_COMPONENT, hikari.impl.VoiceComponentImpl
         )(bot)
 
-    # global_commands = not settings.DEBUG and settings.GLOBAL_COMMANDS
-
-    # client = tanjun.Client.from_gateway_bot(
-    #     bot, declare_global_commands=global_commands, mention_prefix=False
-    # )
-
-    # if settings.MESSAGE_PREFIX:
-    #     client.add_prefix(settings.MESSAGE_PREFIX)
-    return bot  # , client
+    return bot
 
 
 def create_bot(
@@ -95,8 +83,6 @@ def create_bot(
     """
     initialize_atsume(bot_module)
     bot = initialize_discord()
-    # attach_extensions(client)
-    # load_components()
     return bot
 
 
