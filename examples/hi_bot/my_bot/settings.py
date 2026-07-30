@@ -17,3 +17,9 @@ HIKARI_LOGGING = False
 INTENTS = hikari.Intents.ALL_UNPRIVILEGED | hikari.Intents.MESSAGE_CONTENT
 
 DEBUG = env("DEBUG", var_type=bool, default=False)
+
+TOKEN = env("TOKEN")
+
+DATABASE_URL = "sqlite://db.sqlite"
+
+MESSAGE_PREFIX = "-t "

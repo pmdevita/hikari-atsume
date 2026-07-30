@@ -22,7 +22,10 @@ class Settings:
 
     def _initialize(self, bot_module: str) -> None:
         self._SETTINGS = importlib.import_module(f"{bot_module}.settings")
-        self._LOCAL = importlib.import_module(f"{bot_module}.local")
+        try:
+            self._LOCAL = importlib.import_module(f"{bot_module}.local")
+        except ModuleNotFoundError:
+            self._LOCAL = object()
 
     def __getattribute__(self, item: str) -> typing.Any:
         try:
