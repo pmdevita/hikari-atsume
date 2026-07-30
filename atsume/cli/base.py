@@ -30,7 +30,7 @@ def cli(ctx: click.Context) -> None:
 
     settings._initialize(bot_module)
 
-    if not settings.DEBUG:
+    if not (settings.DEBUG and ctx.invoked_subcommand == "run"):
         initialize_atsume(bot_module)
 
 
