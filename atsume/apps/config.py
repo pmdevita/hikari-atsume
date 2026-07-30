@@ -73,6 +73,9 @@ class AppConfig:
     def __str__(self) -> str:
         return f'AppConfig(name"{self.name}")'
 
+    def __repr__(self) -> str:
+        return f"AppConfig({self.name=})"
+
 
 @dataclasses.dataclass
 class BaseChannelHandle:

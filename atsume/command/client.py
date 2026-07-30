@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 import logging
 import shlex
@@ -7,6 +8,7 @@ import hikari
 from hikari import CommandInteraction
 from hikari import Event as HikariBaseEvent
 from hikari import (
+    GuildEvent,
     GuildJoinEvent,
     InteractionCreateEvent,
     InteractionType,
@@ -47,21 +49,43 @@ class CommandManager:
                     self.commands[value.name] = value
                     value.component = component
                 if isinstance(value, Event):
-                    if value.event not in self.events:
-                        self.events[value.event] = []
-                    self.events[value.event].append(value)
+                    self.events.setdefault(value.event, []).append(value)
                     value.bot = self.bot
                     value.component = component
 
         for event, funcs in self.events.items():
-            for func in funcs:
-                self.manager.bot.subscribe(event, func)
+            self.manager.bot.subscribe(event, self._on_event)
 
     async def _on_starting(self, event: StartingEvent) -> None:
         await self._register_commands(event)
 
     async def _on_guild_join(self, event: GuildJoinEvent) -> None:
         await self._register_commands(event)
+
+    async def _on_event(self, event: hikari.Event) -> None:
+        base_event_type = type(event)
+        event_types = [base_event_type] + list(base_event_type.__bases__)
+        handlers = []
+        for event_type in event_types:
+            for handler in self.events.get(event_type, []):
+                if handler not in handlers:
+                    handlers.append(handler)
+
+        await asyncio.gather(
+            *[self._handle_event(event, handler) for handler in handlers]
+        )
+
+    async def _handle_event(self, event: hikari.Event, handler: Event):
+        if handler.component and handler.component.permissions:
+            if isinstance(event, GuildEvent) or hasattr(event, "guild_id"):
+                if not await handler.component.permissions.allow_in_guild(
+                    event.guild_id
+                ):
+                    logger.debug(f"Blocked event handler {handler} due to permissions.")
+                    return
+            # TODO: Add DM perm check
+
+        await handler(event)
 
     async def _register_commands(self, event: Optional[HikariBaseEvent] = None):
         logger.info("Registering commands...")

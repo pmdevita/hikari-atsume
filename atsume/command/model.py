@@ -570,6 +570,9 @@ class Event:
         assert self.bot is not None
         await self.func(self.bot, *args, **kwargs)
 
+    def __str__(self):
+        return f"Event({self.component=}, {self.__name__=})"
+
 
 def event(func: EventHandlerProtocol) -> Event:
     """Register an event handler."""
