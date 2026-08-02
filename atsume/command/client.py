@@ -19,7 +19,7 @@ from hikari import (
 
 from atsume.command.context import CommandContext
 from atsume.command.exceptions import CommandNotFound
-from atsume.command.model import Event, RootCommand
+from atsume.command.model import CommandMixin, Event, RootCommand
 from atsume.settings import settings
 
 if TYPE_CHECKING:
@@ -47,6 +47,9 @@ class CommandManager:
             for value in module_attrs.values():
                 if isinstance(value, RootCommand):
                     self.commands[value.name] = value
+                    if isinstance(value, CommandMixin) and value.aliases:
+                        for alias in value.aliases:
+                            self.commands[alias] = value
                     value.component = component
                 if isinstance(value, Event):
                     self.events.setdefault(value.event, []).append(value)
@@ -92,10 +95,11 @@ class CommandManager:
 
         self.application = await self.manager.bot.rest.fetch_application()
 
+        # We pass the name through in case it's an alias
         commands = [
-            i.as_command()
-            for i in self.commands.values()
-            if i.takes_context_type(CommandContext)
+            command.as_command(name)
+            for name, command in self.commands.items()
+            if command.takes_context_type(CommandContext)
         ]
 
         if isinstance(event, GuildJoinEvent):

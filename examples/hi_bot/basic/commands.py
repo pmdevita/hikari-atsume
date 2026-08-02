@@ -22,8 +22,8 @@ class Hi(CommandModel):
 test_group = Group("group")
 
 
-@test_group.subcommand("hi")
-async def hi_group(ctx: MessageContext, args: Hi) -> None:
+@test_group.subcommand("hi", aliases=["hey", "howdy"])
+async def hi_group(ctx: MessageContext | CommandContext, args: Hi) -> None:
     member = args.member if args.member else ctx.author
 
     await ctx.respond(f"Hello {member.display_name}. (group)")
@@ -32,14 +32,14 @@ async def hi_group(ctx: MessageContext, args: Hi) -> None:
 sub_group = test_group.subgroup("subgroup")
 
 
-@sub_group.subcommand("hi")
+@sub_group.subcommand("hi", aliases=["hey", "howdy"])
 async def hi_subgroup(ctx: CommandContext | MessageContext, args: Hi) -> None:
     member = args.member if args.member else ctx.author
 
     await ctx.respond(f"Hello {member.display_name}. (subgroup)")
 
 
-@command
+@command(aliases=["howdy", "hey"])
 async def hi(ctx: CommandContext | MessageContext, args: Hi) -> None:
     member = args.member if args.member else ctx.author
 

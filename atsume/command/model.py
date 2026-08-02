@@ -129,7 +129,7 @@ class BaseCommand:
     def _get_component(self) -> Optional["AppConfig"]:
         return self.parent._get_component()
 
-    def as_option(self) -> hikari.CommandOption:
+    def as_option(self, name: Optional[str] = None) -> hikari.CommandOption:
         """Represent this command as a CommandOption"""
         raise NotImplementedError()
 
@@ -193,10 +193,13 @@ class SubCallsMixin(BaseCommand):
             e.prepend_command_word(value)
             raise e
 
-    def as_option(self) -> hikari.CommandOption:
+    def as_option(self, name: Optional[str] = None) -> hikari.CommandOption:
+        if name is None:
+            name = self.name
+
         cmd = CommandOption(
             type=OptionType.SUB_COMMAND_GROUP,
-            name=self.name,
+            name=name,
             description=f"Description of {self.name}",
             options=self.get_suboptions(),
         )
@@ -210,9 +213,9 @@ class SubCallsMixin(BaseCommand):
 
     def get_suboptions(self) -> list[hikari.CommandOption]:
         return [
-            i.as_option()
-            for i in self._subcommands.values()
-            if i.takes_context_type(CommandContext)
+            suboption.as_option(name)
+            for name, suboption in self._subcommands.items()
+            if suboption.takes_context_type(CommandContext)
         ]
 
     async def call_with_interaction(
@@ -276,18 +279,24 @@ class HasSubCommandMixin(SubCallsMixin):
         self,
         name: Optional[str] | CommandFunctionType[ArgT] = None,
         description: Optional[str] = None,
+        aliases: Optional[list[str]] = None,
     ) -> "SubCommand[ArgT] | Callable[[CommandFunctionType[ArgT]], SubCommand[ArgT]]":
         if callable(name):
             return SubCommand(name)
 
         def wrapper(func: CommandFunctionType[ArgT]) -> "SubCommand[ArgT]":
-            command = SubCommand(func, name=name, description=description, parent=self)
+            command = SubCommand(
+                func, name=name, description=description, parent=self, aliases=aliases
+            )
             if command.name in self._subcommands:
                 raise Exception(
                     f"{self} already has a subgroup or subcommand registered as name {command.name}."
                 )
 
             self._subcommands[command.name] = command
+            if aliases:
+                for alias in aliases:
+                    self._subcommands[alias] = command
             return command
 
         return wrapper
@@ -316,6 +325,7 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
         name: Optional[str] = None,
         description: Optional[str] = None,
         parent: "Optional[BaseCommand]" = None,
+        aliases: Optional[list[str]] = None,
     ):
         if not inspect.iscoroutinefunction(func):
             raise Exception(
@@ -332,6 +342,7 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
             description = f"Description of {self.name}"
 
         self.description = description
+        self.aliases = aliases
 
         signature = inspect.signature(self.func)
         context_model: list[Context] = []
@@ -361,10 +372,13 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
     async def __call__(self, *args: ArgT.args, **kwargs: ArgT.kwargs) -> None:
         await self.func(*args, **kwargs)
 
-    def as_option(self) -> CommandOption:
+    def as_option(self, name: Optional[str] = None) -> CommandOption:
+        if name is None:
+            name = self.name
+
         cmd = CommandOption(
             type=OptionType.SUB_COMMAND,
-            name=self.name,
+            name=name,
             description=self.description,
             options=self.get_suboptions(),
         )
@@ -443,9 +457,12 @@ class RootCommand(SubCallsMixin, BaseCommand):
     def _get_component(self) -> Optional["AppConfig"]:
         return self.component
 
-    def as_command(self) -> SlashCommandBuilder:
+    def as_command(self, name: Optional[str] = None) -> SlashCommandBuilder:
+        if name is None:
+            name = self.name
+
         cmd = hikari.impl.SlashCommandBuilder(
-            name=self.name, description=f"Description of {self.name}"
+            name=name, description=f"Description of {self.name}"
         )
         for option in self.get_suboptions():
             cmd.add_option(option)
@@ -460,8 +477,9 @@ class Command(
         func: CommandFunctionType[ArgT],
         name: Optional[str] = None,
         description: Optional[str] = None,
+        aliases: Optional[list[str]] = None,
     ):
-        super().__init__(func, name, description, None)
+        super().__init__(func, name, description, None, aliases)
 
 
 class Group(RootCommand, HasSubGroupMixin, HasSubCommandMixin, BaseCommand):
@@ -536,13 +554,14 @@ def command(
 def command(
     name: Optional[str] | CommandFunctionType[ArgT] = None,
     description: Optional[str] = None,
+    aliases: Optional[list[str]] = None,
 ) -> Command[ArgT] | Callable[[CommandFunctionType[ArgT]], Command[ArgT]]:
     """Register a top level command."""
     if callable(name):
         return Command(name)
 
     def wrapper(func: CommandFunctionType[ArgT]) -> Command[ArgT]:
-        return Command(func, name=name, description=description)
+        return Command(func, name=name, description=description, aliases=aliases)
 
     return wrapper
 
