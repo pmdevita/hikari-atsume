@@ -577,6 +577,7 @@ class EventHandlerProtocol(Protocol):
 class Event:
     def __init__(self, func: EventHandlerProtocol) -> None:
         self.func = func
+        # TODO: Improve error checking and messaging on param detection
         signature = inspect.signature(self.func)
         event_parameter = list(signature.parameters.values())[1]
         self.event = event_parameter.annotation
