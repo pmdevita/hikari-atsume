@@ -43,11 +43,11 @@ piccolo = {version = "^1.35.0", extras = ["postgres", "sqlite"]}
 
 [tool.poetry.group.dev.dependencies]
 myst-parser = "^2.0.0"
-sphinx-autodoc2 = "^0.4.2"
+sphinx-autodoc2 = ">=0.4.2,<0.6.0"
 sphinx-autoapi = ">=2.1.1,<4.0.0"
 sphinxcontrib-asyncio = "^0.3.0"
 mypy = {version = "^1.4.1"}
-black = "^23.7.0"
+black = ">=23.7,<25.0"
 pre-commit = "^3.3.3"
 nox = "^2023.4.22"
 nox-poetry = "^1.0.3"
