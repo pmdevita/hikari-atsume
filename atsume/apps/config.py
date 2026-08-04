@@ -4,16 +4,12 @@ import typing
 from pathlib import Path
 from typing import Optional
 
-import sqlalchemy
-
 from atsume.command.model import Command
 from atsume.permissions import import_permission_class
 from atsume.settings import settings
 from atsume.utils import module_to_path
 
 if typing.TYPE_CHECKING:
-    from ormar.models.metaclass import ModelMetaclass
-
     from atsume.permissions.base import AbstractComponentPermissions
 
 
@@ -36,8 +32,6 @@ class AppConfig:
         if not hasattr(self, "verbose_name"):
             self.verbose_name = self.name
         self.module_path = module_path
-        self._models: list["ModelMetaclass"] = []
-        self._model_metadata = sqlalchemy.MetaData()
         self.permissions = None
         if settings.COMPONENT_PERMISSIONS_CLASS:
             permission_class = import_permission_class(
