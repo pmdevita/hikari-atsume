@@ -5,10 +5,10 @@ EnvType = TypeVar("EnvType")
 
 
 def env(
-    key: str, var_type: type[EnvType] = str, default: Optional[EnvType] = None
+    key: str, var_type: type[EnvType] = str, default: Optional[EnvType] = ...
 ) -> EnvType:
     value = os.environ.get(key, default)
-    if value is None:
+    if value is ...:
         raise ValueError(f'Environment variable "{key}" is not set.')
     try:
         cast_value = var_type(value)

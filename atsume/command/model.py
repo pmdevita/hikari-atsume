@@ -421,7 +421,6 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
             raise CommandNotFound()
 
         kwargs = {}
-        options = self.command_model(**kwargs)
         ctx = MessageContext(bot, event)
 
         component = self._get_component()
@@ -436,7 +435,11 @@ class CommandMixin(BaseCommand, Generic[ArgT]):
                     logger.debug(f"Blocked command {command} due to permissions.")
                     return ctx
 
-        await self(ctx, options)
+        if self.command_model:
+            options = self.command_model(**kwargs)
+            await self(ctx, options)
+        else:
+            await self(ctx)
         return ctx
 
     def takes_context_type(self, ctx_class: type[Context]) -> bool:
