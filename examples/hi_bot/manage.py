@@ -14,8 +14,8 @@ All rights reserved.
 
 def main() -> None:
     """Run administrative tasks."""
-    # Bootstrap this folder into the Python path
-    project_dir = Path(__file__).parent
+    # Bootstrap the main folder into the python path
+    project_dir = Path(__file__).parent.parent.parent
     sys.path.append(str(project_dir))
     # Set the management module path
     os.environ.setdefault("ATSUME_SETTINGS_MODULE", "my_bot")
