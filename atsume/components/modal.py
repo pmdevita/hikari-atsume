@@ -73,7 +73,3 @@ class TextInput:
 
     def __get__(self, instance, owner):
         pass
-
-
-class MyModal(ModalModel):
-    test: str = TextInput()
