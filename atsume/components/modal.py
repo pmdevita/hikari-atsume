@@ -13,7 +13,7 @@ class ModalModelMetaclass(type):
         bases: tuple[type[Any], ...],
         namespace: dict[str, Any],
         **kwargs: Any,
-    ) -> "ModalModel | type":
+    ) -> "ModalModelMetaclass":
         if bases == ():
             return super().__new__(mcs, cls_name, bases, namespace, **kwargs)
 

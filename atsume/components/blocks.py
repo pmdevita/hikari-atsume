@@ -1,13 +1,14 @@
 import inspect
 import json
+from abc import abstractmethod, ABC
 from enum import Enum
 from functools import partial
-from typing import TYPE_CHECKING, Optional, Protocol, Union, overload
+from typing import TYPE_CHECKING, Optional, Protocol, Union, overload, Any
 
 import hikari
-from hikari import SelectMenuOption, colors, emojis, files, undefined
+from hikari import SelectMenuOption, colors, emojis, files, undefined, UndefinedType
 from hikari.api import ComponentBuilder
-from hikari.components import ButtonStyle, ComponentType
+from hikari.components import ButtonStyle, ComponentType, SpacingType
 from hikari.impl import (
     ContainerComponentBuilder,
     InteractiveButtonBuilder,
@@ -38,7 +39,8 @@ __all__ = [
 ]
 
 
-class AtsumeComponent:
+class AtsumeComponent(ABC):
+    @abstractmethod
     def build(
         self, bot: hikari.GatewayBot, model: "ComponentModel"
     ) -> ComponentBuilder:
@@ -54,14 +56,14 @@ class TopLevelComponent(AtsumeComponent):
 
 
 class CallbackComponent(AtsumeComponent):
-    def __init__(self, callback: "CallbackProtocol", *args, **kwargs):
+    def __init__(self, callback: "CallbackProtocol", *args: Any, **kwargs: Any) -> None:
         if not inspect.iscoroutinefunction(callback):
             raise Exception(f"Callback for {self} must be async")
 
         self.callback = callback
 
-    def get_callback_name(self, model: "ComponentModel"):
-        data = {}
+    def get_callback_name(self, model: "ComponentModel") -> str:
+        data: dict[str, Any] = {}
         obj = self.callback
         # Destructure partials
         if isinstance(self.callback, partial):
@@ -75,7 +77,8 @@ class CallbackComponent(AtsumeComponent):
             raise Exception(
                 "Component callback must be a method on the ComponentModel."
             )
-        data["f"] = obj.__name__
+        # Functions have names mypy?
+        data["f"] = obj.__name__  # type: ignore[attr-defined]
         return json.dumps(data, separators=(",", ":"))
 
 
@@ -85,10 +88,10 @@ class SelectComponent(CallbackComponent, AtsumeComponent):
     def __init__(
         self,
         callback: "CallbackProtocol",
-        placeholder: Union[str, undefined.UNDEFINED] = undefined.UNDEFINED,
+        placeholder: str | UndefinedType = undefined.UNDEFINED,
         min_values: int = 0,
         max_values: int = 1,
-        disabled: Union[bool, undefined.UNDEFINED] = undefined.UNDEFINED,
+        disabled: bool = False,
     ) -> None:
         super().__init__(callback)
         self.placeholder = placeholder
@@ -98,7 +101,7 @@ class SelectComponent(CallbackComponent, AtsumeComponent):
 
     def build(
         self, bot: hikari.GatewayBot, model: "ComponentModel"
-    ) -> ComponentBuilder:
+    ) -> SelectMenuBuilder:
         component = SelectMenuBuilder(
             type=ComponentType.USER_SELECT_MENU,
             custom_id=self.get_callback_name(model),
@@ -111,12 +114,12 @@ class SelectComponent(CallbackComponent, AtsumeComponent):
 
 
 class CallbackProtocol(Protocol):
-    async def __call__(self):
+    async def __call__(self) -> None:
         pass
 
 
 class CallbackValueProtocol(Protocol):
-    async def __call__(self, value: str):
+    async def __call__(self, value: str) -> None:
         pass
 
 
@@ -125,7 +128,7 @@ class Button(CallbackComponent, AtsumeComponent):
         self,
         label: str,
         callback: CallbackProtocol,
-        emoji: Union[emojis.Emoji, undefined.UNDEFINED] = undefined.UNDEFINED,
+        emoji: emojis.Emoji | UndefinedType = undefined.UNDEFINED,
         style: ButtonStyle = ButtonStyle.PRIMARY,
         disabled: bool = False,
     ) -> None:
@@ -148,15 +151,15 @@ class Button(CallbackComponent, AtsumeComponent):
         return builder
 
 
-class TextSelect(SelectComponent, AtsumeComponent):
+class TextSelect(CallbackComponent, AtsumeComponent):
     def __init__(
         self,
         callback: CallbackProtocol,
         options: list[SelectOptionBuilder],
-        placeholder: Union[str, undefined.UNDEFINED] = undefined.UNDEFINED,
+        placeholder: str | UndefinedType = undefined.UNDEFINED,
         min_values: int = 0,
         max_values: int = 1,
-        disabled: Union[bool, undefined.UNDEFINED] = undefined.UNDEFINED,
+        disabled: bool = False,
     ) -> None:
         super().__init__(callback)
         self.options = options
@@ -201,9 +204,8 @@ class TextDisplay(AtsumeComponent):
 
     def build(
         self, bot: hikari.GatewayBot, model: "ComponentModel"
-    ) -> ComponentBuilder:
-        builder = TextDisplayComponentBuilder(content=self.content)
-        return builder
+    ) -> TextDisplayComponentBuilder:
+        return TextDisplayComponentBuilder(content=self.content)
 
 
 class Thumbnail(AtsumeComponent):
@@ -219,7 +221,7 @@ class Thumbnail(AtsumeComponent):
 
     def build(
         self, bot: hikari.GatewayBot, model: "ComponentModel"
-    ) -> ComponentBuilder:
+    ) -> ThumbnailComponentBuilder:
         builder = ThumbnailComponentBuilder(
             media=self.media, description=self.description
         )
@@ -228,14 +230,14 @@ class Thumbnail(AtsumeComponent):
 
 class ActionRow(TopLevelComponent, AtsumeComponent):
     @overload
-    def __init__(self, component: Button) -> None: ...
+    def __init__(self, component: Button, /) -> None: ...
 
     @overload
-    def __init__(self, component: Button, component2: Button) -> None: ...
+    def __init__(self, component: Button, component2: Button, /) -> None: ...
 
     @overload
     def __init__(
-        self, component: Button, component2: Button, component3: Button
+        self, component: Button, component2: Button, component3: Button, /
     ) -> None: ...
 
     @overload
@@ -245,6 +247,7 @@ class ActionRow(TopLevelComponent, AtsumeComponent):
         component2: Button,
         component3: Button,
         component4: Button,
+        /
     ) -> None: ...
 
     @overload
@@ -255,10 +258,11 @@ class ActionRow(TopLevelComponent, AtsumeComponent):
         component3: Button,
         component4: Button,
         component5: Button,
+        /
     ) -> None: ...
 
     @overload
-    def __init__(self, component: SelectComponent) -> None: ...
+    def __init__(self, component: SelectComponent, /) -> None: ...
 
     def __init__(self, *components: Button | SelectComponent) -> None:
         """
@@ -301,7 +305,7 @@ class Container(TopLevelComponent, AtsumeComponent):
 class Section(TopLevelComponent, AtsumeComponent):
     @overload
     def __init__(
-        self, component: TextDisplay, accessory: Button | Thumbnail
+        self, component: TextDisplay, accessory: Button | Thumbnail, /
     ) -> None: ...
 
     @overload
@@ -310,6 +314,7 @@ class Section(TopLevelComponent, AtsumeComponent):
         component: TextDisplay,
         component2: TextDisplay,
         accessory: Button | Thumbnail,
+        /
     ) -> None: ...
 
     @overload
@@ -319,10 +324,11 @@ class Section(TopLevelComponent, AtsumeComponent):
         component2: TextDisplay,
         component3: TextDisplay,
         accessory: Button | Thumbnail,
+        /
     ) -> None: ...
 
     def __init__(self, *components: TextDisplay | Button | Thumbnail) -> None:
-        text = []
+        self.components: list[TextDisplay] = []
         accessory = None
 
         for component in components:
@@ -331,8 +337,8 @@ class Section(TopLevelComponent, AtsumeComponent):
                     raise Exception("Section can only have one accessory.")
                 accessory = component
             else:
-                text.append(component)
-                if len(text) > 3:
+                self.components.append(component)
+                if len(self.components) > 3:
                     raise Exception(
                         "Section can only have up to 3 TextDisplay components."
                     )
@@ -340,7 +346,6 @@ class Section(TopLevelComponent, AtsumeComponent):
         if accessory is None:
             raise Exception("Section must have an accessory (Button or Thumbnail).")
 
-        self.components = text
         self.accessory = accessory
 
     def build(
@@ -365,7 +370,7 @@ class Separator(TopLevelComponent, AtsumeComponent):
         self, bot: hikari.GatewayBot, model: "ComponentModel"
     ) -> ComponentBuilder:
         return SeparatorComponentBuilder(
-            divider=self.divider, spacing=self.spacing.value
+            divider=self.divider, spacing=SpacingType(self.spacing.value)
         )
 
 
@@ -380,5 +385,5 @@ class Label(TopLevelComponent, AtsumeComponent):
     def build(
         self, bot: hikari.GatewayBot, model: "ComponentModel"
     ) -> ComponentBuilder:
-        builder = TextDisplayComponentBuilder(content=self.content)
+        builder = TextDisplayComponentBuilder(content=self.label)
         return builder
