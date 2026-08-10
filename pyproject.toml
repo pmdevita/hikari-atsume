@@ -70,6 +70,8 @@ sphinx = "^7.0.1"
 sphinx-reload = "^0.2.0"
 furo = "^2023.07.26"
 ruff = ">=0.6.3"
+pytest = "^9.1.1"
+pytest-asyncio = "^1.4.0"
 
 [tool.poetry.scripts]
 atsume = "atsume.cli.project:cli"
