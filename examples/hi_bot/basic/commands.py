@@ -6,6 +6,7 @@ from hikari import MessageCreateEvent
 
 from atsume.command import CommandModel, Group, command, event
 from atsume.command.context import CommandContext, MessageContext
+from atsume.cron import cron
 from atsume.discord import fetch_guild_channel
 
 from .models import PiccoloHiCounter
@@ -68,3 +69,8 @@ async def yell_at_tracking(bot: hikari.GatewayBot, event: MessageCreateEvent) ->
         await channel.send(
             f"Hey {event.author.mention} your link has tracking in it you jerk! Use https://youtube.com/watch?v={matches[0]} instead!"
         )
+
+
+@cron("* * * * *")
+async def test_cron(bot: hikari.GatewayBot) -> None:
+    print("cron!")
