@@ -1,11 +1,14 @@
 import re
+from datetime import datetime, timedelta
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 import hikari
 from hikari import MessageCreateEvent
 
 from atsume.command import CommandModel, Group, command, event
 from atsume.command.context import CommandContext, MessageContext
+from atsume.contrib.schedule import task
 from atsume.cron import cron
 from atsume.discord import fetch_guild_channel
 
@@ -74,3 +77,14 @@ async def yell_at_tracking(bot: hikari.GatewayBot, event: MessageCreateEvent) ->
 @cron("* * * * *")
 async def test_cron(bot: hikari.GatewayBot) -> None:
     print("cron!")
+
+
+@task("my_cool_task")
+async def task():
+    print("task ran!")
+
+
+@command
+async def run_task(ctx: CommandContext):
+    await ctx.respond("running")
+    await task().schedule(datetime.now(ZoneInfo("UTC")) + timedelta(minutes=7))

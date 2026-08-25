@@ -3,7 +3,12 @@ import hikari
 from atsume.settings import env
 from atsume.settings.type_hints import *  # noqa: F403
 
-COMPONENTS = ["basic", "atsume.contrib.handles_gui", "atsume.contrib.handles"]
+COMPONENTS = [
+    "basic",
+    "atsume.contrib.handles_gui",
+    "atsume.contrib.handles",
+    "atsume.contrib.schedule",
+]
 
 # COMPONENT_PERMISSIONS_CLASS = "atsume.permissions.SettingsPermissions"
 COMPONENT_PERMISSIONS_CLASS = "atsume.contrib.handles.permissions.DatabasePermissions"
