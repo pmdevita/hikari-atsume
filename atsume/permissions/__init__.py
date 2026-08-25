@@ -6,20 +6,16 @@ and write your own permissions handler.
 
 """
 
-
 import importlib
 import typing
 
-import tanjun
-
-from .settings_permissions import SettingsPermissions
 from .base import AbstractComponentPermissions
+from .settings_permissions import SettingsPermissions
 
 __all__ = [
     "SettingsPermissions",
     "AbstractComponentPermissions",
     "import_permission_class",
-    "permission_check",
 ]
 
 
@@ -41,23 +37,3 @@ def import_permission_class(
     raise ValueError(
         f"Permissions class {module_path} does not implement {AbstractComponentPermissions.__name__}"
     )
-
-
-def permission_check(
-    permissions: AbstractComponentPermissions,
-) -> typing.Any:
-    """
-    A function that takes an :py:class:`AbstractComponentPermissions` object and returns a Tanjun check that uses it.
-
-    :param permissions: The permissions object to use
-    :returns: An async callable that can be used as a Tanjun check.
-    """
-    async def check(
-        ctx: tanjun.abc.Context, *args: typing.Any, **kwargs: typing.Any
-    ) -> bool:
-        if ctx.guild_id:
-            return permissions.allow_in_guild(ctx.guild_id)
-        else:
-            return permissions.allow_in_dm()
-
-    return check

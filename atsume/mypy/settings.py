@@ -1,10 +1,10 @@
 import typing
 
-import mypy.types
 import mypy.checker
 import mypy.nodes
+import mypy.types
 from mypy.options import Options
-from mypy.plugin import Plugin, AttributeContext
+from mypy.plugin import AttributeContext, Plugin
 
 
 class SettingsPlugin(Plugin):
@@ -51,7 +51,7 @@ class SettingsPlugin(Plugin):
                 "atsume.settings.default_settings"
             )
             if not global_settings:
-                raise ValueError(f"Error getting global Atsume settings")
+                raise ValueError("Error getting global Atsume settings")
             if self.atsume_project_module:
                 project_settings = api.modules.get(
                     f"{self.atsume_project_module}.settings"

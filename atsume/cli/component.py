@@ -1,7 +1,6 @@
 import click
 
-from atsume.cli.base import cli, CLIContext
-
+from atsume.cli.base import CLIContext, cli
 from atsume.templates import create_template
 
 

@@ -25,9 +25,14 @@ def cli(ctx: click.Context) -> None:
     """
     assert isinstance(ctx, CLIContext)
     bot_module = os.environ["ATSUME_SETTINGS_MODULE"]
-    from atsume.bot import create_bot
+    from atsume.bot import initialize_atsume
+    from atsume.settings import settings
 
-    ctx.obj = create_bot(bot_module)
+    settings._initialize(bot_module)
+
+    # Hot reload mode can skip initializing since we'll do it in the subprocess
+    if not (settings.DEBUG and ctx.invoked_subcommand == "run"):
+        initialize_atsume(bot_module)
 
 
 cli.context_class = CLIContext

@@ -1,5 +1,6 @@
-from nox_poetry import session
 import platform
+
+from nox_poetry import session
 
 
 @session

@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 """Atsume's command-line utility for administrative tasks."""
+
+import os
+import sys
+from pathlib import Path
+
 """
 Code adapted from Django.
 Copyright (c) Django Software Foundation and individual contributors.
 All rights reserved.
 """
-
-import os
-import sys
-from pathlib import Path
 
 
 def main() -> None:
@@ -18,6 +19,7 @@ def main() -> None:
     sys.path.append(str(project_dir))
     # Set the management module path
     os.environ.setdefault("ATSUME_SETTINGS_MODULE", "project_name")
+    os.environ.setdefault("PICCOLO_CONF", "atsume.db.conf")
     try:
         from atsume.cli import run_command
     except ImportError as exc:

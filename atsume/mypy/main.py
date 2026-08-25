@@ -1,13 +1,14 @@
 import configparser
-import typing
 import sys
-
-import mypy.types
-from mypy.options import Options
-from mypy.plugin import Plugin, AttributeContext
-import mypy.nodes
-from mypy.modulefinder import mypy_path
+import typing
 from pathlib import Path
+
+import mypy.nodes
+import mypy.types
+from mypy.modulefinder import mypy_path
+from mypy.options import Options
+from mypy.plugin import AttributeContext, Plugin
+
 from .settings import SettingsPlugin
 
 # Adapted from https://github.com/typeddjango/django-stubs/blob/master/mypy_django_plugin/main.py
