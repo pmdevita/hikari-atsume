@@ -1,5 +1,5 @@
 from atsume.command import command
-from atsume.command.context import MessageContext, SlashContext
+from atsume.command.context import CommandContext, MessageContext
 
 from .models import *
 
@@ -8,7 +8,7 @@ from .models import *
 
 @command
 async def hello(
-    ctx: MessageContext | SlashContext,
+    ctx: MessageContext | CommandContext,
 ) -> None:
     member = ctx.author
     if member:
