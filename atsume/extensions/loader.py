@@ -1,8 +1,5 @@
 import importlib
-import logging
 import typing
-
-import tanjun
 
 from atsume.settings import settings
 
@@ -11,11 +8,10 @@ ATSUME_EXTENSIONS = ["atsume.db.manager.hook_database"]
 
 
 class ExtensionCallable:
-    def __call__(self, client: tanjun.Client) -> None:
-        ...
+    def __call__(self, client) -> None: ...
 
 
-def attach_extensions(client: tanjun.Client) -> None:
+def attach_extensions(client) -> None:
     """
     Load the extension modules from the Atsume project settings and hook them
     on to the given `tanjun.Client`.

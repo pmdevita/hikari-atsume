@@ -28,7 +28,7 @@ async def hello(ctx: tanjun.abc.Context, member: Annotated[Optional[Member], "Th
 
 ## Annotated commands: Optional arguments are not positional by default
 
-This is the default in Discord.py. Expected `-prefix hi @user` to output `Hi user!` but it would 
+This is the default in Discord.py. Expected `-prefix hi @user` to output `Hi user!` but it would
 not receive the argument. For this example, the correct command is `-prefix hi --member user`.
 
 ```python
@@ -67,7 +67,7 @@ sure where to store data here.)
       - Also did it for Component open, close, and scheduler
 
 
-# Ormar 
+# Ormar
 
-- Autoincrement is on by default on a primary key integer and this blocks manually setting 
+- Autoincrement is on by default on a primary key integer and this blocks manually setting
 it in some cases (for example, creating an id of 0)

@@ -5,13 +5,15 @@ variables used by the Atsume framework.
 
 """
 
-
 import importlib
-import typing
 import types
+import typing
 
 from atsume.settings import default_settings as _DEFAULT
-from atsume.settings import type_hints
+
+from .env import env
+
+__all__ = ["env", "settings"]
 
 
 class Settings:
@@ -20,7 +22,10 @@ class Settings:
 
     def _initialize(self, bot_module: str) -> None:
         self._SETTINGS = importlib.import_module(f"{bot_module}.settings")
-        self._LOCAL = importlib.import_module(f"{bot_module}.local")
+        try:
+            self._LOCAL = importlib.import_module(f"{bot_module}.local")
+        except ModuleNotFoundError:
+            self._LOCAL = object()
 
     def __getattribute__(self, item: str) -> typing.Any:
         try:

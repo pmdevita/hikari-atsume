@@ -4,8 +4,10 @@
 Command line tools for generating an Atsume project.
 
 """
-import click
+
 import os
+
+import click
 
 from atsume.templates import create_template
 

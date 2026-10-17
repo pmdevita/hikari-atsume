@@ -1,6 +1,6 @@
 # Tutorial
 
-In this tutorial, we'll cover the basics of creating a bot, a component with both slash and message commands, 
+In this tutorial, we'll cover the basics of creating a bot, a component with both slash and message commands,
 database models to store data, and managing our database through migrations.
 
 

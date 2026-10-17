@@ -24,7 +24,6 @@ Example
 
 """
 
-
 import typing
 
 from hikari import Intents
@@ -49,25 +48,25 @@ COMPONENTS: list[str]
 
 COMPONENT_PERMISSIONS_CLASS: typing.Optional[str]
 """
-An optional module path to a Permissions class 
+An optional module path to a Permissions class
 (must implement :py:class:`atsume.permissions.AbstractComponentPermissions`).
 """
 
 COMPONENT_ALL_GUILDS_PERMISSIONS: list[str]
 """
-For use with :py:class:`atsume.permissions.SettingsPermissions`, 
+For use with :py:class:`atsume.permissions.SettingsPermissions`,
 a list of component module paths for those that have access to all guilds.
 """
 
 COMPONENT_DM_PERMISSIONS: list[str]
 """
-For use with :py:class:`atsume.permissions.SettingsPermissions`, 
+For use with :py:class:`atsume.permissions.SettingsPermissions`,
 a list of component module paths for those that have access to DMs.
 """
 
 COMPONENT_GUILD_PERMISSIONS: dict[int, list[str]]
 """
-For use with :py:class:`atsume.permissions.SettingsPermissions`, a dictionary mapping Discord Guild IDs 
+For use with :py:class:`atsume.permissions.SettingsPermissions`, a dictionary mapping Discord Guild IDs
 to a list of allowed component module paths.
 """
 

@@ -1,14 +1,11 @@
 import asyncio
+import logging
 import traceback
 import typing
 from datetime import datetime, timedelta
-import weakref
-from zoneinfo import ZoneInfo
 
 import alluka
-import hikari.events.guild_events
 import tanjun
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +42,7 @@ class TimerTask:
             self._run = True  # Done in case the running task wants to know if it should cancel it
         try:
             await self._callback(*self.args, **self.kwargs)
-        except:
+        except Exception:
             print(traceback.format_exc())
 
         if self.repeat:

@@ -1,20 +1,20 @@
 # Migrations
 
-Atsume integrates [Alembic](https://alembic.sqlalchemy.org/en/latest/index.html) 
-for performing semi-automatic database migrations. A migration is a 
-database operation that takes us from a previous definition of the 
-models to the current. 
+Atsume integrates [Alembic](https://alembic.sqlalchemy.org/en/latest/index.html)
+for performing semi-automatic database migrations. A migration is a
+database operation that takes us from a previous definition of the
+models to the current.
 
 :::warning
-Atsume's migrations are still under heavy development! While 
-it can handle many simple tasks fine, it may not always catch 
-more complicated model modifications. It's a good idea to always 
+Atsume's migrations are still under heavy development! While
+it can handle many simple tasks fine, it may not always catch
+more complicated model modifications. It's a good idea to always
 double-check the generated migration files before running them.
 :::
 
 ## Limitations
 
-Atsume's automatic generation of migrations largely shares the same list of 
+Atsume's automatic generation of migrations largely shares the same list of
 limitations as Alembic. This notably includes:
 
 - Changes to table, column, or constraint name
@@ -22,7 +22,7 @@ limitations as Alembic. This notably includes:
 
 To create migrations for these changes, they must be created manually, which is covered later.
 
-Extending Alembic to add support for automatically generating these changes is 
+Extending Alembic to add support for automatically generating these changes is
 on the roadmap.
 
 ## Commands
@@ -60,10 +60,8 @@ python manage.py upgrade my_component
 
 ## Auto-formatting Migrations
 
-Migrations are automatically formatted if you have the `black` package installed. 
+Migrations are automatically formatted if you have the `black` package installed.
 
 ```shell
 pip install black
 ```
-
-
