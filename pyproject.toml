@@ -24,7 +24,8 @@ dependencies = [
     "aiosqlite (>=0.22.1, <1.0.0)",
     "hupper (>=1.12.1, <2.0.0)",
     "pydantic (>=2.5.3,<3.0.0)",
-    "piccolo (>=1.35.0, <2.0.0)"
+    "piccolo (>=1.35.0, <2.0.0)",
+    "croniter (>=6.2.4,<7.0.0)"
 ]
 
 [project.urls]
@@ -70,6 +71,8 @@ sphinx = "^7.0.1"
 sphinx-reload = "^0.2.0"
 furo = "^2023.07.26"
 ruff = ">=0.6.3"
+pytest = "^9.1.1"
+pytest-asyncio = "^1.4.0"
 
 [tool.poetry.scripts]
 atsume = "atsume.cli.project:cli"
