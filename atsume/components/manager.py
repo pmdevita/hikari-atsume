@@ -28,6 +28,11 @@ class ComponentManager:
         self, event: hikari.ComponentInteractionCreateEvent
     ):
         print("interaction!")
+
+        await event.interaction.create_initial_response(
+            ResponseType.DEFERRED_MESSAGE_UPDATE
+        )
+
         message = event.interaction.message
         window = self.windows.get(message.id, None)
         if not window:
@@ -63,9 +68,7 @@ class ComponentManager:
             )
         rendered = await window.build(self.bot)
         # await event.interaction.message.edit(component=rendered)
-        await event.interaction.create_initial_response(
-            response_type=ResponseType.MESSAGE_UPDATE, components=rendered
-        )
+        await event.interaction.edit_initial_response(components=rendered)
         await WindowState.serialize_from_component(message.id, window)
 
         # await event.interaction.edit_initial_response(component=rendered)

@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 SCHEDULE_FETCH_AHEAD = getattr(settings, "SCHEDULE_FETCH_AHEAD", 300)
 
 
-def get_function_path(func: Callable[Any]) -> str:
+def get_function_path(func: Callable[[...], Any]) -> str:
     return func.__module__ + "." + func.__name__
 
 
