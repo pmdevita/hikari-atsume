@@ -173,7 +173,9 @@ class CommandManager:
         if event.message.content is None:
             return
 
-        if not event.message.content.startswith(settings.MESSAGE_PREFIX):
+        if not settings.MESSAGE_PREFIX or not event.message.content.startswith(
+            settings.MESSAGE_PREFIX
+        ):
             return
 
         command = shlex.split(
