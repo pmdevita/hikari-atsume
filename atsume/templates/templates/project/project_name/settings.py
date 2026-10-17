@@ -4,11 +4,15 @@ from atsume.settings.type_hints import *
 
 TOKEN = "MTIzNDU2Nzg5MA==.Your Discord Bot Token"
 
-DATABASE_URL = "sqlite:///db.sqlite"
+DATABASE_URL = "sqlite://db.sqlite"
 
 DEBUG = True
 
-COMPONENTS = []
+COMPONENTS = [
+    "atsume.contrib.handles_gui",
+    "atsume.contrib.handles",
+    "atsume.contrib.schedule",
+]
 
 EXTENSIONS = []
 
